@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataPilot</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #111827;
+            --surface2: #1a2235;
+            --border: #1e2d45;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --accent3: #10b981;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --card-glow: 0 0 30px rgba(0, 212, 255, 0.07);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* ── MAIN ── */
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* ── UPLOAD ZONE ── */
+        .upload-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .upload-section h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-section p {
+            color: var(--muted);
+            font-size: 1rem;
+            margin-bottom: 32px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 56px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.04) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--accent);
+            box-shadow: var(--card-glow);
+        }
+
+        .drop-zone:hover::before,
+        .drop-zone.dragover::before {
+            opacity: 1;
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .drop-zone h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .drop-zone p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ── LOADING ── */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading p {
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        /* ── OVERVIEW ── */
+        #overview {
+            display: none;
+        }
+
+        #overview.active {
+            display: block;
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .overview-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .file-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-glow);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .stat-card.blue::after {
+            background: var(--accent);
+        }
+
+        .stat-card.purple::after {
+            background: var(--accent2);
+        }
+
+        .stat-card.green::after {
+            background: var(--accent3);
+        }
+
+        .stat-card.warn::after {
+            background: var(--warn);
+        }
+
+        .stat-card.danger::after {
+            background: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Space Mono', monospace;
+            line-height: 1;
+        }
+
+        .stat-card.blue .stat-value {
+            color: var(--accent);
+        }
+
+        .stat-card.purple .stat-value {
+            color: #a78bfa;
+        }
+
+        .stat-card.green .stat-value {
+            color: var(--accent3);
+        }
+
+        .stat-card.warn .stat-value {
+            color: var(--warn);
+        }
+
+        .stat-card.danger .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── HEALTH SCORE ── */
+        .health-bar-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .health-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .health-bar-bg {
+            flex: 1;
+            min-width: 200px;
+            height: 10px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--accent3), var(--accent));
+            transition: width 1s cubic-bezier(.4, 0, .2, 1);
+            width: 0%;
+        }
+
+        .health-score-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent3);
+            white-space: nowrap;
+        }
+
+        /* ── CLEAN BUTTON ── */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #0099cc);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-warn {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warn);
+        }
+
+        .btn-warn:hover {
+            background: rgba(245, 158, 11, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .badge-rec {
+            font-size: 0.65rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent3);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* ── COLUMNS TABLE ── */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        thead th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--surface2);
+        }
+
+        tbody td {
+            padding: 13px 18px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .col-name {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .dtype-tag {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .dtype-str {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .dtype-int {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .dtype-float {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent3);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .null-zero {
+            color: var(--accent3);
+        }
+
+        .null-some {
+            color: var(--warn);
+        }
+
+        .null-many {
+            color: var(--danger);
+        }
+
+        /* ── SAMPLE TABLE ── */
+        .sample-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: auto;
+            margin-bottom: 28px;
+        }
+
+        .sample-wrap table thead th {
+            color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        /* ── CLEAN MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .modal h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
+        .clean-option {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+
+        .clean-option label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .clean-option select {
+            margin-top: 8px;
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+        }
+
+        .clean-preview {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 16px 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent3);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--surface);
+            border: 1px solid var(--accent3);
+            color: var(--accent3);
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 300;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: fadeUp 0.3s ease;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">✈</div>
+            Data<span>Pilot</span>
+        </div>
+        <div class="nav-badge">v1.0 · AI Data Analyst</div>
+    </nav>
+
+    <main>
+
+        <!-- UPLOAD -->
+        <div class="upload-section" id="uploadSection">
+            <h1>Navigate Your Data<br>with AI</h1>
+            <p>Upload a CSV or Excel file and let DataPilot analyze it instantly</p>
+
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
+                <span class="drop-icon">📂</span>
+                <h3>Drop your file here</h3>
+                <p>Supports CSV, XLSX, XLS · Max 50MB</p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing your file...</p>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview">
+
+            <div class="overview-header">
+                <h2>📊 File Overview</h2>
+                <div class="file-badge">
+                    <span>📄</span>
+                    <span id="badgeFilename">—</span>
+                </div>
+            </div>
+
+            <!-- STAT CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-label">Total Rows</div>
+                    <div class="stat-value" id="statRows">—</div>
+                    <div class="stat-sub">data records</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Columns</div>
+                    <div class="stat-value" id="statCols">—</div>
+                    <div class="stat-sub">features</div>
+                </div>
+                <div class="stat-card warn">
+                    <div class="stat-label">Duplicates</div>
+                    <div class="stat-value" id="statDupes">—</div>
+                    <div class="stat-sub">duplicate rows</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Null Values</div>
+                    <div class="stat-value" id="statNulls">—</div>
+                    <div class="stat-sub">missing cells</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-label">File Size</div>
+                    <div class="stat-value" id="statSize">—</div>
+                    <div class="stat-sub">file size</div>
+                </div>
+            </div>
+
+            <!-- HEALTH SCORE -->
+            <div class="health-bar-wrap">
+                <div class="health-label">Data Health Score</div>
+                <div class="health-bar-bg">
+                    <div class="health-bar-fill" id="healthFill"></div>
+                </div>
+                <div class="health-score-val" id="healthScore">—</div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-bar">
+                <button class="btn btn-warn" id="cleanBtn">
+                    🧹 Clean Data
+                    <span class="badge-rec">Recommended</span>
+                </button>
+                <button class="btn btn-outline" id="resetBtn">
+                    ↩ Upload New File
+                </button>
+            </div>
+
+            <!-- COLUMN PROFILE -->
+            <div class="section-title">Column Profile</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Null Count</th>
+                            <th>Null %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="colTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- SAMPLE DATA -->
+            <div class="section-title">Sample Data (Top 5 Rows)</div>
+            <div class="sample-wrap">
+                <table>
+                    <thead id="sampleHead"></thead>
+                    <tbody id="sampleBody"></tbody>
+                </table>
+            </div>
+
+        </div><!-- /overview -->
+    </main>
+
+    <!-- CLEAN MODAL -->
+    <div class="modal-overlay" id="cleanModal">
+        <div class="modal">
+            <h3>🧹 Clean Data</h3>
+            <p>Choose how you want to handle data quality issues before proceeding.</p>
+
+            <div class="clean-option">
+                <label>
+                    <input type="checkbox" id="removeDupes" checked />
+                    Remove duplicate rows
+                </label>
+            </div>
+
+            <div class="clean-option">
+                <label>
+                    <input type="checkbox" id="handleNulls" checked />
+                    Handle null / missing values
+                </label>
+                <select id="nullStrategy">
+                    <option value="drop">Drop rows with nulls</option>
+                    <option value="mean">Fill numeric nulls with mean</option>
+                    <option value="median">Fill numeric nulls with median</option>
+                    <option value="unknown">Fill text nulls with "Unknown"</option>
+                </select>
+            </div>
+
+            <div class="clean-preview" id="cleanPreview">
+                ⚡ Loading preview...
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="cancelClean">Cancel</button>
+                <button class="btn btn-primary" id="confirmClean">Apply Cleaning</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
+
+    <script>
+        let currentData = null;
+        let fileSize = 0;
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const overview = document.getElementById('overview');
+        const uploadSec = document.getElementById('uploadSection');
+
+        // Drag & drop styling
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFile(fileInput.files[0]);
+        });
+
+        async function handleFile(file) {
+            fileSize = file.size;
+            uploadSec.style.display = 'none';
+            loading.classList.add('active');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('http://localhost:8000/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                currentData = data;
+                renderOverview(data);
+            } catch (err) {
+                alert('Error uploading file. Is the server running?');
+                resetUI();
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function renderOverview(data) {
+            // Badge & stats
+            document.getElementById('badgeFilename').textContent = data.filename;
+            document.getElementById('statRows').textContent = data.rows.toLocaleString();
+            document.getElementById('statCols').textContent = data.columns;
+            document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
+            document.getElementById('statSize').textContent = formatSize(fileSize);
+
+            const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
+            document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
+
+            // Health score
+            const totalCells = data.rows * data.columns;
+            const nullPct = totalNulls / totalCells;
+            const dupePct = data.duplicate_rows / data.rows;
+            const health = Math.max(0, Math.round((1 - nullPct * 0.5 - dupePct * 0.5) * 100));
+
+            document.getElementById('healthScore').textContent = health + '%';
+            setTimeout(() => {
+                document.getElementById('healthFill').style.width = health + '%';
+                const fill = document.getElementById('healthFill');
+                if (health < 50) fill.style.background = 'linear-gradient(90deg, #ef4444, #f59e0b)';
+                else if (health < 80) fill.style.background = 'linear-gradient(90deg, #f59e0b, #00d4ff)';
+            }, 100);
+
+            // Column profile table
+            const colBody = document.getElementById('colTableBody');
+            colBody.innerHTML = '';
+            data.column_names.forEach((col, i) => {
+                const nullCount = data.null_counts[col] || 0;
+                const nullPctVal = ((nullCount / data.rows) * 100).toFixed(1);
+                const dtype = data.dtypes[col] || 'unknown';
+                const dtypeClass = dtype.includes('int') || dtype.includes('float') ? (dtype.includes('float') ? 'dtype-float' : 'dtype-int') : 'dtype-str';
+                const nullClass = nullCount === 0 ? 'null-zero' : nullCount < data.rows * 0.1 ? 'null-some' : 'null-many';
+
+                colBody.innerHTML += `
+          <tr>
+            <td style="color:var(--muted)">${i + 1}</td>
+            <td class="col-name">${col}</td>
+            <td><span class="dtype-tag ${dtypeClass}">${dtype}</span></td>
+            <td class="${nullClass}">${nullCount.toLocaleString()}</td>
+            <td class="${nullClass}">${nullPctVal}%</td>
+          </tr>`;
+            });
+
+            // Sample data table
+            const sampleHead = document.getElementById('sampleHead');
+            const sampleBody = document.getElementById('sampleBody');
+            sampleHead.innerHTML = '<tr>' + data.column_names.map(c => `<th>${c}</th>`).join('') + '</tr>';
+            sampleBody.innerHTML = data.sample.map(row =>
+                '<tr>' + data.column_names.map(c => `<td>${row[c] ?? '—'}</td>`).join('') + '</tr>'
+            ).join('');
+
+            overview.classList.add('active');
+        }
+
+        // Clean modal
+        document.getElementById('cleanBtn').addEventListener('click', () => {
+            if (!currentData) return;
+            updateCleanPreview();
+            document.getElementById('cleanModal').classList.add('active');
+        });
+
+        function updateCleanPreview() {
+            const dupes = document.getElementById('removeDupes').checked;
+            const nulls = document.getElementById('handleNulls').checked;
+            const strategy = document.getElementById('nullStrategy').value;
+            const totalNulls = Object.values(currentData.null_counts).reduce((a, b) => a + b, 0);
+
+            let lines = [];
+            if (dupes && currentData.duplicate_rows > 0)
+                lines.push(`🗑 ${currentData.duplicate_rows.toLocaleString()} duplicate rows will be removed`);
+            if (nulls && totalNulls > 0)
+                lines.push(`🔧 ${totalNulls.toLocaleString()} null values will be handled (${strategy})`);
+            if (lines.length === 0)
+                lines.push('✅ No cleaning needed — data looks good!');
+
+            lines.push(`📊 Rows before: ${currentData.rows.toLocaleString()}`);
+            if (dupes) lines.push(`📊 Rows after:  ~${(currentData.rows - currentData.duplicate_rows).toLocaleString()}`);
+
+            document.getElementById('cleanPreview').innerHTML = lines.join('<br>');
+        }
+
+        document.getElementById('removeDupes').addEventListener('change', updateCleanPreview);
+        document.getElementById('handleNulls').addEventListener('change', updateCleanPreview);
+        document.getElementById('nullStrategy').addEventListener('change', updateCleanPreview);
+
+        document.getElementById('cancelClean').addEventListener('click', () => {
+            document.getElementById('cleanModal').classList.remove('active');
+        });
+
+        document.getElementById('confirmClean').addEventListener('click', () => {
+            document.getElementById('cleanModal').classList.remove('active');
+            showToast('Data cleaned successfully!');
+            // TODO: wire to /api/clean/ endpoint
+        });
+
+        // Reset
+        document.getElementById('resetBtn').addEventListener('click', resetUI);
+
+        function resetUI() {
+            currentData = null;
+            overview.classList.remove('active');
+            uploadSec.style.display = 'block';
+            fileInput.value = '';
+        }
+
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+    </script>
+</body>
+
+</html>
