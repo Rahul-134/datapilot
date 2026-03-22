@@ -1,5 +1,20 @@
 import pandas as pd
 import io
+import math
+
+# In-memory store — holds the current session's DataFrame
+_store: dict = {"df": None, "filename": None}
+
+def get_stored_df():
+    return _store["df"]
+
+def sanitize(value):
+    if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+        return None
+    return value
+
+def sanitize_row(row: dict) -> dict:
+    return {k: sanitize(v) for k, v in row.items()}
 
 async def parse_file(file):
     contents = await file.read()
@@ -11,6 +26,10 @@ async def parse_file(file):
     else:
         return {"error": "Unsupported file format"}
 
+    # Store original df in memory
+    _store["df"] = df.copy()
+    _store["filename"] = file.filename
+
     overview = {
         "filename": file.filename,
         "rows": df.shape[0],
@@ -19,7 +38,7 @@ async def parse_file(file):
         "dtypes": df.dtypes.astype(str).to_dict(),
         "null_counts": df.isnull().sum().to_dict(),
         "duplicate_rows": int(df.duplicated().sum()),
-        "sample": df.head(5).to_dict(orient="records")
+        "sample": [sanitize_row(row) for row in df.head(5).to_dict(orient="records")]
     }
 
     return overview
