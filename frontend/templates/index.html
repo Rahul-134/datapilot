@@ -1028,10 +1028,91 @@
             document.getElementById('cleanModal').classList.remove('active');
         });
 
-        document.getElementById('confirmClean').addEventListener('click', () => {
+        document.getElementById('confirmClean').addEventListener('click', async () => {
             document.getElementById('cleanModal').classList.remove('active');
-            showToast('Data cleaned successfully!');
-            // TODO: wire to /api/clean/ endpoint
+
+            // Show loading state on button
+            const cleanBtn = document.getElementById('cleanBtn');
+            cleanBtn.disabled = true;
+            cleanBtn.innerHTML = '⏳ Cleaning...';
+
+            const payload = {
+                remove_duplicates: document.getElementById('removeDupes').checked,
+                handle_nulls: document.getElementById('handleNulls').checked,
+                null_strategy: document.getElementById('nullStrategy').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:8000/api/clean/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    showToast('❌ ' + data.error);
+                    return;
+                }
+
+                // Update stat cards with cleaned values
+                document.getElementById('statRows').textContent = data.final_rows.toLocaleString();
+                document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
+                const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
+                document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
+
+                // Recalculate health score
+                const totalCells = data.final_rows * currentData.columns;
+                const nullPct = totalNulls / totalCells;
+                const dupePct = data.duplicate_rows / data.final_rows;
+                const health = Math.max(0, Math.round((1 - nullPct * 0.5 - dupePct * 0.5) * 100));
+                document.getElementById('healthScore').textContent = health + '%';
+                document.getElementById('healthFill').style.width = health + '%';
+
+                // Update sample table
+                // Update sample table
+                if (data.sample && currentData) {
+                    const sampleBody = document.getElementById('sampleBody');
+                    sampleBody.innerHTML = data.sample.map(row =>
+                        '<tr>' + currentData.column_names.map(c => `<td>${row[c] ?? '—'}</td>`).join('') + '</tr>'
+                    ).join('');
+                }
+
+                // Update column profile table with new null counts
+                const colBody = document.getElementById('colTableBody');
+                colBody.innerHTML = '';
+                currentData.column_names.forEach((col, i) => {
+                    const nullCount = data.null_counts[col] || 0;
+                    const nullPctVal = ((nullCount / data.final_rows) * 100).toFixed(1);
+                    const dtype = currentData.dtypes[col] || 'unknown';
+                    const dtypeClass = dtype.includes('float') ? 'dtype-float' : dtype.includes('int') ? 'dtype-int' : 'dtype-str';
+                    const nullClass = nullCount === 0 ? 'null-zero' : nullCount < data.final_rows * 0.1 ? 'null-some' : 'null-many';
+
+                    colBody.innerHTML += `
+        <tr>
+            <td style="color:var(--muted)">${i + 1}</td>
+            <td class="col-name">${col}</td>
+            <td><span class="dtype-tag ${dtypeClass}">${dtype}</span></td>
+            <td class="${nullClass}">${nullCount.toLocaleString()}</td>
+            <td class="${nullClass}">${nullPctVal}%</td>
+        </tr>`;
+                });
+
+                // Keep currentData null_counts in sync for future modal previews
+                currentData.null_counts = data.null_counts;
+                currentData.rows = data.final_rows;
+                currentData.duplicate_rows = data.duplicate_rows;
+
+                // Disable clean button — already cleaned
+                cleanBtn.innerHTML = '✅ Data Cleaned';
+
+                showToast(`Done! ${data.rows_removed} rows removed, ${data.nulls_handled} nulls handled.`);
+
+            } catch (err) {
+                showToast('❌ Cleaning failed. Is the server running?');
+                cleanBtn.disabled = false;
+                cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
+            }
         });
 
         // Reset
@@ -1042,6 +1123,20 @@
             overview.classList.remove('active');
             uploadSec.style.display = 'block';
             fileInput.value = '';
+
+            // Reset clean button fully
+            const cleanBtn = document.getElementById('cleanBtn');
+            cleanBtn.disabled = false;
+            cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
+
+            // Reset health bar
+            document.getElementById('healthFill').style.width = '0%';
+            document.getElementById('healthScore').textContent = '—';
+
+            // Reset modal checkboxes to defaults
+            document.getElementById('removeDupes').checked = true;
+            document.getElementById('handleNulls').checked = true;
+            document.getElementById('nullStrategy').value = 'drop';
         }
 
         // Toast
