@@ -812,6 +812,12 @@
                     🧹 Clean Data
                     <span class="badge-rec">Recommended</span>
                 </button>
+                <button class="btn btn-outline" id="resetFileBtn">
+                    🔄 Reset File
+                </button>
+                <button class="btn btn-primary" id="downloadBtn" style="display:none">
+                    ⬇ Download Cleaned File
+                </button>
                 <button class="btn btn-outline" id="resetBtn">
                     ↩ Upload New File
                 </button>
@@ -1105,6 +1111,7 @@
 
                 // Disable clean button — already cleaned
                 cleanBtn.innerHTML = '✅ Data Cleaned';
+                document.getElementById('downloadBtn').style.display = 'flex';
 
                 showToast(`Done! ${data.rows_removed} rows removed, ${data.nulls_handled} nulls handled.`);
 
@@ -1115,7 +1122,50 @@
             }
         });
 
-        // Reset
+        // Reset File — restores original uploaded file stats
+        document.getElementById('resetFileBtn').addEventListener('click', async () => {
+            try {
+                await fetch('http://localhost:8000/api/clean/reset', { method: 'POST' });
+
+                // Re-upload the same file to restore original state
+                const file = fileInput.files[0];
+                if (!file) { showToast('❌ No file to reset.'); return; }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
+                const data = await res.json();
+                currentData = data;
+
+                // Re-render overview with original data
+                renderOverview(data);
+
+                // Reset clean button
+                const cleanBtn = document.getElementById('cleanBtn');
+                cleanBtn.disabled = false;
+                cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
+
+                // Hide download button
+                document.getElementById('downloadBtn').style.display = 'none';
+
+                // Reset modal defaults
+                document.getElementById('removeDupes').checked = true;
+                document.getElementById('handleNulls').checked = true;
+                document.getElementById('nullStrategy').value = 'drop';
+
+                showToast('File reset to original state.');
+            } catch (err) {
+                showToast('❌ Reset failed.');
+            }
+        });
+
+        // Download cleaned file
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            window.location.href = 'http://localhost:8000/api/clean/download';
+        });
+
+        // Upload New File
         document.getElementById('resetBtn').addEventListener('click', resetUI);
 
         function resetUI() {

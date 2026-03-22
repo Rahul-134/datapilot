@@ -2,7 +2,6 @@ import pandas as pd
 import io
 import math
 
-# In-memory store — holds the current session's DataFrame
 _store: dict = {"df": None, "filename": None}
 
 def get_stored_df():
@@ -26,19 +25,24 @@ async def parse_file(file):
     else:
         return {"error": "Unsupported file format"}
 
-    # Store original df in memory
-    _store["df"] = df.copy()
+    # Attach filename as a custom attribute so cleaner can use it
+    df._datapilot_filename = file.filename
+
+    _store["df"]       = df.copy()
     _store["filename"] = file.filename
 
+    # Preserve custom attribute on the stored copy
+    _store["df"]._datapilot_filename = file.filename
+
     overview = {
-        "filename": file.filename,
-        "rows": df.shape[0],
-        "columns": df.shape[1],
-        "column_names": df.columns.tolist(),
-        "dtypes": df.dtypes.astype(str).to_dict(),
-        "null_counts": df.isnull().sum().to_dict(),
+        "filename":       file.filename,
+        "rows":           df.shape[0],
+        "columns":        df.shape[1],
+        "column_names":   df.columns.tolist(),
+        "dtypes":         df.dtypes.astype(str).to_dict(),
+        "null_counts":    df.isnull().sum().to_dict(),
         "duplicate_rows": int(df.duplicated().sum()),
-        "sample": [sanitize_row(row) for row in df.head(5).to_dict(orient="records")]
+        "sample":         [sanitize_row(row) for row in df.head(5).to_dict(orient="records")]
     }
 
     return overview

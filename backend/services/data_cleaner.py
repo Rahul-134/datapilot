@@ -12,15 +12,14 @@ def sanitize_row(row: dict) -> dict:
 def clean_dataframe(df: pd.DataFrame, remove_duplicates: bool, handle_nulls: bool, null_strategy: str) -> dict:
 
     original_rows = df.shape[0]
+    filename      = getattr(df, "_datapilot_filename", None)
     dupes_removed = 0
     nulls_handled = 0
 
-    # Step 1 — Remove duplicates
     if remove_duplicates:
         dupes_removed = int(df.duplicated().sum())
         df = df.drop_duplicates()
 
-    # Step 2 — Handle nulls
     if handle_nulls:
         nulls_handled = int(df.isnull().sum().sum())
 
@@ -48,13 +47,15 @@ def clean_dataframe(df: pd.DataFrame, remove_duplicates: bool, handle_nulls: boo
     final_rows = df.shape[0]
 
     return {
-        "success": True,
+        "_df":           df,                # internal — used for download, stripped before API response
+        "filename":      filename,          # internal — used for download filename
+        "success":       True,
         "original_rows": original_rows,
-        "final_rows": final_rows,
-        "rows_removed": original_rows - final_rows,
+        "final_rows":    final_rows,
+        "rows_removed":  original_rows - final_rows,
         "dupes_removed": dupes_removed,
         "nulls_handled": nulls_handled,
-        "null_counts": df.isnull().sum().to_dict(),
+        "null_counts":   df.isnull().sum().to_dict(),
         "duplicate_rows": int(df.duplicated().sum()),
-        "sample": [sanitize_row(row) for row in df.head(5).to_dict(orient="records")]
+        "sample":        [sanitize_row(row) for row in df.head(5).to_dict(orient="records")]
     }
