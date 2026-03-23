@@ -908,6 +908,69 @@
         .query-error.active {
             display: block;
         }
+
+        /* ── SPEECH ── */
+        .mic-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .mic-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .mic-btn.listening {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            animation: mic-pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes mic-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .mic-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--muted);
+            margin-top: 6px;
+            min-height: 18px;
+            transition: color 0.2s;
+        }
+
+        .mic-status.active {
+            color: var(--danger);
+        }
+
+        .speech-not-supported {
+            display: none;
+            font-size: 0.75rem;
+            color: var(--danger);
+            font-family: 'Space Mono', monospace;
+            margin-top: 6px;
+        }
     </style>
 </head>
 
@@ -1052,10 +1115,22 @@
                 <!-- Input box -->
                 <div class="query-box">
                     <div class="query-input-wrap">
-                        <label>Enter your prompt</label>
+                        <label>Enter your prompt or speak</label>
                         <textarea class="query-input" id="queryInput"
                             placeholder="e.g. Show me the top 10 cars by selling price..." rows="1"></textarea>
+                        <div class="mic-status" id="micStatus"></div>
+                        <div class="speech-not-supported" id="speechNotSupported">
+                            ⚠ Speech recognition not supported in this browser. Use Chrome or Edge.
+                        </div>
                     </div>
+
+                    <!-- Mic button -->
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                        <button class="mic-btn" id="micBtn" title="Hold to speak / click to toggle">
+                            🎤
+                        </button>
+                    </div>
+
                     <button class="btn btn-ask" id="askBtn">⚡ Ask</button>
                 </div>
 
@@ -1553,6 +1628,178 @@
 
         function downloadQueryResult(format) {
             window.location.href = `http://localhost:8000/api/query/download?format=${format}`;
+        }
+
+        // ── SPEECH TO TEXT ──
+        const micBtn = document.getElementById('micBtn');
+        const micStatus = document.getElementById('micStatus');
+        const queryInput = document.getElementById('queryInput');
+
+        let recognition = null;
+        let isListening = false;
+        let silenceTimer = null;
+        const SILENCE_DELAY = 2000; // auto-fire query after 2s of silence
+
+        // Check browser support
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            micBtn.style.display = 'none';
+            document.getElementById('speechNotSupported').style.display = 'block';
+        } else {
+            setupSpeechRecognition();
+        }
+
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.continuous = true;   // keep listening
+            recognition.interimResults = true;   // show live transcript
+            recognition.lang = 'en-US';
+
+            // Live transcript — show interim results in input box
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Show live text in input
+                queryInput.value = finalTranscript || interimTranscript;
+
+                // Reset silence timer on every new speech result
+                clearTimeout(silenceTimer);
+
+                // If we have a final transcript, start silence countdown
+                if (finalTranscript.trim()) {
+                    micStatus.textContent = '🟠 Processing in 2s... (keep speaking to cancel)';
+                    silenceTimer = setTimeout(() => {
+                        if (isListening && queryInput.value.trim()) {
+                            micStatus.textContent = '⚡ Running query...';
+                            runQuery();         // auto-fire query
+                        }
+                    }, SILENCE_DELAY);
+                }
+            };
+
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('listening');
+                micBtn.textContent = '⏹';
+                micStatus.textContent = '🔴 Listening... speak your query';
+                micStatus.classList.add('active');
+            };
+
+            recognition.onend = () => {
+                // Auto-restart if still supposed to be listening
+                if (isListening) {
+                    recognition.start();
+                } else {
+                    micBtn.classList.remove('listening');
+                    micBtn.textContent = '🎤';
+                    micStatus.textContent = '';
+                    micStatus.classList.remove('active');
+                }
+            };
+
+            recognition.onerror = (event) => {
+                // Ignore no-speech errors — just keep listening
+                if (event.error === 'no-speech') return;
+
+                // For other errors stop and show message
+                isListening = false;
+                micBtn.classList.remove('listening');
+                micBtn.textContent = '🎤';
+                micStatus.textContent = `⚠ Mic error: ${event.error}`;
+                micStatus.classList.remove('active');
+            };
+        }
+
+        // Toggle mic on click
+        micBtn.addEventListener('click', () => {
+            if (!recognition) return;
+
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        });
+
+        function startListening() {
+            queryInput.value = '';
+            clearTimeout(silenceTimer);
+            isListening = true;
+            recognition.start();
+        }
+
+        function stopListening() {
+            isListening = false;
+            clearTimeout(silenceTimer);
+            recognition.stop();
+        }
+
+        // Stop mic when query runs (auto or manual)
+        const originalRunQuery = runQuery;
+        // Wrap runQuery to stop mic after auto-fire
+        async function runQuery() {
+            if (isListening) {
+                stopListening();
+            }
+
+            const input = document.getElementById('queryInput');
+            const prompt = input.value.trim();
+            const askBtn = document.getElementById('askBtn');
+            const errBox = document.getElementById('queryError');
+            const resWrap = document.getElementById('resultWrap');
+
+            if (!prompt) return;
+            if (!currentData) { showToast('❌ Upload a file first.'); return; }
+
+            askBtn.disabled = true;
+            askBtn.innerHTML = '⏳ Thinking...';
+            errBox.classList.remove('active');
+            resWrap.classList.remove('active');
+
+            try {
+                const res = await fetch('http://localhost:8000/api/query/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    errBox.textContent = '❌ ' + data.error;
+                    errBox.classList.add('active');
+                    return;
+                }
+
+                renderQueryResult(data);
+                addToHistory(prompt);
+                input.value = '';
+                micStatus.textContent = '';
+
+            } catch (err) {
+                errBox.textContent = '❌ Request failed. Is the server running?';
+                errBox.classList.add('active');
+            } finally {
+                askBtn.disabled = false;
+                askBtn.innerHTML = '⚡ Ask';
+            }
+        }
+
+        // Also stop mic when resetUI is called
+        const _originalResetUI = resetUI;
+        function resetUI() {
+            if (isListening) stopListening();
+            _originalResetUI();
         }
     </script>
 </body>
