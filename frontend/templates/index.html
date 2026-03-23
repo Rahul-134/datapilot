@@ -1070,9 +1070,21 @@
                             · <span id="resultCols">—</span> columns
                             · Total <span id="resultTotal">—</span> rows
                         </div>
-                        <button class="result-code-toggle" id="codeToggle" onclick="toggleCode()">
-                            &lt;/&gt; View Generated Code
-                        </button>
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <button class="result-code-toggle" id="codeToggle" onclick="toggleCode()">
+                                &lt;/&gt; View Generated Code
+                            </button>
+                            <button class="result-code-toggle"
+                                style="color:var(--accent3); border-color:rgba(16,185,129,0.25);"
+                                onclick="downloadQueryResult('csv')">
+                                ⬇ CSV
+                            </button>
+                            <button class="result-code-toggle"
+                                style="color:var(--accent3); border-color:rgba(16,185,129,0.25);"
+                                onclick="downloadQueryResult('xlsx')">
+                                ⬇ Excel
+                            </button>
+                        </div>
                     </div>
                     <div class="result-code-block" id="codeBlock"></div>
                     <div class="result-table-wrap">
@@ -1537,6 +1549,10 @@
         function usePrompt(el) {
             document.getElementById('queryInput').value = el.textContent;
             document.getElementById('queryInput').focus();
+        }
+
+        function downloadQueryResult(format) {
+            window.location.href = `http://localhost:8000/api/query/download?format=${format}`;
         }
     </script>
 </body>

@@ -2,7 +2,6 @@ import pandas as pd
 import io
 import math
 
-# In-memory store — holds current session DataFrame
 _store: dict = {"df": None, "filename": None}
 
 def get_stored_df():
@@ -10,6 +9,10 @@ def get_stored_df():
 
 def get_stored_filename():
     return _store["filename"]
+
+def set_stored_df(df: pd.DataFrame):
+    """Called after cleaning to update the active DataFrame."""
+    _store["df"] = df.copy()
 
 def sanitize(value):
     if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from backend.services.file_parser import get_stored_df
+from backend.services.file_parser import get_stored_df, get_stored_filename, set_stored_df
 from backend.services.data_cleaner import clean_dataframe
 import io
 
@@ -12,12 +12,12 @@ class CleanRequest(BaseModel):
     handle_nulls: bool = True
     null_strategy: str = "drop"
 
-# Store last cleaned df in memory for download
 _cleaned_store: dict = {"df": None, "filename": None}
 
 @router.post("/")
 def clean_data(req: CleanRequest):
-    df = get_stored_df()
+    df       = get_stored_df()
+    filename = get_stored_filename()
 
     if df is None:
         return {"error": "No file uploaded yet. Please upload a file first."}
@@ -29,11 +29,14 @@ def clean_data(req: CleanRequest):
         req.null_strategy
     )
 
-    # Store cleaned df and filename for download
-    _cleaned_store["df"]       = result["_df"]
-    _cleaned_store["filename"] = result["filename"]
+    # ✅ Update active df so queries now run on cleaned data
+    set_stored_df(result["_df"])
 
-    # Remove internal keys before returning to frontend
+    # Store for download
+    _cleaned_store["df"]       = result["_df"]
+    _cleaned_store["filename"] = filename
+
+    # Strip internal keys before returning
     result.pop("_df")
     result.pop("filename")
 
@@ -47,7 +50,6 @@ def download_clean():
     if df is None:
         return {"error": "No cleaned data available. Please clean a file first."}
 
-    # Build filename — e.g. cars_cleaned.csv
     base     = filename.rsplit(".", 1)[0] if filename else "data"
     ext      = filename.rsplit(".", 1)[-1] if filename else "csv"
     out_name = f"{base}_cleaned.{ext}"
@@ -69,9 +71,9 @@ def download_clean():
 
 @router.post("/reset")
 def reset_data():
-    from backend.services.file_parser import get_stored_df, _store
-    _store["df"]       = None
-    _store["filename"] = None
+    from backend.services.file_parser import _store
+    _store["df"]               = None
+    _store["filename"]         = None
     _cleaned_store["df"]       = None
     _cleaned_store["filename"] = None
     return {"success": True, "message": "Session reset."}
