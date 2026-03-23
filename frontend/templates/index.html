@@ -1,1267 +1,329 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DataPilot</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
-        rel="stylesheet" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>DataPilot | Upload & Overview</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#5a00c6", "on-primary": "#003642",
+                        "on-secondary-container": "#c9aeff", "primary-container": "#00d4ff",
+                        "tertiary-fixed": "#6ffbbe", "primary": "#a8e8ff", "background": "#0f131f",
+                        "surface-container-highest": "#313442", "tertiary-container": "#49da9f",
+                        "primary-fixed-dim": "#3cd7ff", "on-secondary": "#3f008e",
+                        "primary-fixed": "#b4ebff", "on-tertiary-container": "#005c3e",
+                        "surface-tint": "#3cd7ff", "error-container": "#93000a", "error": "#ffb4ab",
+                        "outline": "#859398", "secondary-fixed": "#eaddff", "tertiary": "#6af7ba",
+                        "secondary": "#d2bbff", "on-background": "#dfe2f3", "on-tertiary-fixed": "#002113",
+                        "secondary-fixed-dim": "#d2bbff", "inverse-primary": "#00677e",
+                        "inverse-surface": "#dfe2f3", "inverse-on-surface": "#2c303d",
+                        "outline-variant": "#3c494e", "surface-dim": "#0f131f", "surface": "#0f131f",
+                        "on-tertiary": "#003824", "tertiary-fixed-dim": "#4edea3",
+                        "surface-bright": "#353946", "surface-container-high": "#262a37",
+                        "surface-container-lowest": "#0a0e1a", "on-primary-fixed-variant": "#004e5f",
+                        "on-error": "#690005", "on-primary-fixed": "#001f27",
+                        "on-tertiary-fixed-variant": "#005236", "surface-container-low": "#171b28",
+                        "on-error-container": "#ffdad6", "surface-container": "#1b1f2c",
+                        "on-secondary-fixed": "#25005a", "surface-variant": "#313442",
+                        "on-surface-variant": "#bbc9cf", "secondary-container": "#6001d1",
+                        "on-surface": "#dfe2f3", "on-primary-container": "#00586b"
+                    },
+                    fontFamily: {
+                        "headline": ["Syne", "sans-serif"],
+                        "body": ["Space Grotesk", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
     <style>
-        :root {
-            --bg: #0a0e1a;
-            --surface: #111827;
-            --surface2: #1a2235;
-            --border: #1e2d45;
-            --accent: #00d4ff;
-            --accent2: #7c3aed;
-            --accent3: #10b981;
-            --warn: #f59e0b;
-            --danger: #ef4444;
-            --text: #e2e8f0;
-            --muted: #64748b;
-            --card-glow: 0 0 30px rgba(0, 212, 255, 0.07);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Syne', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Grid background */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ── NAV ── */
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 40px;
-            background: rgba(10, 14, 26, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.3rem;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .logo span {
-            color: var(--accent);
-        }
-
-        .nav-badge {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-
-        /* ── MAIN ── */
-        main {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 24px 80px;
-        }
-
-        /* ── UPLOAD ZONE ── */
-        .upload-section {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .upload-section h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #fff 30%, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .upload-section p {
-            color: var(--muted);
-            font-size: 1rem;
-            margin-bottom: 32px;
-        }
-
-        .drop-zone {
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            padding: 56px 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--surface);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .drop-zone::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.04) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .drop-zone:hover,
-        .drop-zone.dragover {
-            border-color: var(--accent);
-            box-shadow: var(--card-glow);
-        }
-
-        .drop-zone:hover::before,
-        .drop-zone.dragover::before {
-            opacity: 1;
-        }
-
-        .drop-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            display: block;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
-        }
-
-        .drop-zone h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .drop-zone p {
-            color: var(--muted);
-            font-size: 0.85rem;
-            margin: 0;
-        }
-
-        .drop-zone input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        /* ── LOADING ── */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading p {
-            color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        /* ── OVERVIEW ── */
-        #overview {
-            display: none;
-        }
-
-        #overview.active {
-            display: block;
-            animation: fadeUp 0.5s ease forwards;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .overview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .overview-header h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .file-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--accent);
-        }
-
-        /* ── STAT CARDS ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--card-glow);
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            border-radius: 14px 14px 0 0;
-        }
-
-        .stat-card.blue::after {
-            background: var(--accent);
-        }
-
-        .stat-card.purple::after {
-            background: var(--accent2);
-        }
-
-        .stat-card.green::after {
-            background: var(--accent3);
-        }
-
-        .stat-card.warn::after {
-            background: var(--warn);
-        }
-
-        .stat-card.danger::after {
-            background: var(--danger);
-        }
-
-        .stat-label {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            font-family: 'Space Mono', monospace;
-            line-height: 1;
-        }
-
-        .stat-card.blue .stat-value {
-            color: var(--accent);
-        }
-
-        .stat-card.purple .stat-value {
-            color: #a78bfa;
-        }
-
-        .stat-card.green .stat-value {
-            color: var(--accent3);
-        }
-
-        .stat-card.warn .stat-value {
-            color: var(--warn);
-        }
-
-        .stat-card.danger .stat-value {
-            color: var(--danger);
-        }
-
-        .stat-sub {
-            font-size: 0.75rem;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        /* ── HEALTH SCORE ── */
-        .health-bar-wrap {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .health-label {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
-        .health-bar-bg {
-            flex: 1;
-            min-width: 200px;
-            height: 10px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .health-bar-fill {
-            height: 100%;
-            border-radius: 10px;
-            background: linear-gradient(90deg, var(--accent3), var(--accent));
-            transition: width 1s cubic-bezier(.4, 0, .2, 1);
-            width: 0%;
-        }
-
-        .health-score-val {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent3);
-            white-space: nowrap;
-        }
-
-        /* ── CLEAN BUTTON ── */
-        .action-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 22px;
-            border-radius: 10px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #0099cc);
-            color: #000;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-warn {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: var(--warn);
-        }
-
-        .btn-warn:hover {
-            background: rgba(245, 158, 11, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .badge-rec {
-            font-size: 0.65rem;
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent3);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 2px 7px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        /* ── COLUMNS TABLE ── */
-        .section-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .table-wrap {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 28px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-        }
-
-        thead {
-            background: var(--surface2);
-            border-bottom: 1px solid var(--border);
-        }
-
-        thead th {
-            padding: 14px 18px;
-            text-align: left;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--muted);
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:hover {
-            background: var(--surface2);
-        }
-
-        tbody td {
-            padding: 13px 18px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
-        }
-
-        .col-name {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .dtype-tag {
-            display: inline-block;
-            padding: 3px 9px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 600;
-        }
-
-        .dtype-str {
-            background: rgba(124, 58, 237, 0.15);
-            color: #a78bfa;
-            border: 1px solid rgba(124, 58, 237, 0.2);
-        }
-
-        .dtype-int {
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-        }
-
-        .dtype-float {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent3);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .null-zero {
-            color: var(--accent3);
-        }
-
-        .null-some {
-            color: var(--warn);
-        }
-
-        .null-many {
-            color: var(--danger);
-        }
-
-        /* ── SAMPLE TABLE ── */
-        .sample-wrap {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: auto;
-            margin-bottom: 28px;
-        }
-
-        .sample-wrap table thead th {
-            color: var(--accent);
-            background: rgba(0, 212, 255, 0.05);
-        }
-
-        /* ── CLEAN MODAL ── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 32px;
-            max-width: 480px;
-            width: 90%;
-            animation: fadeUp 0.3s ease;
-        }
-
-        .modal h3 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .modal p {
-            color: var(--muted);
-            font-size: 0.85rem;
-            margin-bottom: 24px;
-        }
-
-        .clean-option {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-        }
-
-        .clean-option label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .clean-option select {
-            margin-top: 8px;
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.8rem;
-        }
-
-        .clean-preview {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin: 16px 0;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--accent3);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        /* ── TOAST ── */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--surface);
-            border: 1px solid var(--accent3);
-            color: var(--accent3);
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            z-index: 300;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            animation: fadeUp 0.3s ease;
-        }
-
-        .toast.active {
-            display: flex;
-        }
-
-        /* ── QUERY SECTION ── */
-        .query-section {
-            margin-top: 40px;
-        }
-
-        .query-box {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-
-        .query-input-wrap {
-            flex: 1;
-        }
-
-        .query-input-wrap label {
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .query-input {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-family: 'Syne', sans-serif;
-            font-size: 0.95rem;
-            padding: 12px 16px;
-            resize: none;
-            transition: border-color 0.2s;
-            min-height: 52px;
-        }
-
-        .query-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .query-input::placeholder {
-            color: var(--muted);
-        }
-
-        .btn-ask {
-            background: linear-gradient(135deg, var(--accent2), #5b21b6);
-            color: #fff;
-            white-space: nowrap;
-            height: 52px;
-            padding: 0 24px;
-        }
-
-        .btn-ask:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
-        }
-
-        .btn-ask:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Query history chips */
-        .query-history {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .history-chip {
-            font-size: 0.75rem;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 5px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: 'Space Mono', monospace;
-        }
-
-        .history-chip:hover {
-            border-color: var(--accent2);
-            color: #a78bfa;
-        }
-
-        /* Result table */
-        .result-wrap {
-            display: none;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .result-wrap.active {
-            display: block;
-        }
-
-        .result-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: var(--surface2);
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .result-meta {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        .result-meta span {
-            color: var(--accent3);
-            font-weight: 700;
-        }
-
-        .result-code-toggle {
-            font-size: 0.75rem;
-            background: rgba(124, 58, 237, 0.12);
-            border: 1px solid rgba(124, 58, 237, 0.25);
-            color: #a78bfa;
-            padding: 4px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            transition: background 0.15s;
-        }
-
-        .result-code-toggle:hover {
-            background: rgba(124, 58, 237, 0.22);
-        }
-
-        .result-code-block {
-            display: none;
-            background: #0d1117;
-            border-bottom: 1px solid var(--border);
-            padding: 14px 18px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
-            color: #7ee787;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .result-code-block.active {
-            display: block;
-        }
-
-        .result-table-wrap {
-            overflow-x: auto;
-        }
-
-        /* Error box */
-        .query-error {
-            display: none;
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            border-radius: 10px;
-            padding: 14px 18px;
-            color: var(--danger);
-            font-size: 0.85rem;
-            font-family: 'Space Mono', monospace;
-            margin-bottom: 16px;
-        }
-
-        .query-error.active {
-            display: block;
-        }
-
-        /* ── SPEECH ── */
-        .mic-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            background: var(--surface);
-            color: var(--muted);
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .mic-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .mic-btn.listening {
-            border-color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            animation: mic-pulse 1.2s ease-in-out infinite;
-        }
-
-        @keyframes mic-pulse {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-            }
-
-            50% {
-                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-            }
-        }
-
-        .mic-status {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.72rem;
-            color: var(--muted);
-            margin-top: 6px;
-            min-height: 18px;
-            transition: color 0.2s;
-        }
-
-        .mic-status.active {
-            color: var(--danger);
-        }
-
-        .speech-not-supported {
-            display: none;
-            font-size: 0.75rem;
-            color: var(--danger);
-            font-family: 'Space Mono', monospace;
-            margin-top: 6px;
-        }
+        .grid-bg {
+            background-image: linear-gradient(to right, rgba(168,232,255,0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(168,232,255,0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .glass-card { background: rgba(27,31,44,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(133,147,152,0.1); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+        .glow-primary { box-shadow: 0 0 20px rgba(0,212,255,0.15); }
+        .glow-primary:hover { box-shadow: 0 0 30px rgba(0,212,255,0.3); }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .animate-fadeUp { animation: fadeUp 0.5s ease forwards; }
     </style>
 </head>
 
-<body>
+<body class="bg-surface-container-lowest text-on-background font-body min-h-screen grid-bg">
 
     <!-- NAV -->
-    <nav>
-        <div class="logo">
-            <div class="logo-icon">✈</div>
-            Data<span>Pilot</span>
+    <nav class="sticky top-0 z-50 w-full bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-cyan-500/10 shadow-[0_0_20px_rgba(0,212,255,0.15)] flex justify-between items-center px-8 py-4">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary-container text-3xl">flight_takeoff</span>
+            <h1 class="text-2xl font-black font-headline tracking-tight">
+                <span class="text-white">Data</span><span class="text-primary-container">Pilot</span>
+            </h1>
         </div>
-        <div class="nav-badge">v1.0 · AI Data Analyst</div>
+        <div class="hidden md:flex items-center space-x-8">
+            <a class="text-[#00d4ff] border-b-2 border-[#00d4ff] pb-1 font-medium" href="#">Dashboard</a>
+            <a class="text-slate-400 hover:text-white transition-colors font-medium" href="analyze.html">Analytics</a>
+        </div>
+        <div class="hidden sm:flex items-center px-3 py-1 rounded-full bg-surface-container border border-outline-variant/30">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-primary-container mr-2">v1.0</span>
+            <span class="text-xs font-medium text-on-surface-variant">AI Data Analyst</span>
+        </div>
     </nav>
 
-    <main>
+    <main class="max-w-7xl mx-auto px-6 py-12 space-y-16">
 
-        <!-- UPLOAD -->
-        <div class="upload-section" id="uploadSection">
-            <h1>Navigate Your Data<br>with AI</h1>
-            <p>Upload a CSV or Excel file and let DataPilot analyze it instantly</p>
-
-            <div class="drop-zone" id="dropZone">
-                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
-                <span class="drop-icon">📂</span>
-                <h3>Drop your file here</h3>
-                <p>Supports CSV, XLSX, XLS · Max 50MB</p>
+        <!-- HERO / UPLOAD -->
+        <section id="uploadSection" class="text-center space-y-8 max-w-3xl mx-auto">
+            <h2 class="text-5xl md:text-7xl font-extrabold font-headline leading-tight tracking-tighter text-white">
+                Navigate Your <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Data with AI</span>
+            </h2>
+            <p class="text-on-surface-variant text-lg md:text-xl font-medium">
+                Upload a CSV or Excel file and let DataPilot analyze it instantly with luminescent precision.
+            </p>
+            <div class="relative group mt-12">
+                <div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-25 group-hover:opacity-100 transition duration-1000"></div>
+                <label id="dropZone" class="relative flex flex-col items-center justify-center w-full h-80 border-2 border-dashed border-outline-variant/50 rounded-xl cursor-pointer bg-surface-container/30 backdrop-blur-md hover:border-primary-container/50 hover:bg-surface-container/50 transition-all duration-300">
+                    <div class="mb-6 p-4 rounded-2xl bg-primary-container/10 border border-primary-container/20 group-hover:scale-110 transition-transform animate-float">
+                        <span class="material-symbols-outlined text-5xl text-primary-container">cloud_upload</span>
+                    </div>
+                    <p class="mb-2 text-2xl font-bold text-white tracking-tight">Drop your file here</p>
+                    <p class="text-sm text-on-surface-variant font-mono">Supports CSV, XLSX, XLS · Max 50MB</p>
+                    <input id="fileInput" class="hidden" type="file" accept=".csv,.xlsx,.xls" />
+                </label>
             </div>
-        </div>
+        </section>
 
         <!-- LOADING -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Analyzing your file...</p>
+        <div id="loading" class="hidden flex-col items-center justify-center py-20 space-y-4">
+            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <p class="font-mono font-medium text-primary animate-pulse">Analyzing your file...</p>
         </div>
 
         <!-- OVERVIEW -->
-        <div id="overview">
+        <section id="overview" class="hidden space-y-10">
 
-            <div class="overview-header">
-                <h2>📊 File Overview</h2>
-                <div class="file-badge">
-                    <span>📄</span>
-                    <span id="badgeFilename">—</span>
+            <!-- Header + buttons -->
+            <div class="flex items-end justify-between flex-wrap gap-4">
+                <div>
+                    <h3 class="text-3xl font-headline font-bold text-white mb-2">Dataset Overview</h3>
+                    <p class="text-on-surface-variant font-mono text-sm">active_session: <span id="badgeFilename">—</span></p>
+                </div>
+                <div class="flex gap-3 flex-wrap">
+                    <button id="resetFileBtn" class="px-5 py-2 rounded-lg border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">🔄 Reset File</button>
+                    <button id="cleanBtn" class="px-5 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-bold hover:bg-amber-500/20 transition-all">
+                        🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>
+                    </button>
+                    <button id="downloadBtn" class="hidden px-5 py-2 rounded-lg bg-primary-container text-on-primary-container text-sm font-bold glow-primary transition-all items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">download</span> Download Cleaned
+                    </button>
+                    <button id="resetBtn" class="px-5 py-2 rounded-lg border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">↩ New File</button>
                 </div>
             </div>
 
-            <!-- STAT CARDS -->
-            <div class="stats-grid">
-                <div class="stat-card blue">
-                    <div class="stat-label">Total Rows</div>
-                    <div class="stat-value" id="statRows">—</div>
-                    <div class="stat-sub">data records</div>
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Total Rows</p>
+                    <p id="statRows" class="text-3xl font-mono font-bold text-white">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-primary">database</span>
                 </div>
-                <div class="stat-card purple">
-                    <div class="stat-label">Columns</div>
-                    <div class="stat-value" id="statCols">—</div>
-                    <div class="stat-sub">features</div>
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Columns</p>
+                    <p id="statCols" class="text-3xl font-mono font-bold text-white">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-secondary">view_column</span>
                 </div>
-                <div class="stat-card warn">
-                    <div class="stat-label">Duplicates</div>
-                    <div class="stat-value" id="statDupes">—</div>
-                    <div class="stat-sub">duplicate rows</div>
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-error"></div>
+                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Duplicates</p>
+                    <p id="statDupes" class="text-3xl font-mono font-bold text-error">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-error">content_copy</span>
                 </div>
-                <div class="stat-card green">
-                    <div class="stat-label">Null Values</div>
-                    <div class="stat-value" id="statNulls">—</div>
-                    <div class="stat-sub">missing cells</div>
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-tertiary"></div>
+                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Null Values</p>
+                    <p id="statNulls" class="text-3xl font-mono font-bold text-tertiary">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-tertiary">scan_delete</span>
                 </div>
-                <div class="stat-card blue">
-                    <div class="stat-label">File Size</div>
-                    <div class="stat-value" id="statSize">—</div>
-                    <div class="stat-sub">file size</div>
+                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
+                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">File Size</p>
+                    <p id="statSize" class="text-3xl font-mono font-bold text-white">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-primary-container">data_usage</span>
                 </div>
             </div>
 
-            <!-- HEALTH SCORE -->
-            <div class="health-bar-wrap">
-                <div class="health-label">Data Health Score</div>
-                <div class="health-bar-bg">
-                    <div class="health-bar-fill" id="healthFill"></div>
+            <!-- Health Score -->
+            <div class="glass-card p-8 rounded-xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h4 class="font-headline font-bold text-lg text-white">Data Health Score</h4>
+                    <span id="healthScore" class="font-mono text-2xl font-bold text-tertiary">—</span>
                 </div>
-                <div class="health-score-val" id="healthScore">—</div>
-            </div>
-
-            <!-- ACTION BUTTONS -->
-            <div class="action-bar">
-                <button class="btn btn-warn" id="cleanBtn">
-                    🧹 Clean Data
-                    <span class="badge-rec">Recommended</span>
-                </button>
-                <button class="btn btn-outline" id="resetFileBtn">
-                    🔄 Reset File
-                </button>
-                <button class="btn btn-primary" id="downloadBtn" style="display:none">
-                    ⬇ Download Cleaned File
-                </button>
-                <button class="btn btn-outline" id="resetBtn">
-                    ↩ Upload New File
-                </button>
-            </div>
-
-            <!-- COLUMN PROFILE -->
-            <div class="section-title">Column Profile</div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Column Name</th>
-                            <th>Data Type</th>
-                            <th>Null Count</th>
-                            <th>Null %</th>
-                        </tr>
-                    </thead>
-                    <tbody id="colTableBody"></tbody>
-                </table>
-            </div>
-
-            <!-- SAMPLE DATA -->
-            <div class="section-title">Sample Data (Top 5 Rows)</div>
-            <div class="sample-wrap">
-                <table>
-                    <thead id="sampleHead"></thead>
-                    <tbody id="sampleBody"></tbody>
-                </table>
-            </div>
-
-            <!-- QUERY SECTION -->
-            <div class="query-section">
-                <div class="section-title">Ask Your Data</div>
-
-                <!-- Suggested prompts -->
-                <div class="query-history" id="suggestedPrompts">
-                    <span class="history-chip" onclick="usePrompt(this)">Show top 10 rows by selling price</span>
-                    <span class="history-chip" onclick="usePrompt(this)">Count of each unique value in fuel
-                        column</span>
-                    <span class="history-chip" onclick="usePrompt(this)">Average selling price grouped by brand</span>
-                    <span class="history-chip" onclick="usePrompt(this)">Filter rows where km_driven is greater than
-                        100000</span>
+                <div class="w-full h-4 bg-surface-container-highest rounded-full overflow-hidden">
+                    <div id="healthFill" class="h-full bg-gradient-to-r from-tertiary to-primary-container rounded-full transition-all duration-1000" style="width:0%"></div>
                 </div>
+                <div class="flex justify-between text-[10px] font-mono uppercase text-on-surface-variant">
+                    <span>Critical issues</span><span>Action required</span><span>Validated Data</span>
+                </div>
+            </div>
 
-                <!-- Input box -->
-                <div class="query-box">
-                    <div class="query-input-wrap">
-                        <label>Enter your prompt or speak</label>
-                        <textarea class="query-input" id="queryInput"
-                            placeholder="e.g. Show me the top 10 cars by selling price..." rows="1"></textarea>
-                        <div class="mic-status" id="micStatus"></div>
-                        <div class="speech-not-supported" id="speechNotSupported">
-                            ⚠ Speech recognition not supported in this browser. Use Chrome or Edge.
-                        </div>
+            <!-- Column Profile + Sample Data -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card rounded-xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-outline-variant/10">
+                        <h4 class="font-headline font-bold text-white">Column Profile</h4>
                     </div>
-
-                    <!-- Mic button -->
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                        <button class="mic-btn" id="micBtn" title="Hold to speak / click to toggle">
-                            🎤
-                        </button>
-                    </div>
-
-                    <button class="btn btn-ask" id="askBtn">⚡ Ask</button>
-                </div>
-
-                <!-- Error -->
-                <div class="query-error" id="queryError"></div>
-
-                <!-- Result -->
-                <div class="result-wrap" id="resultWrap">
-                    <div class="result-header">
-                        <div class="result-meta">
-                            Showing <span id="resultCount">—</span> rows
-                            · <span id="resultCols">—</span> columns
-                            · Total <span id="resultTotal">—</span> rows
-                        </div>
-                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                            <button class="result-code-toggle" id="codeToggle" onclick="toggleCode()">
-                                &lt;/&gt; View Generated Code
-                            </button>
-                            <button class="result-code-toggle"
-                                style="color:var(--accent3); border-color:rgba(16,185,129,0.25);"
-                                onclick="downloadQueryResult('csv')">
-                                ⬇ CSV
-                            </button>
-                            <button class="result-code-toggle"
-                                style="color:var(--accent3); border-color:rgba(16,185,129,0.25);"
-                                onclick="downloadQueryResult('xlsx')">
-                                ⬇ Excel
-                            </button>
-                        </div>
-                    </div>
-                    <div class="result-code-block" id="codeBlock"></div>
-                    <div class="result-table-wrap">
-                        <table>
-                            <thead id="resultHead"></thead>
-                            <tbody id="resultBody"></tbody>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-sm">
+                            <thead class="bg-surface-container-high/50 text-on-surface-variant text-[10px] uppercase tracking-tighter">
+                                <tr><th class="px-4 py-3">#</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">Type</th><th class="px-4 py-3 text-right">Null %</th></tr>
+                            </thead>
+                            <tbody id="colTableBody" class="divide-y divide-outline-variant/5"></tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- Query history -->
-                <div id="historyWrap" style="display:none; margin-top:8px;">
-                    <div class="section-title" style="font-size:0.75rem;">Recent Queries</div>
-                    <div class="query-history" id="queryHistoryList"></div>
+                <div class="lg:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-outline-variant/10">
+                        <h4 class="font-headline font-bold text-white">Sample Data Preview (Top 5)</h4>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-sm whitespace-nowrap">
+                            <thead id="sampleHead" class="bg-primary-container/10 text-primary-container text-[10px] uppercase"></thead>
+                            <tbody id="sampleBody" class="divide-y divide-outline-variant/5"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-        </div><!-- /overview -->
+            <!-- START FULL ANALYSIS CTA -->
+            <div class="flex justify-center pt-8">
+                <button id="startAnalysisBtn" class="group relative px-12 py-5 rounded-xl bg-gradient-to-r from-primary-container via-[#6001d1] to-secondary overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-[0_0_40px_rgba(0,212,255,0.2)]">
+                    <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                    <span class="relative flex items-center gap-3 text-xl font-headline font-black text-on-surface">
+                        <span class="material-symbols-outlined text-2xl">rocket_launch</span>
+                        START FULL ANALYSIS
+                    </span>
+                </button>
+            </div>
+
+        </section>
     </main>
 
     <!-- CLEAN MODAL -->
-    <div class="modal-overlay" id="cleanModal">
-        <div class="modal">
-            <h3>🧹 Clean Data</h3>
-            <p>Choose how you want to handle data quality issues before proceeding.</p>
-
-            <div class="clean-option">
-                <label>
-                    <input type="checkbox" id="removeDupes" checked />
-                    Remove duplicate rows
+    <div id="cleanModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-[#0a0e1a]/80 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6">
+            <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                    <span class="material-symbols-outlined text-amber-400">auto_fix_high</span>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-headline font-bold text-white">Cleanse Dataset</h3>
+                    <p class="text-on-surface-variant text-sm">Select cleaning protocols to apply</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <label class="flex items-center gap-4 cursor-pointer bg-surface-container-high/40 p-4 rounded-xl border border-outline-variant/10 hover:border-primary-container/20 transition-all">
+                    <input type="checkbox" id="removeDupes" checked class="w-4 h-4 accent-[#00d4ff]" />
+                    <div>
+                        <p class="text-white font-bold text-sm">Remove duplicate rows</p>
+                        <p class="text-xs text-on-surface-variant">Deletes all identified redundant rows</p>
+                    </div>
                 </label>
+                <div class="bg-surface-container-high/40 p-4 rounded-xl border border-outline-variant/10 space-y-3">
+                    <label class="flex items-center gap-4 cursor-pointer">
+                        <input type="checkbox" id="handleNulls" checked class="w-4 h-4 accent-[#00d4ff]" />
+                        <p class="text-white font-bold text-sm">Handle missing values</p>
+                    </label>
+                    <select id="nullStrategy" class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-2 px-3 text-sm font-mono text-primary outline-none focus:border-primary-container transition-colors">
+                        <option value="drop">Drop rows with nulls</option>
+                        <option value="mean">Fill numeric nulls with Mean</option>
+                        <option value="median">Fill numeric nulls with Median (Recommended)</option>
+                        <option value="unknown">Fill text nulls with "Unknown"</option>
+                    </select>
+                </div>
+                <div id="cleanPreview" class="p-4 rounded-lg bg-tertiary/5 border border-tertiary/20 flex gap-3">
+                    <span class="material-symbols-outlined text-tertiary shrink-0">visibility</span>
+                    <p class="text-xs text-on-surface-variant leading-relaxed font-mono">⚡ Loading preview...</p>
+                </div>
             </div>
-
-            <div class="clean-option">
-                <label>
-                    <input type="checkbox" id="handleNulls" checked />
-                    Handle null / missing values
-                </label>
-                <select id="nullStrategy">
-                    <option value="drop">Drop rows with nulls</option>
-                    <option value="mean">Fill numeric nulls with mean</option>
-                    <option value="median">Fill numeric nulls with median</option>
-                    <option value="unknown">Fill text nulls with "Unknown"</option>
-                </select>
-            </div>
-
-            <div class="clean-preview" id="cleanPreview">
-                ⚡ Loading preview...
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn btn-outline" id="cancelClean">Cancel</button>
-                <button class="btn btn-primary" id="confirmClean">Apply Cleaning</button>
+            <div class="flex gap-4 pt-2">
+                <button id="cancelClean" class="flex-1 py-3 rounded-xl border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">Cancel</button>
+                <button id="confirmClean" class="flex-1 py-3 rounded-xl bg-primary-container text-on-primary-container text-sm font-bold glow-primary">Apply & Clean</button>
             </div>
         </div>
     </div>
 
     <!-- TOAST -->
-    <div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
+    <div id="toast" class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-surface-container-highest border-l-4 border-tertiary p-4 rounded-xl shadow-2xl max-w-sm">
+        <div id="toastIconWrap" class="h-10 w-10 bg-tertiary-container/20 rounded-full flex items-center justify-center text-tertiary shrink-0">
+            <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
+        </div>
+        <div>
+            <p id="toastTitle" class="font-headline font-bold text-on-surface text-sm">Success</p>
+            <p id="toastMsg" class="text-xs text-on-surface-variant font-mono"></p>
+        </div>
+        <button onclick="hideToast()" class="text-outline hover:text-white transition-colors ml-auto">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+    </div>
+
+    <!-- BG Decoration -->
+    <div class="fixed top-0 right-0 -z-10 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2"></div>
+    <div class="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 translate-y-1/2"></div>
 
     <script>
         let currentData = null;
         let fileSize = 0;
 
-        const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
-        const loading = document.getElementById('loading');
-        const overview = document.getElementById('overview');
+        const dropZone  = document.getElementById('dropZone');
+        const loading   = document.getElementById('loading');
+        const overview  = document.getElementById('overview');
         const uploadSec = document.getElementById('uploadSection');
 
-        // Drag & drop styling
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        // Drag & drop
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-primary-container'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-primary-container'));
         dropZone.addEventListener('drop', e => {
             e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) handleFile(file);
+            dropZone.classList.remove('border-primary-container');
+            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
         });
-
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files[0]) handleFile(fileInput.files[0]);
-        });
+        fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
 
         async function handleFile(file) {
             fileSize = file.size;
-            uploadSec.style.display = 'none';
-            loading.classList.add('active');
-
+            uploadSec.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
             const formData = new FormData();
             formData.append('file', file);
-
             try {
-                const res = await fetch('http://localhost:8000/api/upload', { method: 'POST', body: formData });
+                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
                 const data = await res.json();
                 currentData = data;
                 renderOverview(data);
             } catch (err) {
-                alert('Error uploading file. Is the server running?');
+                alert('Upload failed. Is the server running?');
                 resetUI();
             } finally {
-                loading.classList.remove('active');
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
             }
         }
 
@@ -1271,537 +333,209 @@
             return (bytes / 1048576).toFixed(1) + ' MB';
         }
 
-        function renderOverview(data) {
-            // Badge & stats
-            document.getElementById('badgeFilename').textContent = data.filename;
-            document.getElementById('statRows').textContent = data.rows.toLocaleString();
-            document.getElementById('statCols').textContent = data.columns;
-            document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
-            document.getElementById('statSize').textContent = formatSize(fileSize);
-
-            const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
-            document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
-
-            // Health score
-            const totalCells = data.rows * data.columns;
-            const nullPct = totalNulls / totalCells;
-            const dupePct = data.duplicate_rows / data.rows;
-            const health = Math.max(0, Math.round((1 - nullPct * 0.5 - dupePct * 0.5) * 100));
-
-            document.getElementById('healthScore').textContent = health + '%';
-            setTimeout(() => {
-                document.getElementById('healthFill').style.width = health + '%';
-                const fill = document.getElementById('healthFill');
-                if (health < 50) fill.style.background = 'linear-gradient(90deg, #ef4444, #f59e0b)';
-                else if (health < 80) fill.style.background = 'linear-gradient(90deg, #f59e0b, #00d4ff)';
-            }, 100);
-
-            // Column profile table
+        function renderColTable(colNames, dtypes, nullCounts, totalRows) {
             const colBody = document.getElementById('colTableBody');
             colBody.innerHTML = '';
-            data.column_names.forEach((col, i) => {
-                const nullCount = data.null_counts[col] || 0;
-                const nullPctVal = ((nullCount / data.rows) * 100).toFixed(1);
-                const dtype = data.dtypes[col] || 'unknown';
-                const dtypeClass = dtype.includes('int') || dtype.includes('float') ? (dtype.includes('float') ? 'dtype-float' : 'dtype-int') : 'dtype-str';
-                const nullClass = nullCount === 0 ? 'null-zero' : nullCount < data.rows * 0.1 ? 'null-some' : 'null-many';
-
+            colNames.forEach((col, i) => {
+                const nullCount  = nullCounts[col] || 0;
+                const nullPctVal = ((nullCount / totalRows) * 100).toFixed(1);
+                const dtype      = dtypes[col] || 'unknown';
+                const dtypeLabel = dtype.includes('float') ? 'FLOAT' : dtype.includes('int') ? 'INT' : 'STR';
+                const dtypeColor = dtype.includes('float') ? 'bg-tertiary-container/20 text-tertiary' : dtype.includes('int') ? 'bg-secondary-container/20 text-secondary' : 'bg-primary-container/20 text-primary-container';
+                const nullColor  = nullCount === 0 ? 'text-tertiary' : nullCount < totalRows * 0.1 ? 'text-amber-400' : 'text-error';
                 colBody.innerHTML += `
-          <tr>
-            <td style="color:var(--muted)">${i + 1}</td>
-            <td class="col-name">${col}</td>
-            <td><span class="dtype-tag ${dtypeClass}">${dtype}</span></td>
-            <td class="${nullClass}">${nullCount.toLocaleString()}</td>
-            <td class="${nullClass}">${nullPctVal}%</td>
-          </tr>`;
+                    <tr class="hover:bg-primary-container/5 transition-colors">
+                        <td class="px-4 py-3 text-on-surface-variant">${String(i+1).padStart(2,'0')}</td>
+                        <td class="px-4 py-3 text-primary-container font-medium">${col}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] ${dtypeColor}">${dtypeLabel}</span></td>
+                        <td class="px-4 py-3 text-right ${nullColor}">${nullPctVal}%</td>
+                    </tr>`;
             });
+        }
 
-            // Sample data table
-            const sampleHead = document.getElementById('sampleHead');
-            const sampleBody = document.getElementById('sampleBody');
-            sampleHead.innerHTML = '<tr>' + data.column_names.map(c => `<th>${c}</th>`).join('') + '</tr>';
-            sampleBody.innerHTML = data.sample.map(row =>
-                '<tr>' + data.column_names.map(c => `<td>${row[c] ?? '—'}</td>`).join('') + '</tr>'
+        function renderOverview(data) {
+            document.getElementById('badgeFilename').textContent = data.filename;
+            document.getElementById('statRows').textContent  = data.rows.toLocaleString();
+            document.getElementById('statCols').textContent  = data.columns;
+            document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
+            document.getElementById('statSize').textContent  = formatSize(fileSize);
+            const totalNulls = Object.values(data.null_counts).reduce((a,b) => a+b, 0);
+            document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
+
+            const health = calcHealth(totalNulls, data.rows, data.columns, data.duplicate_rows);
+            document.getElementById('healthScore').textContent = health + '%';
+            setTimeout(() => { document.getElementById('healthFill').style.width = health + '%'; }, 100);
+
+            renderColTable(data.column_names, data.dtypes, data.null_counts, data.rows);
+
+            document.getElementById('sampleHead').innerHTML =
+                '<tr>' + data.column_names.map(c => `<th class="px-6 py-4">${c}</th>`).join('') + '</tr>';
+            document.getElementById('sampleBody').innerHTML = data.sample.map(row =>
+                '<tr class="hover:bg-white/5 transition-colors">' +
+                data.column_names.map(c => `<td class="px-6 py-4">${row[c] ?? '—'}</td>`).join('') + '</tr>'
             ).join('');
 
-            overview.classList.add('active');
+            overview.classList.remove('hidden');
+        }
+
+        function calcHealth(totalNulls, rows, cols, dupes) {
+            const nullPct = totalNulls / (rows * cols);
+            const dupePct = dupes / rows;
+            return Math.max(0, Math.round((1 - nullPct * 0.5 - dupePct * 0.5) * 100));
         }
 
         // Clean modal
         document.getElementById('cleanBtn').addEventListener('click', () => {
             if (!currentData) return;
             updateCleanPreview();
-            document.getElementById('cleanModal').classList.add('active');
+            showModal('cleanModal');
         });
 
         function updateCleanPreview() {
-            const dupes = document.getElementById('removeDupes').checked;
-            const nulls = document.getElementById('handleNulls').checked;
+            const dupes    = document.getElementById('removeDupes').checked;
+            const nulls    = document.getElementById('handleNulls').checked;
             const strategy = document.getElementById('nullStrategy').value;
-            const totalNulls = Object.values(currentData.null_counts).reduce((a, b) => a + b, 0);
-
+            const totalNulls = Object.values(currentData.null_counts).reduce((a,b) => a+b, 0);
             let lines = [];
             if (dupes && currentData.duplicate_rows > 0)
                 lines.push(`🗑 ${currentData.duplicate_rows.toLocaleString()} duplicate rows will be removed`);
             if (nulls && totalNulls > 0)
-                lines.push(`🔧 ${totalNulls.toLocaleString()} null values will be handled (${strategy})`);
-            if (lines.length === 0)
-                lines.push('✅ No cleaning needed — data looks good!');
-
+                lines.push(`🔧 ${totalNulls.toLocaleString()} null values → strategy: ${strategy}`);
+            if (!lines.length) lines.push('✅ No cleaning needed — data looks good!');
             lines.push(`📊 Rows before: ${currentData.rows.toLocaleString()}`);
             if (dupes) lines.push(`📊 Rows after:  ~${(currentData.rows - currentData.duplicate_rows).toLocaleString()}`);
-
-            document.getElementById('cleanPreview').innerHTML = lines.join('<br>');
+            document.getElementById('cleanPreview').innerHTML =
+                `<span class="material-symbols-outlined text-tertiary shrink-0">visibility</span>
+                 <p class="text-xs text-on-surface-variant leading-relaxed font-mono">${lines.join('<br>')}</p>`;
         }
 
         document.getElementById('removeDupes').addEventListener('change', updateCleanPreview);
         document.getElementById('handleNulls').addEventListener('change', updateCleanPreview);
         document.getElementById('nullStrategy').addEventListener('change', updateCleanPreview);
 
-        document.getElementById('cancelClean').addEventListener('click', () => {
-            document.getElementById('cleanModal').classList.remove('active');
-        });
+        document.getElementById('cancelClean').addEventListener('click', () => hideModal('cleanModal'));
 
         document.getElementById('confirmClean').addEventListener('click', async () => {
-            document.getElementById('cleanModal').classList.remove('active');
-
-            // Show loading state on button
+            hideModal('cleanModal');
             const cleanBtn = document.getElementById('cleanBtn');
             cleanBtn.disabled = true;
-            cleanBtn.innerHTML = '⏳ Cleaning...';
-
+            cleanBtn.textContent = '⏳ Cleaning...';
             const payload = {
                 remove_duplicates: document.getElementById('removeDupes').checked,
-                handle_nulls: document.getElementById('handleNulls').checked,
-                null_strategy: document.getElementById('nullStrategy').value
+                handle_nulls:      document.getElementById('handleNulls').checked,
+                null_strategy:     document.getElementById('nullStrategy').value
             };
-
             try {
-                const res = await fetch('http://localhost:8000/api/clean/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const res  = await fetch('http://localhost:8000/api/clean/', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
                 const data = await res.json();
+                if (data.error) { showToast(data.error, true); return; }
 
-                if (data.error) {
-                    showToast('❌ ' + data.error);
-                    return;
-                }
-
-                // Update stat cards with cleaned values
-                document.getElementById('statRows').textContent = data.final_rows.toLocaleString();
+                document.getElementById('statRows').textContent  = data.final_rows.toLocaleString();
                 document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
-                const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
+                const totalNulls = Object.values(data.null_counts).reduce((a,b) => a+b, 0);
                 document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
-
-                // Recalculate health score
-                const totalCells = data.final_rows * currentData.columns;
-                const nullPct = totalNulls / totalCells;
-                const dupePct = data.duplicate_rows / data.final_rows;
-                const health = Math.max(0, Math.round((1 - nullPct * 0.5 - dupePct * 0.5) * 100));
+                const health = calcHealth(totalNulls, data.final_rows, currentData.columns, data.duplicate_rows);
                 document.getElementById('healthScore').textContent = health + '%';
-                document.getElementById('healthFill').style.width = health + '%';
+                document.getElementById('healthFill').style.width  = health + '%';
 
-                // Update sample table
-                // Update sample table
-                if (data.sample && currentData) {
-                    const sampleBody = document.getElementById('sampleBody');
-                    sampleBody.innerHTML = data.sample.map(row =>
-                        '<tr>' + currentData.column_names.map(c => `<td>${row[c] ?? '—'}</td>`).join('') + '</tr>'
-                    ).join('');
-                }
+                renderColTable(currentData.column_names, currentData.dtypes, data.null_counts, data.final_rows);
 
-                // Update column profile table with new null counts
-                const colBody = document.getElementById('colTableBody');
-                colBody.innerHTML = '';
-                currentData.column_names.forEach((col, i) => {
-                    const nullCount = data.null_counts[col] || 0;
-                    const nullPctVal = ((nullCount / data.final_rows) * 100).toFixed(1);
-                    const dtype = currentData.dtypes[col] || 'unknown';
-                    const dtypeClass = dtype.includes('float') ? 'dtype-float' : dtype.includes('int') ? 'dtype-int' : 'dtype-str';
-                    const nullClass = nullCount === 0 ? 'null-zero' : nullCount < data.final_rows * 0.1 ? 'null-some' : 'null-many';
+                document.getElementById('sampleBody').innerHTML = data.sample.map(row =>
+                    '<tr class="hover:bg-white/5 transition-colors">' +
+                    currentData.column_names.map(c => `<td class="px-6 py-4">${row[c] ?? '—'}</td>`).join('') + '</tr>'
+                ).join('');
 
-                    colBody.innerHTML += `
-        <tr>
-            <td style="color:var(--muted)">${i + 1}</td>
-            <td class="col-name">${col}</td>
-            <td><span class="dtype-tag ${dtypeClass}">${dtype}</span></td>
-            <td class="${nullClass}">${nullCount.toLocaleString()}</td>
-            <td class="${nullClass}">${nullPctVal}%</td>
-        </tr>`;
-                });
-
-                // Keep currentData null_counts in sync for future modal previews
-                currentData.null_counts = data.null_counts;
-                currentData.rows = data.final_rows;
+                currentData.null_counts    = data.null_counts;
+                currentData.rows           = data.final_rows;
                 currentData.duplicate_rows = data.duplicate_rows;
 
-                // Disable clean button — already cleaned
-                cleanBtn.innerHTML = '✅ Data Cleaned';
-                document.getElementById('downloadBtn').style.display = 'flex';
-
+                const dlBtn = document.getElementById('downloadBtn');
+                dlBtn.classList.remove('hidden');
+                dlBtn.classList.add('flex');
+                cleanBtn.textContent = '✅ Data Cleaned';
                 showToast(`Done! ${data.rows_removed} rows removed, ${data.nulls_handled} nulls handled.`);
-
             } catch (err) {
-                showToast('❌ Cleaning failed. Is the server running?');
+                showToast('Cleaning failed.', true);
                 cleanBtn.disabled = false;
-                cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
+                cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>';
             }
         });
 
-        // Reset File — restores original uploaded file stats
-        document.getElementById('resetFileBtn').addEventListener('click', async () => {
-            try {
-                await fetch('http://localhost:8000/api/clean/reset', { method: 'POST' });
-
-                // Re-upload the same file to restore original state
-                const file = fileInput.files[0];
-                if (!file) { showToast('❌ No file to reset.'); return; }
-
-                const formData = new FormData();
-                formData.append('file', file);
-
-                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
-                const data = await res.json();
-                currentData = data;
-
-                // Re-render overview with original data
-                renderOverview(data);
-
-                // Reset clean button
-                const cleanBtn = document.getElementById('cleanBtn');
-                cleanBtn.disabled = false;
-                cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
-
-                // Hide download button
-                document.getElementById('downloadBtn').style.display = 'none';
-
-                // Reset modal defaults
-                document.getElementById('removeDupes').checked = true;
-                document.getElementById('handleNulls').checked = true;
-                document.getElementById('nullStrategy').value = 'drop';
-
-                showToast('File reset to original state.');
-            } catch (err) {
-                showToast('❌ Reset failed.');
-            }
-        });
-
-        // Download cleaned file
         document.getElementById('downloadBtn').addEventListener('click', () => {
             window.location.href = 'http://localhost:8000/api/clean/download';
         });
 
-        // Upload New File
+        document.getElementById('resetFileBtn').addEventListener('click', async () => {
+            try {
+                await fetch('http://localhost:8000/api/clean/reset', { method: 'POST' });
+                const file = fileInput.files[0];
+                if (!file) { showToast('No file to reset.', true); return; }
+                const formData = new FormData();
+                formData.append('file', file);
+                const res  = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
+                const data = await res.json();
+                currentData = data;
+                renderOverview(data);
+                resetCleanBtn();
+                document.getElementById('downloadBtn').classList.add('hidden');
+                document.getElementById('downloadBtn').classList.remove('flex');
+                showToast('File reset to original state.');
+            } catch { showToast('Reset failed.', true); }
+        });
+
         document.getElementById('resetBtn').addEventListener('click', resetUI);
 
         function resetUI() {
             currentData = null;
-            overview.classList.remove('active');
-            uploadSec.style.display = 'block';
+            overview.classList.add('hidden');
+            uploadSec.classList.remove('hidden');
             fileInput.value = '';
-
-            // Reset clean button fully
-            const cleanBtn = document.getElementById('cleanBtn');
-            cleanBtn.disabled = false;
-            cleanBtn.innerHTML = '🧹 Clean Data <span class="badge-rec">Recommended</span>';
-
-            // Reset health bar
             document.getElementById('healthFill').style.width = '0%';
             document.getElementById('healthScore').textContent = '—';
+            document.getElementById('downloadBtn').classList.add('hidden');
+            document.getElementById('downloadBtn').classList.remove('flex');
+            resetCleanBtn();
+        }
 
-            // Reset modal checkboxes to defaults
+        function resetCleanBtn() {
+            const cleanBtn = document.getElementById('cleanBtn');
+            cleanBtn.disabled = false;
+            cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>';
             document.getElementById('removeDupes').checked = true;
             document.getElementById('handleNulls').checked = true;
-            document.getElementById('nullStrategy').value = 'drop';
+            document.getElementById('nullStrategy').value  = 'drop';
         }
+
+        document.getElementById('startAnalysisBtn').addEventListener('click', () => {
+            if (!currentData) { showToast('Please upload a file first.', true); return; }
+            sessionStorage.setItem('dp_filename', currentData.filename);
+            window.location.href = 'analyze.html';
+        });
+
+        // Modal helpers
+        function showModal(id) { const m = document.getElementById(id); m.classList.remove('hidden'); m.classList.add('flex'); }
+        function hideModal(id) { const m = document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); }
 
         // Toast
-        function showToast(msg) {
+        let toastTimer = null;
+        function showToast(msg, isError = false) {
+            clearTimeout(toastTimer);
             const toast = document.getElementById('toast');
+            const icon  = document.getElementById('toastIcon');
+            const wrap  = document.getElementById('toastIconWrap');
+            const title = document.getElementById('toastTitle');
             document.getElementById('toastMsg').textContent = msg;
-            toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 3000);
+            icon.textContent  = isError ? 'error' : 'check_circle';
+            wrap.className    = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-error-container/20 text-error' : 'bg-tertiary-container/20 text-tertiary'}`;
+            title.textContent = isError ? 'Error' : 'Success';
+            toast.className   = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${isError ? 'border-error' : 'border-tertiary'} p-4 rounded-xl shadow-2xl max-w-sm`;
+            toastTimer = setTimeout(hideToast, 3500);
         }
-
-        // ── QUERY FEATURE ──
-        let queryHistory = [];
-
-        document.getElementById('askBtn').addEventListener('click', runQuery);
-        document.getElementById('queryInput').addEventListener('keydown', e => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runQuery(); }
-        });
-
-        async function runQuery() {
-            const input = document.getElementById('queryInput');
-            const prompt = input.value.trim();
-            const askBtn = document.getElementById('askBtn');
-            const errBox = document.getElementById('queryError');
-            const resWrap = document.getElementById('resultWrap');
-
-            if (!prompt) return;
-            if (!currentData) { showToast('❌ Upload a file first.'); return; }
-
-            // Loading state
-            askBtn.disabled = true;
-            askBtn.innerHTML = '⏳ Thinking...';
-            errBox.classList.remove('active');
-            resWrap.classList.remove('active');
-
-            try {
-                const res = await fetch('http://localhost:8000/api/query/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                const data = await res.json();
-
-                if (data.error) {
-                    errBox.textContent = '❌ ' + data.error;
-                    errBox.classList.add('active');
-                    return;
-                }
-
-                renderQueryResult(data);
-                addToHistory(prompt);
-                input.value = '';
-
-            } catch (err) {
-                errBox.textContent = '❌ Request failed. Is the server running?';
-                errBox.classList.add('active');
-            } finally {
-                askBtn.disabled = false;
-                askBtn.innerHTML = '⚡ Ask';
-            }
-        }
-
-        function renderQueryResult(data) {
-            // Meta
-            document.getElementById('resultCount').textContent = Math.min(data.rows.length, 100);
-            document.getElementById('resultCols').textContent = data.columns.length;
-            document.getElementById('resultTotal').textContent = data.total_rows;
-
-            // Generated code
-            document.getElementById('codeBlock').textContent = data.generated_code;
-            document.getElementById('codeBlock').classList.remove('active');
-            document.getElementById('codeToggle').textContent = '</> View Generated Code';
-
-            // Table headers
-            document.getElementById('resultHead').innerHTML =
-                '<tr>' + data.columns.map(c => `<th>${c}</th>`).join('') + '</tr>';
-
-            // Table rows
-            document.getElementById('resultBody').innerHTML = data.rows.map(row =>
-                '<tr>' + data.columns.map(c => `<td>${row[c] ?? '—'}</td>`).join('') + '</tr>'
-            ).join('');
-
-            document.getElementById('resultWrap').classList.add('active');
-        }
-
-        function toggleCode() {
-            const block = document.getElementById('codeBlock');
-            const toggle = document.getElementById('codeToggle');
-            const isOpen = block.classList.toggle('active');
-            toggle.textContent = isOpen ? '</> Hide Code' : '</> View Generated Code';
-        }
-
-        function addToHistory(prompt) {
-            if (queryHistory.includes(prompt)) return;
-            queryHistory.unshift(prompt);
-            if (queryHistory.length > 5) queryHistory.pop();
-
-            const list = document.getElementById('queryHistoryList');
-            const wrap = document.getElementById('historyWrap');
-
-            list.innerHTML = queryHistory.map(q =>
-                `<span class="history-chip" onclick="usePrompt(this)">${q}</span>`
-            ).join('');
-
-            wrap.style.display = 'block';
-        }
-
-        function usePrompt(el) {
-            document.getElementById('queryInput').value = el.textContent;
-            document.getElementById('queryInput').focus();
-        }
-
-        function downloadQueryResult(format) {
-            window.location.href = `http://localhost:8000/api/query/download?format=${format}`;
-        }
-
-        // ── SPEECH TO TEXT ──
-        const micBtn = document.getElementById('micBtn');
-        const micStatus = document.getElementById('micStatus');
-        const queryInput = document.getElementById('queryInput');
-
-        let recognition = null;
-        let isListening = false;
-        let silenceTimer = null;
-        const SILENCE_DELAY = 2000; // auto-fire query after 2s of silence
-
-        // Check browser support
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            micBtn.style.display = 'none';
-            document.getElementById('speechNotSupported').style.display = 'block';
-        } else {
-            setupSpeechRecognition();
-        }
-
-        function setupSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-
-            recognition.continuous = true;   // keep listening
-            recognition.interimResults = true;   // show live transcript
-            recognition.lang = 'en-US';
-
-            // Live transcript — show interim results in input box
-            recognition.onresult = (event) => {
-                let interimTranscript = '';
-                let finalTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript;
-                    } else {
-                        interimTranscript += transcript;
-                    }
-                }
-
-                // Show live text in input
-                queryInput.value = finalTranscript || interimTranscript;
-
-                // Reset silence timer on every new speech result
-                clearTimeout(silenceTimer);
-
-                // If we have a final transcript, start silence countdown
-                if (finalTranscript.trim()) {
-                    micStatus.textContent = '🟠 Processing in 2s... (keep speaking to cancel)';
-                    silenceTimer = setTimeout(() => {
-                        if (isListening && queryInput.value.trim()) {
-                            micStatus.textContent = '⚡ Running query...';
-                            runQuery();         // auto-fire query
-                        }
-                    }, SILENCE_DELAY);
-                }
-            };
-
-            recognition.onstart = () => {
-                isListening = true;
-                micBtn.classList.add('listening');
-                micBtn.textContent = '⏹';
-                micStatus.textContent = '🔴 Listening... speak your query';
-                micStatus.classList.add('active');
-            };
-
-            recognition.onend = () => {
-                // Auto-restart if still supposed to be listening
-                if (isListening) {
-                    recognition.start();
-                } else {
-                    micBtn.classList.remove('listening');
-                    micBtn.textContent = '🎤';
-                    micStatus.textContent = '';
-                    micStatus.classList.remove('active');
-                }
-            };
-
-            recognition.onerror = (event) => {
-                // Ignore no-speech errors — just keep listening
-                if (event.error === 'no-speech') return;
-
-                // For other errors stop and show message
-                isListening = false;
-                micBtn.classList.remove('listening');
-                micBtn.textContent = '🎤';
-                micStatus.textContent = `⚠ Mic error: ${event.error}`;
-                micStatus.classList.remove('active');
-            };
-        }
-
-        // Toggle mic on click
-        micBtn.addEventListener('click', () => {
-            if (!recognition) return;
-
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        });
-
-        function startListening() {
-            queryInput.value = '';
-            clearTimeout(silenceTimer);
-            isListening = true;
-            recognition.start();
-        }
-
-        function stopListening() {
-            isListening = false;
-            clearTimeout(silenceTimer);
-            recognition.stop();
-        }
-
-        // Stop mic when query runs (auto or manual)
-        const originalRunQuery = runQuery;
-        // Wrap runQuery to stop mic after auto-fire
-        async function runQuery() {
-            if (isListening) {
-                stopListening();
-            }
-
-            const input = document.getElementById('queryInput');
-            const prompt = input.value.trim();
-            const askBtn = document.getElementById('askBtn');
-            const errBox = document.getElementById('queryError');
-            const resWrap = document.getElementById('resultWrap');
-
-            if (!prompt) return;
-            if (!currentData) { showToast('❌ Upload a file first.'); return; }
-
-            askBtn.disabled = true;
-            askBtn.innerHTML = '⏳ Thinking...';
-            errBox.classList.remove('active');
-            resWrap.classList.remove('active');
-
-            try {
-                const res = await fetch('http://localhost:8000/api/query/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                const data = await res.json();
-
-                if (data.error) {
-                    errBox.textContent = '❌ ' + data.error;
-                    errBox.classList.add('active');
-                    return;
-                }
-
-                renderQueryResult(data);
-                addToHistory(prompt);
-                input.value = '';
-                micStatus.textContent = '';
-
-            } catch (err) {
-                errBox.textContent = '❌ Request failed. Is the server running?';
-                errBox.classList.add('active');
-            } finally {
-                askBtn.disabled = false;
-                askBtn.innerHTML = '⚡ Ask';
-            }
-        }
-
-        // Also stop mic when resetUI is called
-        const _originalResetUI = resetUI;
-        function resetUI() {
-            if (isListening) stopListening();
-            _originalResetUI();
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('hidden');
+            toast.classList.remove('flex');
         }
     </script>
 </body>
-
 </html>
