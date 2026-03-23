@@ -2,10 +2,14 @@ import pandas as pd
 import io
 import math
 
+# In-memory store — holds current session DataFrame
 _store: dict = {"df": None, "filename": None}
 
 def get_stored_df():
     return _store["df"]
+
+def get_stored_filename():
+    return _store["filename"]
 
 def sanitize(value):
     if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
@@ -25,14 +29,8 @@ async def parse_file(file):
     else:
         return {"error": "Unsupported file format"}
 
-    # Attach filename as a custom attribute so cleaner can use it
-    df._datapilot_filename = file.filename
-
     _store["df"]       = df.copy()
     _store["filename"] = file.filename
-
-    # Preserve custom attribute on the stored copy
-    _store["df"]._datapilot_filename = file.filename
 
     overview = {
         "filename":       file.filename,
