@@ -19,11 +19,20 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 templates = Jinja2Templates(directory="frontend/templates")
 
-from backend.routes import upload, clean, query
-app.include_router(upload.router, prefix="/api/upload")
-app.include_router(clean.router,  prefix="/api/clean")
-app.include_router(query.router,  prefix="/api/query")
+from backend.routes import upload, clean, query, scraper
+app.include_router(upload.router,  prefix="/api/upload")
+app.include_router(clean.router,   prefix="/api/clean")
+app.include_router(query.router,   prefix="/api/query")
+app.include_router(scraper.router, prefix="/api/scrape")
 
 @app.get("/")
 def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/scraper")
+def scraper_page(request: Request):
+    return templates.TemplateResponse("scraper.html", {"request": request})
+
+@app.get("/analyze")
+def analyze_page(request: Request):
+    return templates.TemplateResponse("analyze.html", {"request": request})

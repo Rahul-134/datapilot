@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>DataPilot | Web Scraper</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Space+Mono&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#00d4ff", "primary": "#a8e8ff",
+                        "surface-container-highest": "#313442", "tertiary-container": "#49da9f",
+                        "error-container": "#93000a", "error": "#ffb4ab", "outline": "#859398",
+                        "tertiary": "#6af7ba", "secondary": "#d2bbff", "on-background": "#dfe2f3",
+                        "outline-variant": "#3c494e", "surface": "#0f131f",
+                        "surface-container-high": "#262a37", "surface-container-lowest": "#0a0e1a",
+                        "on-error": "#690005", "surface-container-low": "#171b28",
+                        "on-error-container": "#ffdad6", "surface-container": "#1b1f2c",
+                        "secondary-container": "#6001d1", "on-surface": "#dfe2f3",
+                        "on-surface-variant": "#bbc9cf", "on-primary-container": "#00586b"
+                    },
+                    fontFamily: { "headline": ["Space Grotesk"], "body": ["Space Grotesk"], "mono": ["Space Mono"] },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0e1a;
+            background-image: radial-gradient(circle at 2px 2px, rgba(0, 212, 255, 0.03) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(133, 147, 152, 0.1);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+        }
+
+        .glow-primary:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="text-on-background font-body min-h-screen">
+
+    <!-- NAV -->
+    <nav
+        class="bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-cyan-500/10 shadow-[0_0_20px_rgba(0,212,255,0.15)] sticky top-0 z-50 w-full">
+        <div class="flex justify-between items-center px-8 py-4">
+            <div class="flex items-center gap-8">
+                <a href="index.html" class="text-2xl font-black text-white font-headline tracking-tight">
+                    Data<span class="text-[#00d4ff]">Pilot</span>
+                </a>
+                <div class="hidden md:flex gap-6">
+                    <a class="text-slate-400 hover:text-white transition-colors font-headline"
+                        href="index.html">Dashboard</a>
+                    <a class="text-slate-400 hover:text-white transition-colors font-headline"
+                        href="analyze.html">Analytics</a>
+                    <a class="text-[#00d4ff] border-b-2 border-[#00d4ff] pb-1 font-headline" href="#">Scraper</a>
+                </div>
+            </div>
+            <div
+                class="hidden sm:flex items-center px-3 py-1 rounded-full bg-surface-container border border-outline-variant/30">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-primary-container mr-2">v1.0</span>
+                <span class="text-xs font-medium text-on-surface-variant">AI Data Analyst</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 py-10 space-y-10">
+
+        <!-- PAGE HEADER -->
+        <header class="space-y-2">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-xl bg-primary-container/10 border border-primary-container/20">
+                    <span class="material-symbols-outlined text-primary-container text-2xl">travel_explore</span>
+                </div>
+                <h1 class="text-4xl font-extrabold font-headline tracking-tight text-white">Web Scraper</h1>
+            </div>
+            <p class="text-on-surface-variant font-mono text-sm ml-1">Paste a URL · describe what you want · get
+                structured data</p>
+        </header>
+
+        <!-- INPUT SECTION -->
+        <section class="space-y-6">
+
+            <!-- Example chips -->
+            <div class="flex flex-wrap gap-2">
+                <span class="text-xs font-mono text-outline uppercase tracking-widest self-center mr-2">Try:</span>
+                <span onclick="useExample(this)" data-url="https://books.toscrape.com"
+                    data-instruction="Extract all book titles and their prices"
+                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Books
+                    — titles & prices</span>
+                <span onclick="useExample(this)" data-url="https://quotes.toscrape.com"
+                    data-instruction="Extract all quotes and their authors"
+                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Quotes
+                    & authors</span>
+                <span onclick="useExample(this)" data-url="https://news.ycombinator.com"
+                    data-instruction="Extract all story titles and their links"
+                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">HN
+                    — story titles</span>
+            </div>
+
+            <!-- URL Input -->
+            <div class="space-y-3">
+                <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Target URL</label>
+                <div class="relative group">
+                    <div
+                        class="absolute inset-0 bg-primary/5 rounded-2xl blur-xl group-focus-within:bg-primary/10 transition-all">
+                    </div>
+                    <div
+                        class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+                        <span class="material-symbols-outlined text-outline px-3">link</span>
+                        <input id="urlInput"
+                            class="bg-transparent border-none focus:ring-0 flex-grow py-3 font-mono text-on-surface placeholder:text-outline/50"
+                            placeholder="https://example.com/products" type="url" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruction Input -->
+            <div class="space-y-3">
+                <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">What data do you
+                    want?</label>
+                <div class="relative group">
+                    <div
+                        class="absolute inset-0 bg-secondary/5 rounded-2xl blur-xl group-focus-within:bg-secondary/10 transition-all">
+                    </div>
+                    <div
+                        class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-secondary/50 transition-all">
+                        <span class="material-symbols-outlined text-outline px-3">text_fields</span>
+                        <input id="instructionInput"
+                            class="bg-transparent border-none focus:ring-0 flex-grow py-3 font-mono text-on-surface placeholder:text-outline/50"
+                            placeholder="e.g. Extract all product names, prices and ratings" type="text" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrape Button -->
+            <button id="scrapeBtn"
+                class="bg-gradient-to-r from-primary-container via-[#0099cc] to-secondary-container text-on-primary-container font-headline font-bold px-10 py-4 rounded-xl flex items-center gap-3 glow-primary transition-all hover:scale-[1.02] active:scale-95">
+                <span class="material-symbols-outlined">travel_explore</span>
+                Scrape & Extract Data
+            </button>
+
+        </section>
+
+        <!-- LOADING -->
+        <div id="scrapeLoading" class="hidden flex-col items-center justify-center py-16 space-y-4">
+            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <p class="font-mono font-medium text-primary animate-pulse">Fetching and extracting data...</p>
+            <p class="text-xs text-on-surface-variant font-mono">Following pagination — this may take a moment</p>
+        </div>
+
+        <!-- ERROR -->
+        <div id="scrapeError"
+            class="hidden p-4 rounded-xl bg-error-container/10 border border-error/20 text-error font-mono text-sm">
+        </div>
+
+        <!-- RESULT -->
+        <section id="resultSection" class="hidden space-y-6">
+
+            <!-- Result meta + export -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-2 w-2 rounded-full bg-tertiary animate-pulse"></div>
+                    <span class="font-mono text-sm text-on-surface-variant">
+                        <span id="resultCount">—</span> rows extracted ·
+                        <span id="resultCols">—</span> columns ·
+                        <span id="resultPages" class="text-tertiary"></span>
+                        from <span id="resultUrl"
+                            class="text-primary-container truncate max-w-xs inline-block align-bottom">—</span>
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="downloadScrape('csv')"
+                        class="flex items-center gap-2 px-4 py-2 border border-outline-variant/20 rounded-lg text-sm font-headline font-medium hover:bg-outline-variant/10 transition-colors">
+                        <span class="material-symbols-outlined text-sm">download</span> CSV
+                    </button>
+                    <button onclick="downloadScrape('xlsx')"
+                        class="flex items-center gap-2 px-4 py-2 border border-outline-variant/20 rounded-lg text-sm font-headline font-medium hover:bg-outline-variant/10 transition-colors">
+                        <span class="material-symbols-outlined text-sm">download</span> Excel
+                    </button>
+                    <button onclick="sendToAnalyzer()"
+                        class="flex items-center gap-2 px-4 py-2 bg-secondary-container/20 border border-secondary/20 text-secondary rounded-lg text-sm font-headline font-medium hover:bg-secondary-container/40 transition-colors">
+                        <span class="material-symbols-outlined text-sm">analytics</span> Analyze This Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result table -->
+            <div class="bg-surface-container rounded-2xl overflow-hidden border border-outline-variant/10 shadow-2xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="resultHead"></thead>
+                        <tbody id="resultBody" class="divide-y divide-outline-variant/5"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- TOAST -->
+    <div id="toast"
+        class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-surface-container-highest border-l-4 border-tertiary p-4 rounded-xl shadow-2xl max-w-sm">
+        <div id="toastIconWrap"
+            class="h-10 w-10 bg-tertiary-container/20 rounded-full flex items-center justify-center text-tertiary shrink-0">
+            <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
+        </div>
+        <div>
+            <p id="toastTitle" class="font-headline font-bold text-on-surface text-sm">Success</p>
+            <p id="toastMsg" class="text-xs text-on-surface-variant font-mono"></p>
+        </div>
+        <button onclick="hideToast()" class="text-outline hover:text-white transition-colors ml-auto">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+    </div>
+
+    <script>
+        const scrapeBtn = document.getElementById('scrapeBtn');
+        const urlInput = document.getElementById('urlInput');
+        const instructionInput = document.getElementById('instructionInput');
+        const scrapeLoading = document.getElementById('scrapeLoading');
+        const scrapeError = document.getElementById('scrapeError');
+        const resultSection = document.getElementById('resultSection');
+
+        // Example chips
+        function useExample(el) {
+            urlInput.value = el.dataset.url;
+            instructionInput.value = el.dataset.instruction;
+            urlInput.focus();
+        }
+
+        // Enter key on instruction fires scrape
+        instructionInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') runScrape();
+        });
+
+        scrapeBtn.addEventListener('click', runScrape);
+
+        async function runScrape() {
+            const url = urlInput.value.trim();
+            const instruction = instructionInput.value.trim();
+
+            if (!url) { showToast('Please enter a URL.', true); return; }
+            if (!instruction) { showToast('Please describe what data you want.', true); return; }
+            if (!url.startsWith('http')) { showToast('URL must start with http:// or https://', true); return; }
+
+            scrapeBtn.disabled = true;
+            scrapeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Scraping...';
+            scrapeError.classList.add('hidden');
+            resultSection.classList.add('hidden');
+            scrapeLoading.classList.remove('hidden');
+            scrapeLoading.classList.add('flex');
+
+            try {
+                const res = await fetch('http://localhost:8000/api/scrape/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, instruction })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    scrapeError.textContent = '❌ ' + data.error;
+                    scrapeError.classList.remove('hidden');
+                    return;
+                }
+
+                renderResult(data);
+                const pagesMsg = data.pages_scraped > 1 ? ` across ${data.pages_scraped} pages` : '';
+                showToast(`Extracted ${data.total_rows} rows${pagesMsg}!`);
+
+            } catch (err) {
+                scrapeError.textContent = '❌ Request failed. Is the server running?';
+                scrapeError.classList.remove('hidden');
+            } finally {
+                scrapeBtn.disabled = false;
+                scrapeBtn.innerHTML = '<span class="material-symbols-outlined">travel_explore</span> Scrape & Extract Data';
+                scrapeLoading.classList.add('hidden');
+                scrapeLoading.classList.remove('flex');
+            }
+        }
+
+        function renderResult(data) {
+            document.getElementById('resultCount').textContent = data.total_rows.toLocaleString();
+            document.getElementById('resultCols').textContent = data.columns.length;
+            document.getElementById('resultUrl').textContent = data.url;
+
+            const pagesEl = document.getElementById('resultPages');
+            if (data.pages_scraped > 1) {
+                pagesEl.textContent = `${data.pages_scraped} pages ·`;
+            } else {
+                pagesEl.textContent = '';
+            }
+
+            document.getElementById('resultHead').innerHTML =
+                '<tr class="bg-surface-container-high/50 border-b border-outline-variant/10">' +
+                data.columns.map(c => `<th class="px-6 py-4 font-mono text-xs uppercase tracking-widest text-outline">${c}</th>`).join('') +
+                '</tr>';
+
+            document.getElementById('resultBody').innerHTML = data.rows.map(row =>
+                '<tr class="hover:bg-primary/5 transition-colors cursor-default">' +
+                data.columns.map(c => `<td class="px-6 py-4 font-mono text-sm">${row[c] ?? '—'}</td>`).join('') +
+                '</tr>'
+            ).join('');
+
+            resultSection.classList.remove('hidden');
+        }
+
+        function downloadScrape(format) {
+            window.location.href = `http://localhost:8000/api/scrape/download?format=${format}`;
+        }
+
+        // Analyze This Data — saves scraped data context and opens analyze page
+        function sendToAnalyzer() {
+            sessionStorage.setItem('dp_filename', 'scraped_data.csv');
+            showToast('Note: Upload the downloaded CSV to analyze it on the dashboard.');
+        }
+
+        // Toast
+        let toastTimer = null;
+        function showToast(msg, isError = false) {
+            clearTimeout(toastTimer);
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle';
+            document.getElementById('toastIconWrap').className = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-error-container/20 text-error' : 'bg-tertiary-container/20 text-tertiary'}`;
+            document.getElementById('toastTitle').textContent = isError ? 'Error' : 'Success';
+            toast.className = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${isError ? 'border-error' : 'border-tertiary'} p-4 rounded-xl shadow-2xl max-w-sm`;
+            toastTimer = setTimeout(hideToast, 3500);
+        }
+        function hideToast() {
+            const t = document.getElementById('toast');
+            t.classList.add('hidden');
+            t.classList.remove('flex');
+        }
+    </script>
+</body>
+
+</html>
