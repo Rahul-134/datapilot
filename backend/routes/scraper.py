@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from backend.services.scraper_service import scrape_url
 import pandas as pd
 import io
@@ -13,6 +13,7 @@ _scrape_store: dict = {"df": None}
 class ScrapeRequest(BaseModel):
     url:         str
     instruction: str
+    max_pages:   int = Field(default=5, ge=1, le=20)
 
 @router.post("/")
 def run_scrape(req: ScrapeRequest):
@@ -25,7 +26,7 @@ def run_scrape(req: ScrapeRequest):
     if not req.url.startswith(("http://", "https://")):
         return {"error": "URL must start with http:// or https://"}
 
-    result = scrape_url(req.url.strip(), req.instruction.strip())
+    result = scrape_url(req.url.strip(), req.instruction.strip(), req.max_pages)
 
     if result.get("success"):
         _scrape_store["df"] = pd.DataFrame(result["rows"], columns=result["columns"])

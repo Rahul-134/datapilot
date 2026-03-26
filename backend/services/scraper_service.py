@@ -12,7 +12,7 @@ import re
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-MAX_PAGES = 5  # max pagination pages to follow
+DEFAULT_MAX_PAGES = 5  # default pagination pages to follow
 
 def sanitize(value):
     if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
@@ -86,12 +86,21 @@ def detect_next_page(html: str, current_url: str) -> str | None:
 
     return None
 
-def build_scraper_prompt(user_instruction: str, page_text: str, url: str) -> str:
+def build_scraper_prompt(user_instruction: str, page_text: str, url: str,
+                         expected_columns: list[str] | None = None) -> str:
+    column_rule = ""
+    if expected_columns:
+        cols_str = ", ".join(f'"{c}"' for c in expected_columns)
+        column_rule = (
+            f"\nIMPORTANT: You MUST use exactly these column names as keys: [{cols_str}].\n"
+            f"Do NOT rename, add, or remove any columns. Use these exact keys for every object.\n"
+        )
+
     return f"""You are a data extraction expert. A user wants to extract structured data from a webpage.
 
 URL: {url}
 User Instruction: "{user_instruction}"
-
+{column_rule}
 Page Content (cleaned):
 {page_text}
 
@@ -107,14 +116,15 @@ Example output:
 [{{"name": "iPhone 15", "price": "$799", "rating": "4.5"}}, {{"name": "Samsung S24", "price": "$699", "rating": "4.3"}}]
 """
 
-def extract_page_data(url: str, html: str, user_instruction: str) -> list | dict:
+def extract_page_data(url: str, html: str, user_instruction: str,
+                      expected_columns: list[str] | None = None) -> list | dict:
     """Clean one page's HTML and ask Gemini to extract structured data."""
     page_text = clean_html(html)
 
     if not page_text.strip():
         return []
 
-    prompt = build_scraper_prompt(user_instruction, page_text, url)
+    prompt = build_scraper_prompt(user_instruction, page_text, url, expected_columns)
 
     try:
         response = client.models.generate_content(
@@ -138,12 +148,13 @@ def extract_page_data(url: str, html: str, user_instruction: str) -> list | dict
 
     return data
 
-def scrape_url(url: str, user_instruction: str) -> dict:
+def scrape_url(url: str, user_instruction: str, max_pages: int = DEFAULT_MAX_PAGES) -> dict:
     all_rows = []
     current_url = url
     pages_fetched = 0
+    ran_out_of_pages = False
 
-    while current_url and pages_fetched < MAX_PAGES:
+    while current_url and pages_fetched < max_pages:
         # Fetch page
         fetch_result = fetch_page(current_url)
         if not fetch_result["success"]:
@@ -154,8 +165,9 @@ def scrape_url(url: str, user_instruction: str) -> dict:
         html = fetch_result["html"]
         pages_fetched += 1
 
-        # Extract data from this page
-        page_data = extract_page_data(current_url, html, user_instruction)
+        # Extract data from this page (enforce columns from page 1 onward)
+        expected_cols = list(all_rows[0].keys()) if all_rows else None
+        page_data = extract_page_data(current_url, html, user_instruction, expected_cols)
 
         if isinstance(page_data, dict) and "error" in page_data:
             if pages_fetched == 1:
@@ -165,7 +177,10 @@ def scrape_url(url: str, user_instruction: str) -> dict:
         all_rows.extend(page_data)
 
         # Check for next page
-        current_url = detect_next_page(html, current_url)
+        next_url = detect_next_page(html, current_url)
+        if next_url is None and pages_fetched < max_pages:
+            ran_out_of_pages = True
+        current_url = next_url
 
     if len(all_rows) == 0:
         return {"error": "No relevant data found for your instruction. Try a different URL or instruction."}
@@ -184,7 +199,7 @@ def scrape_url(url: str, user_instruction: str) -> dict:
     columns = df.columns.tolist()
     rows    = [sanitize_row(row) for row in df.to_dict(orient="records")]
 
-    return {
+    result = {
         "success":      True,
         "url":          url,
         "instruction":  user_instruction,
@@ -194,3 +209,12 @@ def scrape_url(url: str, user_instruction: str) -> dict:
         "shape":        list(df.shape),
         "pages_scraped": pages_fetched
     }
+
+    if ran_out_of_pages:
+        result["warning"] = (
+            f"You requested {max_pages} pages, but only {pages_fetched} "
+            f"{'page was' if pages_fetched == 1 else 'pages were'} available on this website. "
+            f"Showing all available data."
+        )
+
+    return result

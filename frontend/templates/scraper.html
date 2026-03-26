@@ -155,6 +155,25 @@
                 </div>
             </div>
 
+            <!-- Pages to Scrape Input -->
+            <div class="space-y-3">
+                <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Pages to
+                    scrape</label>
+                <div class="relative group">
+                    <div
+                        class="absolute inset-0 bg-tertiary/5 rounded-2xl blur-xl group-focus-within:bg-tertiary/10 transition-all">
+                    </div>
+                    <div
+                        class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-tertiary/50 transition-all">
+                        <span class="material-symbols-outlined text-outline px-3">auto_stories</span>
+                        <input id="maxPagesInput"
+                            class="bg-transparent border-none focus:ring-0 w-24 py-3 font-mono text-on-surface placeholder:text-outline/50"
+                            type="number" min="1" max="20" value="5" />
+                        <span class="text-xs text-outline font-mono pr-3">pages (1–20)</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Scrape Button -->
             <button id="scrapeBtn"
                 class="bg-gradient-to-r from-primary-container via-[#0099cc] to-secondary-container text-on-primary-container font-headline font-bold px-10 py-4 rounded-xl flex items-center gap-3 glow-primary transition-all hover:scale-[1.02] active:scale-95">
@@ -190,6 +209,8 @@
                         from <span id="resultUrl"
                             class="text-primary-container truncate max-w-xs inline-block align-bottom">—</span>
                     </span>
+                    <span id="resultWarning"
+                        class="hidden text-xs font-mono px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"></span>
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="downloadScrape('csv')"
@@ -241,6 +262,7 @@
         const scrapeBtn = document.getElementById('scrapeBtn');
         const urlInput = document.getElementById('urlInput');
         const instructionInput = document.getElementById('instructionInput');
+        const maxPagesInput = document.getElementById('maxPagesInput');
         const scrapeLoading = document.getElementById('scrapeLoading');
         const scrapeError = document.getElementById('scrapeError');
         const resultSection = document.getElementById('resultSection');
@@ -262,10 +284,16 @@
         async function runScrape() {
             const url = urlInput.value.trim();
             const instruction = instructionInput.value.trim();
+            let max_pages = parseInt(maxPagesInput.value, 10);
 
             if (!url) { showToast('Please enter a URL.', true); return; }
             if (!instruction) { showToast('Please describe what data you want.', true); return; }
             if (!url.startsWith('http')) { showToast('URL must start with http:// or https://', true); return; }
+
+            // Clamp max_pages to 1-20
+            if (isNaN(max_pages) || max_pages < 1) max_pages = 1;
+            if (max_pages > 20) max_pages = 20;
+            maxPagesInput.value = max_pages;
 
             scrapeBtn.disabled = true;
             scrapeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Scraping...';
@@ -278,7 +306,7 @@
                 const res = await fetch('http://localhost:8000/api/scrape/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, instruction })
+                    body: JSON.stringify({ url, instruction, max_pages })
                 });
                 const data = await res.json();
 
@@ -291,6 +319,11 @@
                 renderResult(data);
                 const pagesMsg = data.pages_scraped > 1 ? ` across ${data.pages_scraped} pages` : '';
                 showToast(`Extracted ${data.total_rows} rows${pagesMsg}!`);
+
+                // Show warning toast if fewer pages were available
+                if (data.warning) {
+                    setTimeout(() => showToast(data.warning, false, true), 800);
+                }
 
             } catch (err) {
                 scrapeError.textContent = '❌ Request failed. Is the server running?';
@@ -313,6 +346,15 @@
                 pagesEl.textContent = `${data.pages_scraped} pages ·`;
             } else {
                 pagesEl.textContent = '';
+            }
+
+            // Show inline warning badge if present
+            const warningEl = document.getElementById('resultWarning');
+            if (data.warning) {
+                warningEl.textContent = '⚠ ' + data.warning;
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
             }
 
             document.getElementById('resultHead').innerHTML =
@@ -341,15 +383,28 @@
 
         // Toast
         let toastTimer = null;
-        function showToast(msg, isError = false) {
+        function showToast(msg, isError = false, isWarning = false) {
             clearTimeout(toastTimer);
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').textContent = msg;
-            document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle';
-            document.getElementById('toastIconWrap').className = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-error-container/20 text-error' : 'bg-tertiary-container/20 text-tertiary'}`;
-            document.getElementById('toastTitle').textContent = isError ? 'Error' : 'Success';
-            toast.className = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${isError ? 'border-error' : 'border-tertiary'} p-4 rounded-xl shadow-2xl max-w-sm`;
-            toastTimer = setTimeout(hideToast, 3500);
+
+            let icon, iconClasses, title, borderClass;
+            if (isError) {
+                icon = 'error'; iconClasses = 'bg-error-container/20 text-error';
+                title = 'Error'; borderClass = 'border-error';
+            } else if (isWarning) {
+                icon = 'warning'; iconClasses = 'bg-yellow-500/10 text-yellow-400';
+                title = 'Heads Up'; borderClass = 'border-yellow-500';
+            } else {
+                icon = 'check_circle'; iconClasses = 'bg-tertiary-container/20 text-tertiary';
+                title = 'Success'; borderClass = 'border-tertiary';
+            }
+
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastIconWrap').className = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${iconClasses}`;
+            document.getElementById('toastTitle').textContent = title;
+            toast.className = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${borderClass} p-4 rounded-xl shadow-2xl max-w-sm`;
+            toastTimer = setTimeout(hideToast, isWarning ? 6000 : 3500);
         }
         function hideToast() {
             const t = document.getElementById('toast');
