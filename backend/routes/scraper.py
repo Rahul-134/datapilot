@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-from backend.services.scraper_service import scrape_url
+from backend.services.scraper_service import scrape_url, search_and_scrape
 import pandas as pd
 import io
 
@@ -15,6 +15,11 @@ class ScrapeRequest(BaseModel):
     instruction: str
     max_pages:   int = Field(default=5, ge=1, le=20)
 
+class SearchScrapeRequest(BaseModel):
+    query:              str
+    max_results:        int = Field(default=3, ge=1, le=10)
+    max_pages_per_site: int = Field(default=3, ge=1, le=10)
+
 @router.post("/")
 def run_scrape(req: ScrapeRequest):
     if not req.url.strip():
@@ -27,6 +32,18 @@ def run_scrape(req: ScrapeRequest):
         return {"error": "URL must start with http:// or https://"}
 
     result = scrape_url(req.url.strip(), req.instruction.strip(), req.max_pages)
+
+    if result.get("success"):
+        _scrape_store["df"] = pd.DataFrame(result["rows"], columns=result["columns"])
+
+    return result
+
+@router.post("/search")
+def run_search_scrape(req: SearchScrapeRequest):
+    if not req.query.strip():
+        return {"error": "Search query cannot be empty."}
+
+    result = search_and_scrape(req.query.strip(), req.max_results, req.max_pages_per_site)
 
     if result.get("success"):
         _scrape_store["df"] = pd.DataFrame(result["rows"], columns=result["columns"])

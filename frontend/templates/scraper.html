@@ -57,6 +57,38 @@
         .glow-primary:hover {
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
         }
+
+        /* Mode toggle active pill */
+        .mode-pill {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mode-pill.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(96, 1, 209, 0.2));
+            border-color: rgba(0, 212, 255, 0.5);
+            color: #a8e8ff;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.12);
+        }
+
+        .mode-pill:not(.active) {
+            background: transparent;
+            border-color: rgba(133, 147, 152, 0.15);
+            color: #859398;
+        }
+
+        .mode-pill:not(.active):hover {
+            border-color: rgba(133, 147, 152, 0.35);
+            color: #bbc9cf;
+        }
+
+        .source-badge {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
@@ -96,32 +128,66 @@
                 </div>
                 <h1 class="text-4xl font-extrabold font-headline tracking-tight text-white">Web Scraper</h1>
             </div>
-            <p class="text-on-surface-variant font-mono text-sm ml-1">Paste a URL · describe what you want · get
-                structured data</p>
+            <p class="text-on-surface-variant font-mono text-sm ml-1">Paste a URL or describe what you need — AI finds
+                &amp; extracts structured data</p>
         </header>
+
+        <!-- MODE TOGGLE -->
+        <div class="flex items-center gap-2">
+            <button id="modeUrl" onclick="setMode('url')"
+                class="mode-pill active flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-headline font-semibold cursor-pointer">
+                <span class="material-symbols-outlined text-base">link</span>
+                URL Mode
+            </button>
+            <button id="modeSearch" onclick="setMode('search')"
+                class="mode-pill flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-headline font-semibold cursor-pointer">
+                <span class="material-symbols-outlined text-base">auto_awesome</span>
+                Search Mode
+            </button>
+            <span class="ml-3 text-xs text-outline font-mono" id="modeHint">paste a URL to scrape</span>
+        </div>
 
         <!-- INPUT SECTION -->
         <section class="space-y-6">
 
             <!-- Example chips -->
-            <div class="flex flex-wrap gap-2">
-                <span class="text-xs font-mono text-outline uppercase tracking-widest self-center mr-2">Try:</span>
-                <span onclick="useExample(this)" data-url="https://books.toscrape.com"
-                    data-instruction="Extract all book titles and their prices"
-                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Books
-                    — titles & prices</span>
-                <span onclick="useExample(this)" data-url="https://quotes.toscrape.com"
-                    data-instruction="Extract all quotes and their authors"
-                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Quotes
-                    & authors</span>
-                <span onclick="useExample(this)" data-url="https://news.ycombinator.com"
-                    data-instruction="Extract all story titles and their links"
-                    class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">HN
-                    — story titles</span>
+            <div id="exampleChips" class="flex flex-wrap gap-2">
+                <!-- URL mode chips -->
+                <div id="urlChips" class="contents">
+                    <span class="text-xs font-mono text-outline uppercase tracking-widest self-center mr-2">Try:</span>
+                    <span onclick="useExample(this)" data-url="https://books.toscrape.com"
+                        data-instruction="Extract all book titles and their prices"
+                        class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Books
+                        — titles & prices</span>
+                    <span onclick="useExample(this)" data-url="https://quotes.toscrape.com"
+                        data-instruction="Extract all quotes and their authors"
+                        class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Quotes
+                        & authors</span>
+                    <span onclick="useExample(this)" data-url="https://news.ycombinator.com"
+                        data-instruction="Extract all story titles and their links"
+                        class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">HN
+                        — story titles</span>
+                </div>
+                <!-- Search mode chips -->
+                <div id="searchChips" class="contents hidden">
+                    <span class="text-xs font-mono text-outline uppercase tracking-widest self-center mr-2">Try:</span>
+                    <span onclick="useSearchExample(this)"
+                        data-query="Top 10 programming languages 2025 with popularity percentage"
+                        class="px-3 py-1.5 bg-primary-container/15 text-primary border border-primary-container/20 rounded-full text-xs font-medium cursor-pointer hover:bg-primary-container/25 transition-all">
+                        Programming languages ranking</span>
+                    <span onclick="useSearchExample(this)"
+                        data-query="Best selling books of all time with author and copies sold"
+                        class="px-3 py-1.5 bg-primary-container/15 text-primary border border-primary-container/20 rounded-full text-xs font-medium cursor-pointer hover:bg-primary-container/25 transition-all">
+                        Best selling books ever</span>
+                    <span onclick="useSearchExample(this)"
+                        data-query="Countries with highest GDP 2024 including population and GDP per capita"
+                        class="px-3 py-1.5 bg-primary-container/15 text-primary border border-primary-container/20 rounded-full text-xs font-medium cursor-pointer hover:bg-primary-container/25 transition-all">
+                        GDP by country</span>
+                </div>
             </div>
 
-            <!-- URL Input -->
-            <div class="space-y-3">
+            <!-- URL Input (URL mode only) -->
+            <div id="urlField" class="space-y-3">
                 <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Target URL</label>
                 <div class="relative group">
                     <div
@@ -137,17 +203,19 @@
                 </div>
             </div>
 
-            <!-- Instruction Input -->
+            <!-- Instruction / Search Query Input -->
             <div class="space-y-3">
-                <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">What data do you
+                <label id="instructionLabel"
+                    class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">What data do you
                     want?</label>
                 <div class="relative group">
-                    <div
+                    <div id="instructionGlow"
                         class="absolute inset-0 bg-secondary/5 rounded-2xl blur-xl group-focus-within:bg-secondary/10 transition-all">
                     </div>
-                    <div
+                    <div id="instructionBorder"
                         class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-secondary/50 transition-all">
-                        <span class="material-symbols-outlined text-outline px-3">text_fields</span>
+                        <span id="instructionIcon"
+                            class="material-symbols-outlined text-outline px-3">text_fields</span>
                         <input id="instructionInput"
                             class="bg-transparent border-none focus:ring-0 flex-grow py-3 font-mono text-on-surface placeholder:text-outline/50"
                             placeholder="e.g. Extract all product names, prices and ratings" type="text" />
@@ -155,8 +223,8 @@
                 </div>
             </div>
 
-            <!-- Pages to Scrape Input -->
-            <div class="space-y-3">
+            <!-- Pages to Scrape (URL mode) -->
+            <div id="pagesField" class="space-y-3">
                 <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Pages to
                     scrape</label>
                 <div class="relative group">
@@ -174,11 +242,51 @@
                 </div>
             </div>
 
+            <!-- Search mode controls -->
+            <div id="searchControls" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Websites to find -->
+                <div class="space-y-3">
+                    <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Websites to
+                        find</label>
+                    <div class="relative group">
+                        <div
+                            class="absolute inset-0 bg-primary-container/5 rounded-2xl blur-xl group-focus-within:bg-primary-container/10 transition-all">
+                        </div>
+                        <div
+                            class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-primary-container/50 transition-all">
+                            <span class="material-symbols-outlined text-outline px-3">language</span>
+                            <input id="maxResultsInput"
+                                class="bg-transparent border-none focus:ring-0 w-24 py-3 font-mono text-on-surface placeholder:text-outline/50"
+                                type="number" min="1" max="10" value="3" />
+                            <span class="text-xs text-outline font-mono pr-3">sites (1–10)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pages per site -->
+                <div class="space-y-3">
+                    <label class="text-on-surface-variant text-xs font-mono uppercase tracking-widest">Pages per
+                        site</label>
+                    <div class="relative group">
+                        <div
+                            class="absolute inset-0 bg-tertiary/5 rounded-2xl blur-xl group-focus-within:bg-tertiary/10 transition-all">
+                        </div>
+                        <div
+                            class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-tertiary/50 transition-all">
+                            <span class="material-symbols-outlined text-outline px-3">auto_stories</span>
+                            <input id="maxPagesPerSiteInput"
+                                class="bg-transparent border-none focus:ring-0 w-24 py-3 font-mono text-on-surface placeholder:text-outline/50"
+                                type="number" min="1" max="10" value="3" />
+                            <span class="text-xs text-outline font-mono pr-3">pages (1–10)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Scrape Button -->
             <button id="scrapeBtn"
                 class="bg-gradient-to-r from-primary-container via-[#0099cc] to-secondary-container text-on-primary-container font-headline font-bold px-10 py-4 rounded-xl flex items-center gap-3 glow-primary transition-all hover:scale-[1.02] active:scale-95">
                 <span class="material-symbols-outlined">travel_explore</span>
-                Scrape & Extract Data
+                <span id="scrapeBtnText">Scrape & Extract Data</span>
             </button>
 
         </section>
@@ -186,8 +294,10 @@
         <!-- LOADING -->
         <div id="scrapeLoading" class="hidden flex-col items-center justify-center py-16 space-y-4">
             <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p class="font-mono font-medium text-primary animate-pulse">Fetching and extracting data...</p>
-            <p class="text-xs text-on-surface-variant font-mono">Following pagination — this may take a moment</p>
+            <p id="loadingText" class="font-mono font-medium text-primary animate-pulse">Fetching and extracting
+                data...</p>
+            <p id="loadingSubtext" class="text-xs text-on-surface-variant font-mono">Following pagination — this may
+                take a moment</p>
         </div>
 
         <!-- ERROR -->
@@ -197,6 +307,15 @@
 
         <!-- RESULT -->
         <section id="resultSection" class="hidden space-y-6">
+
+            <!-- Sources badges (search mode) -->
+            <div id="sourcesSection" class="hidden space-y-3">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary-container text-lg">public</span>
+                    <span class="text-xs font-mono text-outline uppercase tracking-widest">Data sourced from</span>
+                </div>
+                <div id="sourcesList" class="flex flex-wrap gap-2"></div>
+            </div>
 
             <!-- Result meta + export -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -259,70 +378,177 @@
     </div>
 
     <script>
-        const scrapeBtn = document.getElementById('scrapeBtn');
-        const urlInput = document.getElementById('urlInput');
-        const instructionInput = document.getElementById('instructionInput');
-        const maxPagesInput = document.getElementById('maxPagesInput');
-        const scrapeLoading = document.getElementById('scrapeLoading');
-        const scrapeError = document.getElementById('scrapeError');
-        const resultSection = document.getElementById('resultSection');
+        // ─── State ───────────────────────────────────────────────
+        let currentMode = 'url'; // 'url' | 'search'
 
-        // Example chips
+        // ─── DOM refs ────────────────────────────────────────────
+        const scrapeBtn        = document.getElementById('scrapeBtn');
+        const scrapeBtnText    = document.getElementById('scrapeBtnText');
+        const urlInput         = document.getElementById('urlInput');
+        const instructionInput = document.getElementById('instructionInput');
+        const maxPagesInput    = document.getElementById('maxPagesInput');
+        const maxResultsInput  = document.getElementById('maxResultsInput');
+        const maxPagesPerSite  = document.getElementById('maxPagesPerSiteInput');
+        const scrapeLoading    = document.getElementById('scrapeLoading');
+        const scrapeError      = document.getElementById('scrapeError');
+        const resultSection    = document.getElementById('resultSection');
+
+        // Mode-specific elements
+        const urlField        = document.getElementById('urlField');
+        const pagesField      = document.getElementById('pagesField');
+        const searchControls  = document.getElementById('searchControls');
+        const urlChips        = document.getElementById('urlChips');
+        const searchChips     = document.getElementById('searchChips');
+        const modeHint        = document.getElementById('modeHint');
+        const instructionIcon = document.getElementById('instructionIcon');
+
+        // ─── Mode toggle ────────────────────────────────────────
+        function setMode(mode) {
+            currentMode = mode;
+            const isSearch = mode === 'search';
+
+            // Toggle pill active state
+            document.getElementById('modeUrl').classList.toggle('active', !isSearch);
+            document.getElementById('modeSearch').classList.toggle('active', isSearch);
+
+            // Show/hide fields
+            urlField.classList.toggle('hidden', isSearch);
+            pagesField.classList.toggle('hidden', isSearch);
+            searchControls.classList.toggle('hidden', !isSearch);
+
+            // Swap chips
+            urlChips.classList.toggle('hidden', isSearch);
+            searchChips.classList.toggle('hidden', !isSearch);
+
+            // Update instruction field style & placeholder
+            if (isSearch) {
+                modeHint.textContent = 'describe what you want, AI finds & scrapes';
+                instructionInput.placeholder = 'e.g. Top 10 laptops under $500 with specs and ratings';
+                instructionIcon.textContent = 'auto_awesome';
+                document.getElementById('instructionLabel').textContent = 'Describe what data you want';
+                document.getElementById('instructionGlow').className =
+                    'absolute inset-0 bg-primary-container/5 rounded-2xl blur-xl group-focus-within:bg-primary-container/10 transition-all';
+                document.getElementById('instructionBorder').className =
+                    'relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-primary-container/50 transition-all';
+                scrapeBtnText.textContent = 'Search & Extract Data';
+                document.getElementById('loadingText').textContent = 'Discovering websites and extracting data...';
+                document.getElementById('loadingSubtext').textContent = 'AI is finding sites, scraping each one — this may take a moment';
+            } else {
+                modeHint.textContent = 'paste a URL to scrape';
+                instructionInput.placeholder = 'e.g. Extract all product names, prices and ratings';
+                instructionIcon.textContent = 'text_fields';
+                document.getElementById('instructionLabel').textContent = 'What data do you want?';
+                document.getElementById('instructionGlow').className =
+                    'absolute inset-0 bg-secondary/5 rounded-2xl blur-xl group-focus-within:bg-secondary/10 transition-all';
+                document.getElementById('instructionBorder').className =
+                    'relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-secondary/50 transition-all';
+                scrapeBtnText.textContent = 'Scrape & Extract Data';
+                document.getElementById('loadingText').textContent = 'Fetching and extracting data...';
+                document.getElementById('loadingSubtext').textContent = 'Following pagination — this may take a moment';
+            }
+        }
+
+        // ─── Example chips ──────────────────────────────────────
         function useExample(el) {
             urlInput.value = el.dataset.url;
             instructionInput.value = el.dataset.instruction;
             urlInput.focus();
         }
 
-        // Enter key on instruction fires scrape
+        function useSearchExample(el) {
+            instructionInput.value = el.dataset.query;
+            instructionInput.focus();
+        }
+
+        // Enter key fires scrape
         instructionInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') runScrape();
         });
 
         scrapeBtn.addEventListener('click', runScrape);
 
+        // ─── Run scrape ─────────────────────────────────────────
         async function runScrape() {
-            const url = urlInput.value.trim();
             const instruction = instructionInput.value.trim();
-            let max_pages = parseInt(maxPagesInput.value, 10);
-
-            if (!url) { showToast('Please enter a URL.', true); return; }
             if (!instruction) { showToast('Please describe what data you want.', true); return; }
-            if (!url.startsWith('http')) { showToast('URL must start with http:// or https://', true); return; }
 
-            // Clamp max_pages to 1-20
-            if (isNaN(max_pages) || max_pages < 1) max_pages = 1;
-            if (max_pages > 20) max_pages = 20;
-            maxPagesInput.value = max_pages;
-
+            // Reset UI
             scrapeBtn.disabled = true;
-            scrapeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Scraping...';
+            scrapeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> ' +
+                (currentMode === 'search' ? 'Searching...' : 'Scraping...');
             scrapeError.classList.add('hidden');
             resultSection.classList.add('hidden');
             scrapeLoading.classList.remove('hidden');
             scrapeLoading.classList.add('flex');
+            document.getElementById('sourcesSection').classList.add('hidden');
 
             try {
-                const res = await fetch('http://localhost:8000/api/scrape/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, instruction, max_pages })
-                });
-                const data = await res.json();
+                let res, data;
 
-                if (data.error) {
-                    scrapeError.textContent = '❌ ' + data.error;
-                    scrapeError.classList.remove('hidden');
-                    return;
-                }
+                if (currentMode === 'search') {
+                    // ─── SEARCH MODE ─────────────────────
+                    let max_results = parseInt(maxResultsInput.value, 10);
+                    let max_pages_per_site_val = parseInt(maxPagesPerSite.value, 10);
+                    if (isNaN(max_results) || max_results < 1) max_results = 1;
+                    if (max_results > 10) max_results = 10;
+                    if (isNaN(max_pages_per_site_val) || max_pages_per_site_val < 1) max_pages_per_site_val = 1;
+                    if (max_pages_per_site_val > 10) max_pages_per_site_val = 10;
 
-                renderResult(data);
-                const pagesMsg = data.pages_scraped > 1 ? ` across ${data.pages_scraped} pages` : '';
-                showToast(`Extracted ${data.total_rows} rows${pagesMsg}!`);
+                    res = await fetch('http://localhost:8000/api/scrape/search', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: instruction,
+                            max_results,
+                            max_pages_per_site: max_pages_per_site_val
+                        })
+                    });
+                    data = await res.json();
 
-                // Show warning toast if fewer pages were available
-                if (data.warning) {
-                    setTimeout(() => showToast(data.warning, false, true), 800);
+                    if (data.error) {
+                        let errorMsg = '❌ ' + data.error;
+                        if (data.sources_attempted) {
+                            errorMsg += '\n\nAttempted sites: ' + data.sources_attempted.join(', ');
+                        }
+                        scrapeError.textContent = errorMsg;
+                        scrapeError.classList.remove('hidden');
+                        return;
+                    }
+
+                    renderResult(data, true);
+                    showToast(`Extracted ${data.total_rows} rows from ${data.sources.length} website(s)!`);
+
+                } else {
+                    // ─── URL MODE ────────────────────────
+                    const url = urlInput.value.trim();
+                    if (!url) { showToast('Please enter a URL.', true); return; }
+                    if (!url.startsWith('http')) { showToast('URL must start with http:// or https://', true); return; }
+
+                    let max_pages = parseInt(maxPagesInput.value, 10);
+                    if (isNaN(max_pages) || max_pages < 1) max_pages = 1;
+                    if (max_pages > 20) max_pages = 20;
+                    maxPagesInput.value = max_pages;
+
+                    res = await fetch('http://localhost:8000/api/scrape/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url, instruction, max_pages })
+                    });
+                    data = await res.json();
+
+                    if (data.error) {
+                        scrapeError.textContent = '❌ ' + data.error;
+                        scrapeError.classList.remove('hidden');
+                        return;
+                    }
+
+                    renderResult(data, false);
+                    const pagesMsg = data.pages_scraped > 1 ? ` across ${data.pages_scraped} pages` : '';
+                    showToast(`Extracted ${data.total_rows} rows${pagesMsg}!`);
+
+                    if (data.warning) {
+                        setTimeout(() => showToast(data.warning, false, true), 800);
+                    }
                 }
 
             } catch (err) {
@@ -330,25 +556,39 @@
                 scrapeError.classList.remove('hidden');
             } finally {
                 scrapeBtn.disabled = false;
-                scrapeBtn.innerHTML = '<span class="material-symbols-outlined">travel_explore</span> Scrape & Extract Data';
+                scrapeBtn.innerHTML = '<span class="material-symbols-outlined">travel_explore</span> ' +
+                    '<span id="scrapeBtnText">' + (currentMode === 'search' ? 'Search & Extract Data' : 'Scrape & Extract Data') + '</span>';
                 scrapeLoading.classList.add('hidden');
                 scrapeLoading.classList.remove('flex');
             }
         }
 
-        function renderResult(data) {
+        // ─── Render result ──────────────────────────────────────
+        function renderResult(data, isSearch) {
             document.getElementById('resultCount').textContent = data.total_rows.toLocaleString();
             document.getElementById('resultCols').textContent = data.columns.length;
-            document.getElementById('resultUrl').textContent = data.url;
 
+            const resultUrlEl = document.getElementById('resultUrl');
             const pagesEl = document.getElementById('resultPages');
-            if (data.pages_scraped > 1) {
-                pagesEl.textContent = `${data.pages_scraped} pages ·`;
+
+            if (isSearch) {
+                resultUrlEl.textContent = `${data.sources.length} website(s)`;
+                const totalPages = data.sources.reduce((sum, s) => sum + s.pages_scraped, 0);
+                pagesEl.textContent = totalPages > 1 ? `${totalPages} pages ·` : '';
+
+                // Render sources
+                renderSources(data.sources);
             } else {
-                pagesEl.textContent = '';
+                resultUrlEl.textContent = data.url;
+                if (data.pages_scraped > 1) {
+                    pagesEl.textContent = `${data.pages_scraped} pages ·`;
+                } else {
+                    pagesEl.textContent = '';
+                }
+                document.getElementById('sourcesSection').classList.add('hidden');
             }
 
-            // Show inline warning badge if present
+            // Show warning badge
             const warningEl = document.getElementById('resultWarning');
             if (data.warning) {
                 warningEl.textContent = '⚠ ' + data.warning;
@@ -357,31 +597,58 @@
                 warningEl.classList.add('hidden');
             }
 
+            // Table header
             document.getElementById('resultHead').innerHTML =
                 '<tr class="bg-surface-container-high/50 border-b border-outline-variant/10">' +
                 data.columns.map(c => `<th class="px-6 py-4 font-mono text-xs uppercase tracking-widest text-outline">${c}</th>`).join('') +
                 '</tr>';
 
+            // Table body
             document.getElementById('resultBody').innerHTML = data.rows.map(row =>
                 '<tr class="hover:bg-primary/5 transition-colors cursor-default">' +
-                data.columns.map(c => `<td class="px-6 py-4 font-mono text-sm">${row[c] ?? '—'}</td>`).join('') +
+                data.columns.map(c => {
+                    const val = row[c] ?? '—';
+                    // Make source_url column clickable
+                    if (c === 'source_url' && val.startsWith('http')) {
+                        return `<td class="px-6 py-4 font-mono text-sm"><a href="${val}" target="_blank" class="text-primary-container hover:underline truncate inline-block max-w-[200px]" title="${val}">${new URL(val).hostname}</a></td>`;
+                    }
+                    return `<td class="px-6 py-4 font-mono text-sm">${val}</td>`;
+                }).join('') +
                 '</tr>'
             ).join('');
 
             resultSection.classList.remove('hidden');
         }
 
+        // ─── Render sources badges ──────────────────────────────
+        function renderSources(sources) {
+            const container = document.getElementById('sourcesList');
+            container.innerHTML = sources.map((s, i) => {
+                let hostname;
+                try { hostname = new URL(s.url).hostname; } catch { hostname = s.url; }
+                return `<a href="${s.url}" target="_blank"
+                    class="source-badge flex items-center gap-2 px-4 py-2 bg-primary-container/10 border border-primary-container/20 rounded-xl text-sm font-mono hover:bg-primary-container/20 hover:border-primary-container/40 transition-all group"
+                    style="animation-delay: ${i * 100}ms" title="${s.url}">
+                    <span class="material-symbols-outlined text-primary-container text-base group-hover:scale-110 transition-transform">language</span>
+                    <span class="text-primary">${hostname}</span>
+                    <span class="text-outline text-xs">${s.rows_extracted} rows · ${s.pages_scraped} pg</span>
+                </a>`;
+            }).join('');
+            document.getElementById('sourcesSection').classList.remove('hidden');
+        }
+
+        // ─── Download ───────────────────────────────────────────
         function downloadScrape(format) {
             window.location.href = `http://localhost:8000/api/scrape/download?format=${format}`;
         }
 
-        // Analyze This Data — saves scraped data context and opens analyze page
+        // Analyze This Data
         function sendToAnalyzer() {
             sessionStorage.setItem('dp_filename', 'scraped_data.csv');
             showToast('Note: Upload the downloaded CSV to analyze it on the dashboard.');
         }
 
-        // Toast
+        // ─── Toast ──────────────────────────────────────────────
         let toastTimer = null;
         function showToast(msg, isError = false, isWarning = false) {
             clearTimeout(toastTimer);
