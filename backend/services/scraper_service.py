@@ -29,51 +29,40 @@ if not log.handlers:
     log.addHandler(_h)
 
 # ── Model Cascade ─────────────────────────────────────────────────────
-# Ordered by preference: best quality first, highest-quota workhorse second
+# Ordered by preference: best quality first, then highest-quota workhorse
+# NOTE: Model names must match the API exactly (use `client.models.list()` to verify)
 GEMINI_MODELS = [
-    "gemini-2.5-flash",        # Best quality, 20 RPD
-    "gemini-3.1-flash-lite",   # Workhorse, 500 RPD
-    "gemini-3-flash",          # Good quality, 20 RPD
-    "gemini-2.5-flash-lite",   # Decent, 20 RPD
+    "gemini-2.5-flash",              # Best quality, 20 RPD
+    "gemini-3.1-flash-lite-preview", # Workhorse, 500 RPD (highest quota!)
+    "gemini-3-flash-preview",        # Good quality, 20 RPD
+    "gemini-2.5-flash-lite",         # Decent, 20 RPD
 ]
 
-def gemini_generate(prompt: str, max_retries_per_model: int = 2) -> str | None:
+def gemini_generate(prompt: str) -> str | None:
     """Call Gemini with automatic model cascading on rate limits.
-    Tries each model in GEMINI_MODELS order. If a model is rate-limited,
-    immediately switches to the next model instead of waiting."""
+    Tries each model in GEMINI_MODELS order. On rate limit, immediately
+    switches to the next model (no retry wait on same model)."""
     for model_idx, model_name in enumerate(GEMINI_MODELS):
-        for attempt in range(max_retries_per_model):
-            try:
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=prompt
-                )
-                if model_idx > 0:
-                    log.info(f"  ✓ Succeeded with fallback model: {model_name}")
-                return response.text.strip()
-            except Exception as e:
-                err_str = str(e)
-                is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
-                if is_rate_limit:
-                    if attempt < max_retries_per_model - 1:
-                        # Retry same model once with a short wait
-                        wait_time = 5
-                        delay_match = re.search(r"retryDelay['\"]:\s*['\"]\s*(\d+)s['\"]", err_str)
-                        if delay_match:
-                            wait_time = min(int(delay_match.group(1)) + 1, 10)
-                        log.warning(f"  Rate limited on {model_name} "
-                                    f"(attempt {attempt+1}), waiting {wait_time}s...")
-                        time.sleep(wait_time)
-                        continue
-                    else:
-                        # Move to next model
-                        log.warning(f"  {model_name} rate limited, "
-                                    f"falling back to next model...")
-                        break  # break inner loop, try next model
-                else:
-                    # Non-rate-limit error — log and try next model
-                    log.error(f"  {model_name} error: {err_str[:200]}")
-                    break  # try next model
+        try:
+            log.debug(f"  Trying model: {model_name}")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt
+            )
+            if model_idx > 0:
+                log.info(f"  ✓ Succeeded with fallback model: {model_name}")
+            return response.text.strip()
+        except Exception as e:
+            err_str = str(e)
+            is_rate_limit = "429" in err_str or "RESOURCE_EXHAUSTED" in err_str
+            is_not_found = "404" in err_str or "NOT_FOUND" in err_str
+            if is_rate_limit:
+                log.warning(f"  {model_name} rate limited → trying next model...")
+            elif is_not_found:
+                log.warning(f"  {model_name} not found → trying next model...")
+            else:
+                log.error(f"  {model_name} error: {err_str[:150]}")
+            continue  # try next model immediately
 
     log.error("  All Gemini models exhausted!")
     return None
