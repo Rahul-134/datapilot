@@ -60,10 +60,13 @@ DataPilot is an AI-powered data analysis and web scraping platform built with Fa
   - Deduplication of extracted rows.
 - **Search Mode**: Describe what data you need in natural language. The system will:
   1. Analyze the query to determine the target schema and extraction instructions.
-  2. Use Gemini to discover relevant, scrapable URLs.
+  2. Discover relevant URLs via Google Custom Search API, DuckDuckGo, or Gemini (cascading fallback).
   3. Scrape each discovered site with the unified schema.
-  4. Merge, align, and deduplicate results from multiple sources.
-  5. Fall back to AI-generated data if all web sources fail.
+  4. Row-level relevance filtering to keep good data and discard noise.
+  5. Merge, align, and deduplicate results from multiple sources.
+  6. Supplement with AI-generated data if web sources yield too few rows.
+- **Multi-Model Cascade**: Automatically falls through four Gemini models (gemini-2.5-flash → gemini-3.1-flash-lite → gemini-3-flash → gemini-2.5-flash-lite) when a model's rate limit is hit, maximizing uptime.
+- **Rate Limit Resilience**: Built-in retry with exponential backoff and model switching ensures scraping completes even under heavy API quota pressure.
 - Download scraped data as CSV or Excel.
 
 ---
@@ -95,7 +98,7 @@ The frontend is server-rendered using Jinja2 templates and communicates with the
 | Layer     | Technology                                               |
 |-----------|----------------------------------------------------------|
 | Backend   | Python 3, FastAPI, Uvicorn                               |
-| AI/LLM    | Google Gemini API (gemini-2.5-flash, gemini-2.5-flash-lite) |
+| AI/LLM    | Google Gemini API (gemini-2.5-flash, gemini-3.1-flash-lite, gemini-3-flash, gemini-2.5-flash-lite — auto-cascade) |
 | Data      | pandas, openpyxl, BeautifulSoup, lxml                     |
 | Frontend  | HTML, JavaScript, Tailwind CSS (CDN)                      |
 | Fonts     | Space Grotesk, Space Mono, Syne (Google Fonts)            |
@@ -197,7 +200,7 @@ Navigate to the Scraper page from the navigation bar.
 
 **URL Mode**: Enter a target URL and describe what data to extract. Set the number of pages to scrape (1-20). Click **Scrape & Extract Data**.
 
-**Search Mode**: Toggle to Search Mode. Describe the data you need in natural language. Configure the number of websites to discover (1-10) and pages per site (1-10). Click **Search & Extract Data**. The system finds relevant websites, scrapes them, and merges the results under a unified schema.
+**Search Mode**: Toggle to Search Mode. Describe the data you need in natural language. Configure the number of websites to discover (1-10) and pages per site (1-10). Click **Search & Extract Data**. The system finds relevant websites via search engines, scrapes them with a unified schema, filters out irrelevant rows, and merges the results. If any Gemini model is rate-limited, the system automatically switches to another available model.
 
 ---
 
