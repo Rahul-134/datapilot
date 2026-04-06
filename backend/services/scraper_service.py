@@ -10,6 +10,7 @@ from urllib.parse import urljoin, urlparse
 import os
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -101,46 +102,131 @@ def fetch_page(url: str) -> dict:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def clean_html(html: str) -> str:
-    """Strip scripts, styles and return clean readable text.
-    Preserves table/list structure and replaces truncated text with title attributes."""
+def extract_structured_data(html: str) -> str:
+    """Extract JSON-LD, OpenGraph meta tags, and tables as structured text preamble."""
     soup = BeautifulSoup(html, "lxml")
+    parts = []
 
-    # Remove noise
-    for tag in soup(["script", "style", "nav", "footer", "iframe", "noscript",
-                      "header", "aside", "form", "button", "svg"]):
+    # 1. JSON-LD structured data
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            ld = json.loads(script.string or "")
+            parts.append(f"[STRUCTURED DATA (JSON-LD)]:\n{json.dumps(ld, indent=1, default=str)[:5000]}")
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    # 2. OpenGraph / meta description
+    og_tags = []
+    for meta in soup.find_all("meta"):
+        prop = meta.get("property", "") or meta.get("name", "")
+        content = meta.get("content", "")
+        if prop and content and any(k in prop.lower() for k in ["og:", "description", "author", "article:"]):
+            og_tags.append(f"  {prop}: {content}")
+    if og_tags:
+        parts.append("[META TAGS]:\n" + "\n".join(og_tags[:15]))
+
+    # 3. Tables → pipe-delimited text
+    for i, table in enumerate(soup.find_all("table")[:5]):
+        rows_text = []
+        for tr in table.find_all("tr")[:100]:
+            cells = [td.get_text(strip=True) for td in tr.find_all(["td", "th"])]
+            if any(cells):
+                rows_text.append(" | ".join(cells))
+        if rows_text:
+            parts.append(f"[TABLE {i+1}]:\n" + "\n".join(rows_text))
+
+    return "\n\n".join(parts)
+
+
+def extract_page_links(html: str, base_url: str) -> list[dict]:
+    """Extract content links that likely point to detail pages (same-domain, not nav/external)."""
+    soup = BeautifulSoup(html, "lxml")
+    base_domain = urlparse(base_url).netloc.lower()
+
+    # Remove nav/footer links — we want content area links only
+    for tag in soup.find_all(["nav", "footer", "header"]):
         tag.decompose()
 
-    # Fix truncated text: replace inner text of <a> and <img> tags
-    # with their title attribute (which usually has the full text)
+    skip_patterns = re.compile(r"(login|signup|register|cart|checkout|privacy|terms|contact|about|faq|help|#|javascript:|mailto:)", re.I)
+    links = []
+    seen = set()
+
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if not href or skip_patterns.search(href):
+            continue
+        abs_url = urljoin(base_url, href)
+        domain = urlparse(abs_url).netloc.lower()
+        if domain != base_domain:
+            continue
+        if abs_url == base_url or abs_url in seen:
+            continue
+        text = a.get_text(strip=True)
+        if len(text) < 3:
+            continue
+        seen.add(abs_url)
+        links.append({"url": abs_url, "text": text})
+
+    return links[:50]
+
+
+def clean_html(html: str, preserve_links: bool = False) -> str:
+    """Strip scripts/styles, return clean text.
+    Preserves table/list structure, link hrefs (optionally), and structured data."""
+    soup = BeautifulSoup(html, "lxml")
+
+    # Remove noise — keep header/aside (they often have useful metadata)
+    for tag in soup(["script", "style", "nav", "footer", "iframe", "noscript",
+                      "form", "button", "svg"]):
+        tag.decompose()
+
+    # Fix truncated text
     for a_tag in soup.find_all("a", title=True):
         title = a_tag["title"].strip()
         if title:
             a_tag.string = title
+
+    # Preserve link hrefs inline so Gemini can see detail page URLs
+    if preserve_links:
+        for a_tag in soup.find_all("a", href=True):
+            href = a_tag["href"].strip()
+            text = a_tag.get_text(strip=True)
+            if text and href and not href.startswith(("#", "javascript:")):
+                a_tag.replace_with(f"{text} [LINK:{href}]")
 
     for img_tag in soup.find_all("img", alt=True):
         alt = img_tag["alt"].strip()
         if alt:
             img_tag.insert_after(alt)
 
-    # Preserve table structure better by adding separators
+    # Preserve table structure
     for td in soup.find_all(["td", "th"]):
         td.insert_before(" | ")
     for tr in soup.find_all("tr"):
         tr.insert_after("\n")
 
+    # Preserve list structure
+    for li in soup.find_all("li"):
+        li.insert_before("• ")
+
+    # Preserve definition lists
+    for dt in soup.find_all("dt"):
+        dt.insert_before("\n▸ ")
+    for dd in soup.find_all("dd"):
+        dd.insert_before(": ")
+
     text = soup.get_text(separator="\n", strip=True)
 
-    # Smart truncation: cap at 30k chars but try to break at a newline
-    max_chars = 30000
+    # Smart truncation: cap at 60k chars
+    max_chars = 60000
     if len(text) > max_chars:
-        # Find the last newline before the cap
         truncation_point = text.rfind("\n", 0, max_chars)
         if truncation_point == -1:
             truncation_point = max_chars
         text = text[:truncation_point]
 
     return text
+
 
 def detect_next_page(html: str, current_url: str) -> str | None:
     """Look for a 'next' pagination link and return its absolute URL."""
@@ -162,10 +248,32 @@ def detect_next_page(html: str, current_url: str) -> str | None:
     if rel_next:
         return urljoin(current_url, rel_next["href"])
 
+    # Strategy 4: Numbered pagination — find current page and get next
+    for selector in ["a.page-link", "a.pagination-link", ".pagination a", ".pager a"]:
+        page_links = soup.select(selector)
+        for i, a in enumerate(page_links):
+            if a.find_parent(class_=re.compile(r"active|current|selected", re.I)):
+                if i + 1 < len(page_links):
+                    return urljoin(current_url, page_links[i + 1]["href"])
+
+    # Strategy 5: URL pattern — if current URL has page=N, try page=N+1
+    parsed = urlparse(current_url)
+    page_match = re.search(r'[?&](page|p)=(\d+)', parsed.query)
+    if page_match:
+        param, num = page_match.group(1), int(page_match.group(2))
+        next_num = num + 1
+        next_query = re.sub(rf'{param}={num}', f'{param}={next_num}', parsed.query)
+        next_url = parsed._replace(query=next_query).geturl()
+        # Verify this link actually exists on the page
+        for a in soup.find_all("a", href=True):
+            if str(next_num) in a.get("href", ""):
+                return next_url
+
     return None
 
 def build_scraper_prompt(user_instruction: str, page_text: str, url: str,
-                         expected_columns: list[str] | None = None) -> str:
+                         expected_columns: list[str] | None = None,
+                         structured_data: str = "") -> str:
     column_rule = ""
     if expected_columns:
         cols_str = ", ".join(f'"{c}"' for c in expected_columns)
@@ -174,44 +282,85 @@ def build_scraper_prompt(user_instruction: str, page_text: str, url: str,
             f"Do NOT rename, add, or remove any columns. Use these exact keys for every object.\n"
         )
 
-    return f"""You are a data extraction expert. A user wants to extract structured data from a webpage.
+    structured_section = ""
+    if structured_data:
+        structured_section = f"""
+=== STRUCTURED DATA (HIGH PRIORITY — use this to enrich your extraction) ===
+{structured_data[:8000]}
+=== END STRUCTURED DATA ===
+"""
+
+    return f"""You are an elite data extraction expert. Extract the MAXIMUM amount of useful, structured data from this webpage.
 
 URL: {url}
 User Instruction: "{user_instruction}"
 {column_rule}
+{structured_section}
 Page Content (cleaned):
 {page_text}
 
 Your job:
-1. Extract the data the user requested from the page content above.
+1. Extract ALL data matching the user's request — be EXHAUSTIVE, not selective.
 2. Return the data as a JSON array of objects where each object is one row.
 3. Each object must have the same keys (column names).
 4. Column names should be clean snake_case strings.
 5. Return ONLY the JSON array — no explanation, no markdown, no backticks.
 6. If no relevant data is found, return an empty array: []
 
-CRITICAL RULES for extraction quality:
-- Extract SPECIFIC, ACTIONABLE data — not generic definitions or category descriptions.
-- Each row should represent a concrete, distinct data point (e.g., a specific disease, a specific product, a specific country).
-- Do NOT extract table-of-contents entries, navigation items, category headings, or generic descriptions.
-- Do NOT extract data that is just a definition of a concept (e.g., "A disease is an abnormal condition...").
-- Values should be detailed and informative — not just "N/A" or single words where more data exists on the page.
-- If the page contains tabular data, extract ALL rows from every relevant table, not just the first few.
-- If the page has detailed paragraph content about individual items, extract structured data from those paragraphs.
+CRITICAL RULES for MAXIMUM extraction quality:
+- Extract EVERY SINGLE matching item from the page — do NOT stop early or sample.
+- If the page contains tabular data, extract ALL rows from ALL relevant tables.
+- Values MUST be rich and detailed:
+  * For descriptions: extract at least 2-3 full sentences, not truncated snippets.
+  * For numeric data: include units (e.g., "$799", "4.5/5", "128GB").
+  * For lists within a cell: use comma-separated format (e.g., "fever, headache, fatigue").
+  * NEVER use just "N/A" or "-" if the page has ANY relevant info — extract what exists.
+- If STRUCTURED DATA is provided above (JSON-LD, meta tags, tables), USE IT. It often has richer data than the page text.
+- Extract SPECIFIC, ACTIONABLE data — each row = one concrete entity (product, disease, country, etc.).
+- Do NOT extract: table-of-contents entries, navigation items, category headings, generic definitions, or boilerplate text.
+- If the page has paragraph content about individual items, parse it into structured rows.
+- Prefer COMPLETE data over more rows — 20 rows with rich detail > 50 rows with mostly empty fields.
 
 Example output:
-[{{"name": "iPhone 15", "price": "$799", "rating": "4.5"}}, {{"name": "Samsung S24", "price": "$699", "rating": "4.3"}}]
+[{{"name": "iPhone 15", "price": "$799", "storage": "128GB/256GB/512GB", "display": "6.1-inch Super Retina XDR OLED", "chip": "A16 Bionic", "camera": "48MP main + 12MP ultrawide", "rating": "4.5/5"}}, {{"name": "Samsung S24", "price": "$799", "storage": "128GB/256GB", "display": "6.2-inch Dynamic AMOLED 2X", "chip": "Snapdragon 8 Gen 3", "camera": "50MP main + 12MP ultrawide + 10MP telephoto", "rating": "4.3/5"}}]
 """
+
+
+def build_enrichment_prompt(row: dict, detail_page_text: str, detail_url: str,
+                            columns: list[str]) -> str:
+    """Prompt for enriching a single row with detail-page data."""
+    cols_str = ", ".join(f'"{c}"' for c in columns)
+    row_json = json.dumps(row, default=str)
+    return f"""You are a data enrichment expert. You have a partially-filled data row extracted from a listing page.
+Now you have the DETAIL PAGE for this specific item. Your job is to FILL IN missing/shallow values with rich data from the detail page.
+
+Current row data:
+{row_json}
+
+Detail page URL: {detail_url}
+Detail page content:
+{detail_page_text[:15000]}
+
+RULES:
+1. Return a SINGLE JSON object with exactly these keys: [{cols_str}]
+2. For fields that already have good values, KEEP THEM (don't overwrite with worse data).
+3. For fields that are "N/A", empty, or very short (1-2 words), REPLACE with richer data from the detail page.
+4. For description/detail fields, extract 2-4 full sentences from the detail page.
+5. Return ONLY the JSON object — no explanation, no markdown, no backticks.
+"""
+
 
 def extract_page_data(url: str, html: str, user_instruction: str,
                       expected_columns: list[str] | None = None) -> list | dict:
-    """Clean one page's HTML and ask Gemini to extract structured data."""
-    page_text = clean_html(html)
+    """Clean one page's HTML, extract structured data, and ask Gemini to extract structured rows."""
+    # Extract structured data preamble (JSON-LD, OpenGraph, tables)
+    structured = extract_structured_data(html)
+    page_text = clean_html(html, preserve_links=True)
 
     if not page_text.strip():
         return []
 
-    prompt = build_scraper_prompt(user_instruction, page_text, url, expected_columns)
+    prompt = build_scraper_prompt(user_instruction, page_text, url, expected_columns, structured)
 
     raw = gemini_generate(prompt)
     if raw is None:
@@ -230,12 +379,154 @@ def extract_page_data(url: str, html: str, user_instruction: str,
 
     return data
 
+
+# ── Sub-page Enrichment ───────────────────────────────────────────────
+
+MAX_DETAIL_PAGES = 10  # max sub-pages to drill into per URL
+
+def _fetch_and_enrich_row(row: dict, detail_url: str, columns: list[str]) -> dict | None:
+    """Fetch a detail page and enrich a single row. Used in thread pool."""
+    try:
+        result = fetch_page(detail_url)
+        if not result["success"]:
+            return None
+        detail_text = clean_html(result["html"])
+        if not detail_text.strip():
+            return None
+        prompt = build_enrichment_prompt(row, detail_text, detail_url, columns)
+        raw = gemini_generate(prompt)
+        if raw is None:
+            return None
+        raw = re.sub(r"```(?:json)?|```", "", raw).strip()
+        enriched = json.loads(raw)
+        if isinstance(enriched, dict):
+            return enriched
+    except Exception as e:
+        log.warning(f"  Enrichment error for {detail_url}: {e}")
+    return None
+
+
+def enrich_rows_from_detail_pages(rows: list[dict], html: str, base_url: str,
+                                  columns: list[str], max_detail: int = MAX_DETAIL_PAGES) -> list[dict]:
+    """Drill into detail sub-pages to enrich rows with richer data.
+    Matches listing-page links to rows by text similarity, then fetches detail pages concurrently."""
+    if not rows or max_detail <= 0:
+        return rows
+
+    page_links = extract_page_links(html, base_url)
+    if not page_links:
+        log.info("  No detail page links found for enrichment")
+        return rows
+
+    # Try to match links to rows by finding text overlap
+    # Use the first text-like column as the match key
+    match_key = None
+    for k in columns:
+        if k not in ("source_url", "rank", "price", "rating") and rows[0].get(k):
+            match_key = k
+            break
+    if not match_key:
+        return rows
+
+    # Build match pairs: (row_index, detail_url)
+    match_pairs = []
+    used_links = set()
+    for i, row in enumerate(rows):
+        row_val = str(row.get(match_key, "")).lower().strip()
+        if not row_val or row_val == "n/a":
+            continue
+        best_link = None
+        best_score = 0
+        for link in page_links:
+            if link["url"] in used_links:
+                continue
+            link_text = link["text"].lower().strip()
+            # Check if row value appears in link text or vice versa
+            if row_val in link_text or link_text in row_val:
+                score = len(row_val)
+            else:
+                # Word overlap
+                row_words = set(row_val.split())
+                link_words = set(link_text.split())
+                overlap = row_words & link_words
+                score = len(overlap)
+            if score > best_score:
+                best_score = score
+                best_link = link
+        if best_link and best_score >= 1:
+            match_pairs.append((i, best_link["url"]))
+            used_links.add(best_link["url"])
+        if len(match_pairs) >= max_detail:
+            break
+
+    if not match_pairs:
+        log.info("  Could not match any detail page links to rows")
+        return rows
+
+    log.info(f"  Enriching {len(match_pairs)} rows from detail pages...")
+
+    # Fetch and enrich concurrently
+    enriched_map = {}
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {}
+        for row_idx, detail_url in match_pairs:
+            f = executor.submit(_fetch_and_enrich_row, rows[row_idx], detail_url, columns)
+            futures[f] = row_idx
+            time.sleep(0.5)  # small stagger to avoid rate limits
+
+        for future in as_completed(futures):
+            row_idx = futures[future]
+            try:
+                enriched = future.result()
+                if enriched:
+                    enriched_map[row_idx] = enriched
+            except Exception:
+                pass
+
+    # Merge enriched data back — only overwrite empty/shallow values
+    enriched_count = 0
+    for row_idx, enriched_row in enriched_map.items():
+        original = rows[row_idx]
+        improved = False
+        for col in columns:
+            old_val = str(original.get(col, "")).strip()
+            new_val = str(enriched_row.get(col, "")).strip()
+            # Overwrite if: old is empty/N/A OR new is significantly longer
+            if new_val and new_val.lower() not in ("n/a", "none", ""):
+                if not old_val or old_val.lower() in ("n/a", "none", "") or len(new_val) > len(old_val) * 1.5:
+                    original[col] = enriched_row[col]
+                    improved = True
+        if improved:
+            enriched_count += 1
+
+    log.info(f"  Enrichment complete: {enriched_count}/{len(match_pairs)} rows improved")
+    return rows
+
+
+# ── Concurrent page fetching ─────────────────────────────────────────
+
+def fetch_pages_concurrent(urls: list[str], max_workers: int = 3) -> dict[str, dict]:
+    """Fetch multiple URLs concurrently. Returns {url: fetch_result}."""
+    results = {}
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_map = {executor.submit(fetch_page, url): url for url in urls}
+        for future in as_completed(future_map):
+            url = future_map[future]
+            try:
+                results[url] = future.result()
+            except Exception as e:
+                results[url] = {"success": False, "error": str(e)}
+    return results
+
+
 def scrape_url(url: str, user_instruction: str, max_pages: int = DEFAULT_MAX_PAGES,
-               target_columns: list[str] | None = None) -> dict:
+               target_columns: list[str] | None = None,
+               enable_enrichment: bool = True) -> dict:
     all_rows = []
     current_url = url
     pages_fetched = 0
     ran_out_of_pages = False
+    first_page_html = None
 
     while current_url and pages_fetched < max_pages:
         # Fetch page
@@ -247,6 +538,10 @@ def scrape_url(url: str, user_instruction: str, max_pages: int = DEFAULT_MAX_PAG
 
         html = fetch_result["html"]
         pages_fetched += 1
+
+        # Save first page HTML for detail-page enrichment later
+        if pages_fetched == 1:
+            first_page_html = html
 
         # On the first page, use target_columns if provided (search mode);
         # on subsequent pages, enforce columns from page 1's data.
@@ -273,6 +568,11 @@ def scrape_url(url: str, user_instruction: str, max_pages: int = DEFAULT_MAX_PAG
 
     if len(all_rows) == 0:
         return {"error": "No relevant data found for your instruction. Try a different URL or instruction."}
+
+    # Sub-page detail enrichment (the big quality uplift)
+    if enable_enrichment and first_page_html and all_rows:
+        columns = list(all_rows[0].keys())
+        all_rows = enrich_rows_from_detail_pages(all_rows, first_page_html, url, columns)
 
     # Deduplicate rows (by converting dicts to frozensets for comparison)
     seen = set()
@@ -419,32 +719,72 @@ def discover_urls_via_search(search_queries: list[str], max_results: int = 5) ->
     return all_results[:max_results] if all_results else []
 
 
+def _url_relevance_score(url: str, query: str) -> float:
+    """Score how relevant a URL is to the query (0.0 = irrelevant, 1.0 = perfect).
+    Uses keyword overlap between query words and URL domain+path."""
+    # Extract keywords from query (lowercase, 3+ chars, no stopwords)
+    stopwords = {"the", "and", "for", "from", "with", "that", "this", "all", "are",
+                 "was", "were", "been", "have", "has", "had", "like", "data", "list",
+                 "table", "year", "get", "find", "show", "about"}
+    query_words = set()
+    for w in re.split(r'\W+', query.lower()):
+        if len(w) >= 3 and w not in stopwords:
+            query_words.add(w)
+
+    if not query_words:
+        return 0.5  # can't determine relevance
+
+    parsed = urlparse(url)
+    # Combine domain + path for matching
+    url_text = (parsed.netloc + " " + parsed.path).lower().replace("-", " ").replace("_", " ").replace("/", " ")
+
+    # Count keyword matches
+    matches = sum(1 for w in query_words if w in url_text)
+    # Also check partial matches (e.g., "ipl" in "ipl-results")
+    partial = sum(0.5 for w in query_words if any(w in part for part in url_text.split()) and w not in url_text.split())
+
+    score = (matches + partial) / len(query_words)
+    return min(score, 1.0)
+
+
 def discover_urls_via_duckduckgo(search_queries: list[str], query: str,
                                   max_results: int = 5) -> list[str]:
     """Use DuckDuckGo HTML search (no API key needed) for URL discovery.
-    Filters out Wikipedia and enforces domain diversity."""
+    Filters out Wikipedia, enforces domain diversity, and validates URL relevance."""
     blocked_domains = {"wikipedia.org", "en.wikipedia.org", "simple.wikipedia.org",
-                       "www.wikipedia.org", "en.m.wikipedia.org"}
+                       "www.wikipedia.org", "en.m.wikipedia.org",
+                       "academia.edu", "researchgate.net", "quora.com"}
     all_urls = []
     seen_domains = set()
 
     queries_to_try = (search_queries or []) + [query]
-    # Add "-wikipedia" to each query to bias search away from Wikipedia
-    queries_to_try = [f"{q} -wikipedia" for q in queries_to_try]
-    # Deduplicate queries
-    queries_to_try = list(dict.fromkeys(queries_to_try))
+    # Only add "-wikipedia" to first 2 queries — it can hurt niche searches
+    processed = []
+    for i, q in enumerate(queries_to_try):
+        if i < 2 and "wikipedia" not in q.lower():
+            processed.append(f"{q} -wikipedia")
+        else:
+            processed.append(q)
+    queries_to_try = list(dict.fromkeys(processed))  # deduplicate
 
-    for q in queries_to_try[:4]:  # max 4 queries to avoid rate limits
+    for q in queries_to_try[:5]:  # try up to 5 queries
         urls = duckduckgo_search(q, max_results=10)
         for url in urls:
             domain = urlparse(url).netloc.lower().replace("www.", "")
-            # Skip Wikipedia
+            # Skip blocked domains
             if any(blocked in domain for blocked in blocked_domains):
                 continue
             # Skip duplicate domains
-            base_domain = ".".join(domain.split(".")[-2:])  # e.g. "mayoclinic.org"
+            base_domain = ".".join(domain.split(".")[-2:])
             if base_domain in seen_domains:
                 continue
+
+            # Relevance check — skip URLs that have zero relation to the query
+            relevance = _url_relevance_score(url, query)
+            if relevance < 0.1:
+                log.debug(f"  DDG skip (irrelevant, score={relevance:.2f}): {url}")
+                continue
+
             seen_domains.add(base_domain)
             all_urls.append(url)
 
@@ -453,7 +793,7 @@ def discover_urls_via_duckduckgo(search_queries: list[str], query: str,
         if len(all_urls) >= max_results:
             break
 
-    log.info(f"DuckDuckGo Discovery: {len(all_urls)} unique URLs found")
+    log.info(f"DuckDuckGo Discovery: {len(all_urls)} relevant URLs found")
     for u in all_urls:
         log.info(f"  → {u}")
     return all_urls[:max_results]
@@ -574,13 +914,32 @@ def discover_urls(query: str, search_queries: list[str] | None = None,
     # Try 2: DuckDuckGo HTML search (free, no API key needed)
     log.info("Trying DuckDuckGo HTML search...")
     ddg_urls = discover_urls_via_duckduckgo(search_queries or [], query, max_results)
-    if ddg_urls:
+    if len(ddg_urls) >= max_results:
         log.info(f"✓ DuckDuckGo → {len(ddg_urls)} URLs")
         return ddg_urls
 
-    # Try 3: Gemini-based URL discovery (last resort)
+    # Try 3: Gemini-based URL discovery
+    # If DDG found some but not enough, combine with Gemini results
     log.info("Trying Gemini-based URL discovery...")
-    return discover_urls_via_gemini(query, search_queries, max_results)
+    gemini_result = discover_urls_via_gemini(query, search_queries, max_results)
+
+    if isinstance(gemini_result, dict) and "error" in gemini_result:
+        # Gemini failed — return DDG results if we have any, otherwise the error
+        if ddg_urls:
+            log.info(f"Gemini failed, using {len(ddg_urls)} DDG URL(s)")
+            return ddg_urls
+        return gemini_result
+
+    # Combine DDG + Gemini, dedup by domain
+    combined = list(ddg_urls)
+    seen = {urlparse(u).netloc.lower() for u in combined}
+    for u in gemini_result:
+        domain = urlparse(u).netloc.lower()
+        if domain not in seen:
+            seen.add(domain)
+            combined.append(u)
+    log.info(f"✓ Combined DDG({len(ddg_urls)}) + Gemini({len(gemini_result)}) → {len(combined)} URLs")
+    return combined[:max_results]
 
 
 def analyze_query(query: str) -> dict:
@@ -596,39 +955,40 @@ You must do THREE things:
 Deeply analyze what the user ACTUALLY wants. Think about:
 - What specific entities/items should each row represent?
 - What attributes/properties are most useful for each entity?
-- What level of detail is needed (e.g., just names vs. full descriptions)?
+- What level of detail is needed — aim for COMPREHENSIVE, RICH data
+- What would make this data genuinely useful for analysis, training, or decision-making?
 
 ## 2. Define the Schema
-Create a precise schema with column names that will produce USEFUL, ACTIONABLE data.
+Create a COMPREHENSIVE schema that captures the MAXIMUM useful information.
 - Use descriptive snake_case column names
-- Include 4-8 columns that capture the most valuable information
-- Think about what makes data TRAINABLE or ANALYZABLE (not just definitions)
+- Include 8-12 columns that capture rich, multi-dimensional data
+- Always include at least one DESCRIPTION or DETAILS column with 2+ sentences expected
+- Think about what makes data genuinely USEFUL — not just names and numbers, but context, details, relationships
+- Consider columns like: descriptions, categories, dates, metrics, relationships, notable_features
 
 ## 3. Generate Search Queries
-Create 3 different Google search queries that will find DIVERSE, DATA-RICH pages.
-- Each query should target a DIFFERENT type of source (e.g., medical database vs. health article vs. symptom checker)
-- Include site-specific operators where helpful (e.g., site:mayoclinic.org)
-- Focus on pages that contain STRUCTURED data (tables, lists, databases) not just articles
-- Make queries specific enough to find pages with actual data, not generic overviews
+Create 4 different Google search queries that will find DIVERSE, DATA-RICH pages.
+- Each query should target a DIFFERENT type of source
+- Include site-specific operators where helpful
+- Focus on pages that contain STRUCTURED data (tables, lists, databases)
+- At least one query should target a site known to have rich detail pages (for sub-page drilling)
 
 Return a JSON object with exactly these keys:
-- "columns": array of snake_case column names (4-8 columns ideal)
-- "extraction_instruction": a very specific, detailed instruction for extracting data from any webpage. Be explicit about what each column should contain, what to include, and what to EXCLUDE. Mention the kind of data that should fill each column.
-- "search_queries": array of 3 different Google search query strings for finding diverse sources
+- "columns": array of snake_case column names (8-12 columns)
+- "extraction_instruction": a very specific, detailed instruction for extracting data from any webpage. For EACH column, explain what data should go in it and how detailed it should be. Be explicit about minimum detail levels (e.g., "descriptions should be 2-3 sentences"). Mention the kind of data that should fill each column.
+- "search_queries": array of 4 different Google search query strings for finding diverse sources
+- "detail_worthy": boolean — true if this data type typically benefits from drilling into individual item pages for richer details (e.g., products, diseases, companies = true; simple rankings or statistics = false)
 
 Rules:
 - Do NOT include generic metadata columns like "source_url" — those are added automatically.
 - Focus columns on the actual data the user wants, not meta-information.
 - The extraction instruction should be specific enough that data from different websites will have the same structure.
-- The extraction instruction MUST specify: "Do NOT extract generic category definitions, table-of-contents entries, or navigation text."
+- The extraction instruction MUST include: "Extract EVERY matching item exhaustively. Do NOT extract generic category definitions, table-of-contents entries, or navigation text. Values must be detailed — descriptions of at least 2 sentences, lists as comma-separated items."
 
 Return ONLY the JSON object — no explanation, no markdown, no backticks.
 
 Example for query "Data to train a medical chatbot that reads symptoms and tells diseases and cures":
-{{"columns": ["disease_name", "common_symptoms", "causes", "treatment_options", "when_to_see_doctor", "severity_level"], "extraction_instruction": "Extract a list of specific diseases or medical conditions. For each disease, extract: the disease name, a comma-separated list of its common symptoms (e.g., fever, headache, fatigue), known causes or risk factors, recommended treatment options (medications, home remedies, procedures), when to see a doctor, and severity level (mild/moderate/severe). Only include SPECIFIC diseases (e.g., 'Influenza', 'Diabetes Type 2', 'Pneumonia'), NOT generic categories (e.g., 'Infectious disease', 'Chronic disease'). Do NOT extract table-of-contents entries, navigation text, or generic medical definitions.", "search_queries": ["common diseases symptoms treatment list table", "diseases A-Z symptoms causes treatment site:healthline.com OR site:webmd.com", "medical conditions symptoms diagnosis treatment database"]}}
-
-Example for query "Top programming languages 2025 with popularity":
-{{"columns": ["rank", "language_name", "popularity_index", "paradigm", "typical_use_cases", "year_created"], "extraction_instruction": "Extract a ranked list of programming languages. For each language, extract: its rank/position, the language name, its popularity score or percentage, its primary programming paradigm (OOP, functional, etc.), typical use cases, and the year it was created. Only include actual programming languages, not frameworks, libraries, or tools. Do NOT extract navigation text or category headings.", "search_queries": ["programming language popularity ranking 2025 TIOBE index", "most popular programming languages statistics 2025", "programming language index ranking comparison site:spectrum.ieee.org OR site:redmonk.com"]}}
+{{"columns": ["disease_name", "category", "common_symptoms", "causes_risk_factors", "diagnosis_methods", "treatment_options", "medications", "prevention", "when_to_see_doctor", "severity_level", "description"], "extraction_instruction": "Extract a list of specific diseases or medical conditions. For each: disease_name = exact medical name; category = type (infectious, chronic, autoimmune, etc.); common_symptoms = comma-separated list of 5+ symptoms; causes_risk_factors = known causes and risk factors (2+ sentences); diagnosis_methods = how it's diagnosed; treatment_options = all treatments (medications, procedures, home remedies); medications = specific drug names if available; prevention = preventive measures; when_to_see_doctor = warning signs requiring medical attention; severity_level = mild/moderate/severe/life-threatening; description = 2-3 sentence overview. Only include SPECIFIC diseases (e.g., 'Influenza', 'Type 2 Diabetes'). Do NOT extract generic categories. Extract EVERY matching item exhaustively.", "search_queries": ["common diseases symptoms causes treatment comprehensive list", "diseases A-Z symptoms diagnosis treatment database", "medical conditions medications side effects drug interactions", "disease symptoms treatment prevention guide comprehensive"], "detail_worthy": true}}
 """
     raw = gemini_generate(prompt)
     if raw is None:
@@ -645,6 +1005,9 @@ Example for query "Top programming languages 2025 with popularity":
         # Ensure search_queries exists
         if "search_queries" not in result or not isinstance(result["search_queries"], list):
             result["search_queries"] = [query]  # fallback to raw query
+        # Default detail_worthy to True
+        if "detail_worthy" not in result:
+            result["detail_worthy"] = True
         return result
     return None
 
@@ -802,11 +1165,13 @@ def search_and_scrape(query: str, max_results: int = 5,
         extraction_instruction = schema["extraction_instruction"]
         target_columns = schema["columns"]
         search_queries = schema.get("search_queries")
+        detail_worthy = schema.get("detail_worthy", True)
     else:
         # Fallback: generate simple search queries from the raw query
         log.warning("  analyze_query failed (API issue?), using raw query as fallback")
         extraction_instruction = query
         target_columns = None
+        detail_worthy = False
         # Generate basic search queries from the user's query
         search_queries = [
             f"{query} data table list",
@@ -814,6 +1179,7 @@ def search_and_scrape(query: str, max_results: int = 5,
             query,
         ]
     log.info(f"  Columns: {target_columns}")
+    log.info(f"  Detail-worthy: {detail_worthy}")
     log.info(f"  Search queries: {search_queries}")
     log.info(f"  Extraction: {extraction_instruction[:120]}...")
 
@@ -844,7 +1210,8 @@ def search_and_scrape(query: str, max_results: int = 5,
 
         result = scrape_url(url, extraction_instruction,
                             max_pages=max_pages_per_site,
-                            target_columns=target_columns)
+                            target_columns=target_columns,
+                            enable_enrichment=detail_worthy)
 
         if result.get("error"):
             log.warning(f"  ✗ Error scraping {url}: {result['error']}")
