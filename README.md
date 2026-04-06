@@ -55,18 +55,22 @@ DataPilot is an AI-powered data analysis and web scraping platform built with Fa
 
 ### AI-Powered Web Scraper
 - **URL Mode**: Paste any URL and describe the data you want. The scraper fetches the page, cleans the HTML, and uses Gemini to extract structured data matching your instruction.
-  - Automatic pagination detection and multi-page scraping (up to 20 pages).
+  - Automatic pagination detection with 5 strategies (next link, rel=next, numbered pages, URL patterns, CSS selectors).
   - Consistent column schema enforced across paginated pages.
   - Deduplication of extracted rows.
 - **Search Mode**: Describe what data you need in natural language. The system will:
-  1. Analyze the query to determine the target schema and extraction instructions.
-  2. Discover relevant URLs via Google Custom Search API, DuckDuckGo, or Gemini (cascading fallback).
+  1. Analyze the query to determine a comprehensive schema (8-12 columns) and extraction instructions.
+  2. Discover relevant URLs via Google Custom Search API, DuckDuckGo, or Gemini (cascading fallback with URL relevance scoring).
   3. Scrape each discovered site with the unified schema.
   4. Row-level relevance filtering to keep good data and discard noise.
   5. Merge, align, and deduplicate results from multiple sources.
   6. Supplement with AI-generated data if web sources yield too few rows.
+- **Structured Data Extraction**: Automatically extracts JSON-LD schemas, OpenGraph meta tags, and HTML tables as a structured preamble to improve extraction quality.
+- **Sub-Page Detail Enrichment**: After extracting listing-page data, the scraper follows links into detail pages to fill in missing or shallow values — turning "iPhone 15, $799" into full specs, descriptions, and ratings.
+- **Concurrent Fetching**: Detail pages are fetched in parallel using a thread pool (3 workers) for faster enrichment.
+- **URL Relevance Filtering**: Search results are scored for relevance before scraping, preventing wasted API calls on irrelevant pages.
 - **Multi-Model Cascade**: Automatically falls through four Gemini models (gemini-2.5-flash → gemini-3.1-flash-lite → gemini-3-flash → gemini-2.5-flash-lite) when a model's rate limit is hit, maximizing uptime.
-- **Rate Limit Resilience**: Built-in retry with exponential backoff and model switching ensures scraping completes even under heavy API quota pressure.
+- **Rate Limit Resilience**: Built-in retry with model switching ensures scraping completes even under heavy API quota pressure.
 - Download scraped data as CSV or Excel.
 
 ---
