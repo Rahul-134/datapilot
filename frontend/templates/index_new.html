@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>DataPilot | Guided Insights</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+            --primary: #2563eb;
+            --secondary: #059669;
+            --accent: #f59e0b;
+            --bg-warm: #fdfdfb;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-main);
+        }
+        .step-number {
+            @apply flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold text-sm;
+        }
+        .insight-card {
+            @apply bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .humanistic-btn {
+            @apply px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen selection:bg-blue-100">
+    <nav class="sticky top-0 z-50 w-full glass-nav border-b border-slate-100 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white" data-icon="auto_awesome">auto_awesome</span>
+                </div>
+                <h1 class="text-xl font-extrabold tracking-tight text-slate-900">
+                    Data<span class="text-blue-600">Pilot</span>
+                </h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <a class="text-sm font-medium text-slate-600 hover:text-blue-600" href="#">My Projects</a>
+                <a class="text-sm font-medium text-slate-600 hover:text-blue-600" href="#">Templates</a>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+                <button
+                    class="flex items-center gap-2 text-sm font-semibold bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+                    Support
+                </button>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-4xl mx-auto px-6 py-12 lg:py-20 space-y-16">
+        <section class="space-y-8">
+            <div class="flex items-center gap-4">
+                <span class="step-number">1</span>
+                <h2 class="text-3xl font-bold tracking-tight">Tell me about your data...</h2>
+            </div>
+            <div class="relative group">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-500">
+                </div>
+                <div
+                    class="relative bg-white border-2 border-slate-200 rounded-2xl p-2 focus-within:border-blue-500 transition-colors shadow-xl">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <div class="flex-1 relative">
+                            <span
+                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                                data-icon="search">search</span>
+                            <input
+                                class="w-full pl-12 pr-4 py-4 border-none focus:ring-0 text-lg placeholder:text-slate-400"
+                                placeholder="e.g., 'What were the sales trends in Q3?' or 'Find my top customers'"
+                                type="text" />
+                        </div>
+                        <label
+                            class="flex items-center justify-center px-6 py-4 bg-slate-50 border-l border-slate-100 hover:bg-slate-100 cursor-pointer rounded-xl transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-blue-600 mr-2"
+                                data-icon="upload_file">upload_file</span>
+                            <span class="font-semibold text-slate-700">Upload CSV/Excel</span>
+                            <input class="hidden" type="file" />
+                        </label>
+                        <button
+                            class="humanistic-btn bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200">
+                            Analyze
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 text-sm text-slate-500">
+                <span>Try these:</span>
+                <button
+                    class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors">"Growth
+                    by region"</button>
+                <button
+                    class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors">"Anomalies
+                    last month"</button>
+                <button
+                    class="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors">"Clean
+                    duplicates"</button>
+            </div>
+        </section>
+        <section class="space-y-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="step-number">2</span>
+                    <h2 class="text-3xl font-bold tracking-tight">Discover key trends instantly</h2>
+                </div>
+                <div
+                    class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-sm font-bold">
+                    <span class="material-symbols-outlined text-sm" data-icon="verified">verified</span>
+                    Data looks healthy
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="insight-card border-l-4 border-l-blue-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="p-2 bg-blue-50 rounded-lg">
+                            <span class="material-symbols-outlined text-blue-600"
+                                data-icon="trending_up">trending_up</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Growth Metric</span>
+                    </div>
+                    <h3 class="text-slate-500 font-medium mb-1">Total Revenue Performance</h3>
+                    <p class="text-3xl font-bold mb-2">$428,920</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Your revenue is <span class="text-emerald-600 font-bold">up 12%</span> compared to last month.
+                        Most of this growth comes from the <span class="font-semibold italic">Enterprise</span> segment.
+                    </p>
+                </div>
+                <div class="insight-card border-l-4 border-l-amber-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="p-2 bg-amber-50 rounded-lg">
+                            <span class="material-symbols-outlined text-amber-600"
+                                data-icon="priority_high">priority_high</span>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Optimization</span>
+                    </div>
+                    <h3 class="text-slate-500 font-medium mb-1">Customer Retention</h3>
+                    <p class="text-3xl font-bold mb-2">152 Risk Flags</p>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        We found 152 customers who haven't logged in for 30 days. Targeting them now could <span
+                            class="text-amber-600 font-bold">save $12k</span> in potential churn.
+                    </p>
+                </div>
+            </div>
+            <div class="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                    <div class="flex-1 space-y-4">
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-blue-300 text-xs font-bold uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm" data-icon="lightbulb">lightbulb</span>
+                            AI Recommendation
+                        </div>
+                        <h3 class="text-2xl font-bold">Maximize your campaign impact</h3>
+                        <p class="text-slate-300">Based on your user profiles, launching a campaign on <strong>Tuesdays
+                                at 10 AM</strong> for the 'Pro' plan users will likely yield the highest conversion rate
+                            (estimated +18%).</p>
+                        <div class="flex gap-4 pt-2">
+                            <button class="humanistic-btn bg-white text-slate-900 hover:bg-blue-50">Draft Email
+                                Campaign</button>
+                            <button
+                                class="humanistic-btn bg-white/10 text-white border border-white/20 hover:bg-white/20">Learn
+                                Why</button>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col gap-3">
+                        <div class="h-4 w-full bg-white/10 rounded-full"></div>
+                        <div class="h-4 w-3/4 bg-white/10 rounded-full"></div>
+                        <div class="h-24 w-full bg-blue-500/20 rounded-xl flex items-center justify-center">
+                            <span class="material-symbols-outlined text-4xl text-blue-400"
+                                data-icon="bar_chart">bar_chart</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[80px] rounded-full -mr-20 -mt-20">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/10 blur-[80px] rounded-full -ml-20 -mb-20">
+                </div>
+            </div>
+        </section>
+        <section class="space-y-8">
+            <div class="flex items-center gap-4">
+                <span class="step-number">3</span>
+                <h2 class="text-3xl font-bold tracking-tight">How would you like to proceed?</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <button
+                    class="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-3xl hover:border-blue-500 hover:shadow-xl transition-all group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl" data-icon="dashboard">dashboard</span>
+                    </div>
+                    <span class="text-lg font-bold mb-2">Build Dashboard</span>
+                    <p class="text-sm text-slate-500 text-center">Auto-generate a suite of visualizations for your team.
+                    </p>
+                </button>
+                <button
+                    class="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-3xl hover:border-emerald-500 hover:shadow-xl transition-all group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl" data-icon="auto_fix_high">auto_fix_high</span>
+                    </div>
+                    <span class="text-lg font-bold mb-2">Clean My Data</span>
+                    <p class="text-sm text-slate-500 text-center">Let AI fix formatting issues and remove redundancies.
+                    </p>
+                </button>
+                <button
+                    class="flex flex-col items-center p-8 bg-white border border-slate-200 rounded-3xl hover:border-amber-500 hover:shadow-xl transition-all group">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl" data-icon="download">download</span>
+                    </div>
+                    <span class="text-lg font-bold mb-2">Export Insights</span>
+                    <p class="text-sm text-slate-500 text-center">Get a PDF report summarizing these key findings.</p>
+                </button>
+            </div>
+        </section>
+        <section class="pt-8 border-t border-slate-100">
+            <details class="group">
+                <summary
+                    class="flex items-center justify-between cursor-pointer list-none text-slate-400 hover:text-slate-600 transition-colors">
+                    <div class="flex items-center gap-2 font-medium">
+                        <span class="material-symbols-outlined" data-icon="database">database</span>
+                        Looking for the raw details?
+                    </div>
+                    <span class="material-symbols-outlined group-open:rotate-180 transition-transform"
+                        data-icon="expand_more">expand_more</span>
+                </summary>
+                <div class="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h4 class="font-bold">Dataset Snapshot</h4>
+                        <span class="text-xs font-mono text-slate-400">active: user_engagement_v2.csv (12.4MB)</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+                                <tr>
+                                    <th class="px-6 py-3">Column Name</th>
+                                    <th class="px-6 py-3">Data Type</th>
+                                    <th class="px-6 py-3">Fill Rate</th>
+                                    <th class="px-6 py-3">Sample Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium">user_id</td>
+                                    <td class="px-6 py-4"><span
+                                            class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-bold">Integer</span>
+                                    </td>
+                                    <td class="px-6 py-4">100%</td>
+                                    <td class="px-6 py-4 text-slate-400">10284</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium">revenue</td>
+                                    <td class="px-6 py-4"><span
+                                            class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-xs font-bold">Currency</span>
+                                    </td>
+                                    <td class="px-6 py-4">98%</td>
+                                    <td class="px-6 py-4 text-slate-400">$1,450.00</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium">signup_date</td>
+                                    <td class="px-6 py-4"><span
+                                            class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-xs font-bold">Date</span>
+                                    </td>
+                                    <td class="px-6 py-4">100%</td>
+                                    <td class="px-6 py-4 text-slate-400">2023-10-12</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </details>
+        </section>
+    </main>
+    <footer class="max-w-6xl mx-auto px-6 py-12 text-center text-slate-400 text-sm">
+        <p>© 2024 DataPilot AI. Making data analysis approachable for everyone.</p>
+    </footer>
+    <div class="fixed bottom-8 right-8 z-50">
+        <button
+            class="w-14 h-14 bg-slate-900 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform group">
+            <span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+            <div
+                class="absolute right-16 px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Need help asking the right question?
+            </div>
+        </button>
+    </div>
+
+</body>
+
+</html>

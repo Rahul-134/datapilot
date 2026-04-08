@@ -1,108 +1,200 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>DataPilot | Upload & Overview</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-secondary-fixed-variant": "#5a00c6", "on-primary": "#003642",
-                        "on-secondary-container": "#c9aeff", "primary-container": "#00d4ff",
-                        "tertiary-fixed": "#6ffbbe", "primary": "#a8e8ff", "background": "#0f131f",
-                        "surface-container-highest": "#313442", "tertiary-container": "#49da9f",
-                        "primary-fixed-dim": "#3cd7ff", "on-secondary": "#3f008e",
-                        "primary-fixed": "#b4ebff", "on-tertiary-container": "#005c3e",
-                        "surface-tint": "#3cd7ff", "error-container": "#93000a", "error": "#ffb4ab",
-                        "outline": "#859398", "secondary-fixed": "#eaddff", "tertiary": "#6af7ba",
-                        "secondary": "#d2bbff", "on-background": "#dfe2f3", "on-tertiary-fixed": "#002113",
-                        "secondary-fixed-dim": "#d2bbff", "inverse-primary": "#00677e",
-                        "inverse-surface": "#dfe2f3", "inverse-on-surface": "#2c303d",
-                        "outline-variant": "#3c494e", "surface-dim": "#0f131f", "surface": "#0f131f",
-                        "on-tertiary": "#003824", "tertiary-fixed-dim": "#4edea3",
-                        "surface-bright": "#353946", "surface-container-high": "#262a37",
-                        "surface-container-lowest": "#0a0e1a", "on-primary-fixed-variant": "#004e5f",
-                        "on-error": "#690005", "on-primary-fixed": "#001f27",
-                        "on-tertiary-fixed-variant": "#005236", "surface-container-low": "#171b28",
-                        "on-error-container": "#ffdad6", "surface-container": "#1b1f2c",
-                        "on-secondary-fixed": "#25005a", "surface-variant": "#313442",
-                        "on-surface-variant": "#bbc9cf", "secondary-container": "#6001d1",
-                        "on-surface": "#dfe2f3", "on-primary-container": "#00586b"
-                    },
-                    fontFamily: {
-                        "headline": ["Syne", "sans-serif"],
-                        "body": ["Space Grotesk", "sans-serif"],
-                        "mono": ["Space Mono", "monospace"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <style>
-        .grid-bg {
-            background-image: linear-gradient(to right, rgba(168,232,255,0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(168,232,255,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
+        :root {
+            --primary: #2563EB;
+            --secondary: #059669;
+            --accent: #f59e0b;
+            --bg-warm: #F5F4EF;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
         }
-        .glass-card { background: rgba(27,31,44,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(133,147,152,0.1); }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
-        .glow-primary { box-shadow: 0 0 20px rgba(0,212,255,0.15); }
-        .glow-primary:hover { box-shadow: 0 0 30px rgba(0,212,255,0.3); }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        .animate-fadeUp { animation: fadeUp 0.5s ease forwards; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-warm);
+            color: var(--text-main);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 9999px;
+            background-color: #2563EB;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        .insight-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .insight-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .humanistic-btn {
+            padding: 0.625rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background-color: #2563EB;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #F3F4F6;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #E5E7EB;
+        }
+
+        .btn-warning {
+            background-color: #FFFBEB;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+        }
+
+        .btn-warning:hover {
+            background-color: #FEF3C7;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fadeUp {
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Health bar colors */
+        .health-fill {
+            background: linear-gradient(90deg, #059669, #2563EB);
+            border-radius: 9999px;
+            transition: width 1s ease;
+        }
+
+        /* Select styling */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
     </style>
 </head>
 
-<body class="bg-surface-container-lowest text-on-background font-body min-h-screen grid-bg">
+<body class="min-h-screen selection:bg-blue-100">
 
     <!-- NAV -->
-    <nav class="sticky top-0 z-50 w-full bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-cyan-500/10 shadow-[0_0_20px_rgba(0,212,255,0.15)] flex justify-between items-center px-8 py-4">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-primary-container text-3xl">flight_takeoff</span>
-            <h1 class="text-2xl font-black font-headline tracking-tight">
-                <span class="text-white">Data</span><span class="text-primary-container">Pilot</span>
-            </h1>
-        </div>
-        <div class="hidden md:flex items-center space-x-8">
-            <a class="text-[#00d4ff] border-b-2 border-[#00d4ff] pb-1 font-medium" href="#">Dashboard</a>
-            <a class="text-slate-400 hover:text-white transition-colors font-medium" href="analyze.html">Analytics</a>
-            <a class="text-slate-400 hover:text-white transition-colors font-medium" href="scraper.html">Scraper</a>
-        </div>
-        <div class="hidden sm:flex items-center px-3 py-1 rounded-full bg-surface-container border border-outline-variant/30">
-            <span class="text-[10px] font-mono uppercase tracking-widest text-primary-container mr-2">v1.0</span>
-            <span class="text-xs font-medium text-on-surface-variant">AI Data Analyst</span>
+    <nav class="sticky top-0 z-50 w-full glass-nav border-b border-slate-100 px-6 py-4 shadow-sm">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white" data-icon="auto_awesome">auto_awesome</span>
+                </div>
+                <h1 class="text-xl font-extrabold tracking-tight text-slate-900">
+                    Data<span class="text-blue-600">Pilot</span>
+                </h1>
+            </div>
+            <div class="hidden md:flex items-center gap-6">
+                <a class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1" href="#">Dashboard</a>
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors" href="analyze.html">Analytics</a>
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors" href="scraper.html">Scraper</a>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+                <div class="flex items-center px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
+                    <span class="text-[10px] font-mono uppercase tracking-widest text-blue-600 mr-2">v1.0</span>
+                    <span class="text-xs font-medium text-slate-500">AI Data Analyst</span>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 space-y-16">
+    <main class="max-w-4xl mx-auto px-6 py-12 lg:py-16 space-y-16">
 
         <!-- HERO / UPLOAD -->
         <section id="uploadSection" class="text-center space-y-8 max-w-3xl mx-auto">
-            <h2 class="text-5xl md:text-7xl font-extrabold font-headline leading-tight tracking-tighter text-white">
-                Navigate Your <br />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Data with AI</span>
-            </h2>
-            <p class="text-on-surface-variant text-lg md:text-xl font-medium">
-                Upload a CSV or Excel file and let DataPilot analyze it instantly with luminescent precision.
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <span class="step-number">1</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+                    Tell me about your data...
+                </h2>
+            </div>
+            <p class="text-slate-500 text-lg font-medium">
+                Upload a CSV or Excel file and let DataPilot analyze it instantly.
             </p>
-            <div class="relative group mt-12">
-                <div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur opacity-25 group-hover:opacity-100 transition duration-1000"></div>
-                <label id="dropZone" class="relative flex flex-col items-center justify-center w-full h-80 border-2 border-dashed border-outline-variant/50 rounded-xl cursor-pointer bg-surface-container/30 backdrop-blur-md hover:border-primary-container/50 hover:bg-surface-container/50 transition-all duration-300">
-                    <div class="mb-6 p-4 rounded-2xl bg-primary-container/10 border border-primary-container/20 group-hover:scale-110 transition-transform animate-float">
-                        <span class="material-symbols-outlined text-5xl text-primary-container">cloud_upload</span>
+            <div class="relative group mt-8">
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-500">
+                </div>
+                <label id="dropZone"
+                    class="relative flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-white hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-300 shadow-sm">
+                    <div
+                        class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 transition-transform animate-float">
+                        <span class="material-symbols-outlined text-5xl text-blue-600">cloud_upload</span>
                     </div>
-                    <p class="mb-2 text-2xl font-bold text-white tracking-tight">Drop your file here</p>
-                    <p class="text-sm text-on-surface-variant font-mono">Supports CSV, XLSX, XLS · Max 50MB</p>
+                    <p class="mb-2 text-xl font-bold text-slate-800 tracking-tight">Drop your file here</p>
+                    <p class="text-sm text-slate-400">Supports CSV, XLSX, XLS · Max 50MB</p>
                     <input id="fileInput" class="hidden" type="file" accept=".csv,.xlsx,.xls" />
                 </label>
             </div>
@@ -110,8 +202,8 @@
 
         <!-- LOADING -->
         <div id="loading" class="hidden flex-col items-center justify-center py-20 space-y-4">
-            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p class="font-mono font-medium text-primary animate-pulse">Analyzing your file...</p>
+            <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <p class="font-medium text-blue-600 animate-pulse">Analyzing your file...</p>
         </div>
 
         <!-- OVERVIEW -->
@@ -120,103 +212,115 @@
             <!-- Header + buttons -->
             <div class="flex items-end justify-between flex-wrap gap-4">
                 <div>
-                    <h3 class="text-3xl font-headline font-bold text-white mb-2">Dataset Overview</h3>
-                    <p class="text-on-surface-variant font-mono text-sm">active_session: <span id="badgeFilename">—</span></p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="step-number">2</span>
+                        <h3 class="text-2xl font-bold text-slate-900">Dataset Overview</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm ml-9">active: <span id="badgeFilename" class="font-medium text-slate-600">—</span></p>
                 </div>
                 <div class="flex gap-3 flex-wrap">
-                    <button id="resetFileBtn" class="px-5 py-2 rounded-lg border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">🔄 Reset File</button>
-                    <button id="cleanBtn" class="px-5 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-bold hover:bg-amber-500/20 transition-all">
-                        🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>
+                    <button id="resetFileBtn"
+                        class="humanistic-btn btn-secondary">
+                        🔄 Reset File
                     </button>
-                    <button id="downloadBtn" class="hidden px-5 py-2 rounded-lg bg-primary-container text-on-primary-container text-sm font-bold glow-primary transition-all items-center gap-2">
+                    <button id="cleanBtn"
+                        class="humanistic-btn btn-warning">
+                        🧹 Clean Data
+                        <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>
+                    </button>
+                    <button id="downloadBtn"
+                        class="hidden humanistic-btn btn-primary items-center gap-2">
                         <span class="material-symbols-outlined text-lg">download</span> Download Cleaned
                     </button>
-                    <button id="resetBtn" class="px-5 py-2 rounded-lg border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">↩ New File</button>
+                    <button id="resetBtn"
+                        class="humanistic-btn btn-secondary">
+                        ↩ New File
+                    </button>
                 </div>
             </div>
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Total Rows</p>
-                    <p id="statRows" class="text-3xl font-mono font-bold text-white">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-primary">database</span>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-600 rounded-t-xl"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Total Rows</p>
+                    <p id="statRows" class="text-2xl font-bold text-slate-900">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-blue-600">database</span>
                 </div>
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
-                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Columns</p>
-                    <p id="statCols" class="text-3xl font-mono font-bold text-white">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-secondary">view_column</span>
+                <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 rounded-t-xl"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Columns</p>
+                    <p id="statCols" class="text-2xl font-bold text-slate-900">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-emerald-500">view_column</span>
                 </div>
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-error"></div>
-                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Duplicates</p>
-                    <p id="statDupes" class="text-3xl font-mono font-bold text-error">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-error">content_copy</span>
+                <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-red-500 rounded-t-xl"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Duplicates</p>
+                    <p id="statDupes" class="text-2xl font-bold text-red-500">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-red-500">content_copy</span>
                 </div>
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-tertiary"></div>
-                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">Null Values</p>
-                    <p id="statNulls" class="text-3xl font-mono font-bold text-tertiary">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-tertiary">scan_delete</span>
+                <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-amber-500 rounded-t-xl"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Null Values</p>
+                    <p id="statNulls" class="text-2xl font-bold text-amber-500">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-amber-500">scan_delete</span>
                 </div>
-                <div class="glass-card p-6 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
-                    <p class="text-on-surface-variant text-xs font-mono uppercase tracking-widest mb-4">File Size</p>
-                    <p id="statSize" class="text-3xl font-mono font-bold text-white">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-6xl opacity-5 text-primary-container">data_usage</span>
+                <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-violet-500 rounded-t-xl"></div>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">File Size</p>
+                    <p id="statSize" class="text-2xl font-bold text-slate-900">—</p>
+                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-violet-500">data_usage</span>
                 </div>
             </div>
 
             <!-- Health Score -->
-            <div class="glass-card p-8 rounded-xl space-y-4">
+            <div class="insight-card space-y-4">
                 <div class="flex justify-between items-center">
-                    <h4 class="font-headline font-bold text-lg text-white">Data Health Score</h4>
-                    <span id="healthScore" class="font-mono text-2xl font-bold text-tertiary">—</span>
+                    <h4 class="font-bold text-lg text-slate-900">Data Health Score</h4>
+                    <span id="healthScore" class="text-2xl font-bold text-emerald-600">—</span>
                 </div>
-                <div class="w-full h-4 bg-surface-container-highest rounded-full overflow-hidden">
-                    <div id="healthFill" class="h-full bg-gradient-to-r from-tertiary to-primary-container rounded-full transition-all duration-1000" style="width:0%"></div>
+                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div id="healthFill" class="h-full health-fill" style="width:0%"></div>
                 </div>
-                <div class="flex justify-between text-[10px] font-mono uppercase text-on-surface-variant">
+                <div class="flex justify-between text-[10px] uppercase text-slate-400 font-semibold">
                     <span>Critical issues</span><span>Action required</span><span>Validated Data</span>
                 </div>
             </div>
 
             <!-- Column Profile + Sample Data -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 glass-card rounded-xl overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-outline-variant/10">
-                        <h4 class="font-headline font-bold text-white">Column Profile</h4>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 insight-card p-0 overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-slate-100">
+                        <h4 class="font-bold text-slate-900">Column Profile</h4>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left font-mono text-sm">
-                            <thead class="bg-surface-container-high/50 text-on-surface-variant text-[10px] uppercase tracking-tighter">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
                                 <tr><th class="px-4 py-3">#</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">Type</th><th class="px-4 py-3 text-right">Null %</th></tr>
                             </thead>
-                            <tbody id="colTableBody" class="divide-y divide-outline-variant/5"></tbody>
+                            <tbody id="colTableBody" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
-                <div class="lg:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-outline-variant/10">
-                        <h4 class="font-headline font-bold text-white">Sample Data Preview (Top 5)</h4>
+                <div class="lg:col-span-2 insight-card p-0 overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-slate-100">
+                        <h4 class="font-bold text-slate-900">Sample Data Preview (Top 5)</h4>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left font-mono text-sm whitespace-nowrap">
-                            <thead id="sampleHead" class="bg-primary-container/10 text-primary-container text-[10px] uppercase"></thead>
-                            <tbody id="sampleBody" class="divide-y divide-outline-variant/5"></tbody>
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead id="sampleHead" class="bg-blue-50 text-blue-600 text-[10px] uppercase font-semibold"></thead>
+                            <tbody id="sampleBody" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
             <!-- START FULL ANALYSIS CTA -->
-            <div class="flex justify-center pt-8">
-                <button id="startAnalysisBtn" class="group relative px-12 py-5 rounded-xl bg-gradient-to-r from-primary-container via-[#6001d1] to-secondary overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-[0_0_40px_rgba(0,212,255,0.2)]">
-                    <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                    <span class="relative flex items-center gap-3 text-xl font-headline font-black text-on-surface">
-                        <span class="material-symbols-outlined text-2xl">rocket_launch</span>
+            <div class="flex justify-center pt-6">
+                <button id="startAnalysisBtn"
+                    class="group relative px-10 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-blue-200">
+                    <span class="relative flex items-center gap-3 text-lg font-bold">
+                        <span class="material-symbols-outlined text-xl">rocket_launch</span>
                         START FULL ANALYSIS
                     </span>
                 </button>
@@ -226,66 +330,70 @@
     </main>
 
     <!-- CLEAN MODAL -->
-    <div id="cleanModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-[#0a0e1a]/80 backdrop-blur-sm">
-        <div class="glass-card w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6">
+    <div id="cleanModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-black/30 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-slate-200">
             <div class="flex items-center gap-4">
-                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                    <span class="material-symbols-outlined text-amber-400">auto_fix_high</span>
+                <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <span class="material-symbols-outlined text-amber-500">auto_fix_high</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-headline font-bold text-white">Cleanse Dataset</h3>
-                    <p class="text-on-surface-variant text-sm">Select cleaning protocols to apply</p>
+                    <h3 class="text-xl font-bold text-slate-900">Cleanse Dataset</h3>
+                    <p class="text-slate-400 text-sm">Select cleaning protocols to apply</p>
                 </div>
             </div>
             <div class="space-y-4">
-                <label class="flex items-center gap-4 cursor-pointer bg-surface-container-high/40 p-4 rounded-xl border border-outline-variant/10 hover:border-primary-container/20 transition-all">
-                    <input type="checkbox" id="removeDupes" checked class="w-4 h-4 accent-[#00d4ff]" />
+                <label class="flex items-center gap-4 cursor-pointer bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-200 transition-all">
+                    <input type="checkbox" id="removeDupes" checked class="w-4 h-4 accent-blue-600 rounded" />
                     <div>
-                        <p class="text-white font-bold text-sm">Remove duplicate rows</p>
-                        <p class="text-xs text-on-surface-variant">Deletes all identified redundant rows</p>
+                        <p class="text-slate-800 font-bold text-sm">Remove duplicate rows</p>
+                        <p class="text-xs text-slate-400">Deletes all identified redundant rows</p>
                     </div>
                 </label>
-                <div class="bg-surface-container-high/40 p-4 rounded-xl border border-outline-variant/10 space-y-3">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
                     <label class="flex items-center gap-4 cursor-pointer">
-                        <input type="checkbox" id="handleNulls" checked class="w-4 h-4 accent-[#00d4ff]" />
-                        <p class="text-white font-bold text-sm">Handle missing values</p>
+                        <input type="checkbox" id="handleNulls" checked class="w-4 h-4 accent-blue-600 rounded" />
+                        <p class="text-slate-800 font-bold text-sm">Handle missing values</p>
                     </label>
-                    <select id="nullStrategy" class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-2 px-3 text-sm font-mono text-primary outline-none focus:border-primary-container transition-colors">
+                    <select id="nullStrategy"
+                        class="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all pr-8">
                         <option value="drop">Drop rows with nulls</option>
                         <option value="mean">Fill numeric nulls with Mean</option>
                         <option value="median">Fill numeric nulls with Median (Recommended)</option>
                         <option value="unknown">Fill text nulls with "Unknown"</option>
                     </select>
                 </div>
-                <div id="cleanPreview" class="p-4 rounded-lg bg-tertiary/5 border border-tertiary/20 flex gap-3">
-                    <span class="material-symbols-outlined text-tertiary shrink-0">visibility</span>
-                    <p class="text-xs text-on-surface-variant leading-relaxed font-mono">⚡ Loading preview...</p>
+                <div id="cleanPreview" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex gap-3">
+                    <span class="material-symbols-outlined text-emerald-600 shrink-0">visibility</span>
+                    <p class="text-xs text-slate-600 leading-relaxed">⚡ Loading preview...</p>
                 </div>
             </div>
             <div class="flex gap-4 pt-2">
-                <button id="cancelClean" class="flex-1 py-3 rounded-xl border border-outline-variant text-sm font-bold hover:bg-surface-container-high transition-colors">Cancel</button>
-                <button id="confirmClean" class="flex-1 py-3 rounded-xl bg-primary-container text-on-primary-container text-sm font-bold glow-primary">Apply & Clean</button>
+                <button id="cancelClean"
+                    class="flex-1 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button id="confirmClean"
+                    class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Apply & Clean</button>
             </div>
         </div>
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-surface-container-highest border-l-4 border-tertiary p-4 rounded-xl shadow-2xl max-w-sm">
-        <div id="toastIconWrap" class="h-10 w-10 bg-tertiary-container/20 rounded-full flex items-center justify-center text-tertiary shrink-0">
+    <div id="toast" class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-white border-l-4 border-emerald-500 p-4 rounded-xl shadow-xl max-w-sm border border-slate-200">
+        <div id="toastIconWrap" class="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
             <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
         </div>
         <div>
-            <p id="toastTitle" class="font-headline font-bold text-on-surface text-sm">Success</p>
-            <p id="toastMsg" class="text-xs text-on-surface-variant font-mono"></p>
+            <p id="toastTitle" class="font-bold text-slate-900 text-sm">Success</p>
+            <p id="toastMsg" class="text-xs text-slate-500"></p>
         </div>
-        <button onclick="hideToast()" class="text-outline hover:text-white transition-colors ml-auto">
+        <button onclick="hideToast()" class="text-slate-300 hover:text-slate-500 transition-colors ml-auto">
             <span class="material-symbols-outlined text-sm">close</span>
         </button>
     </div>
 
-    <!-- BG Decoration -->
-    <div class="fixed top-0 right-0 -z-10 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2"></div>
-    <div class="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 translate-y-1/2"></div>
+    <!-- Footer -->
+    <footer class="max-w-6xl mx-auto px-6 py-12 text-center text-slate-400 text-sm">
+        <p>© 2024 DataPilot AI. Making data analysis approachable for everyone.</p>
+    </footer>
 
     <script>
         let currentData = null;
@@ -298,11 +406,11 @@
         const uploadSec = document.getElementById('uploadSection');
 
         // Drag & drop
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-primary-container'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-primary-container'));
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-blue-400'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-400'));
         dropZone.addEventListener('drop', e => {
             e.preventDefault();
-            dropZone.classList.remove('border-primary-container');
+            dropZone.classList.remove('border-blue-400');
             if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
         });
         fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
@@ -342,13 +450,13 @@
                 const nullPctVal = ((nullCount / totalRows) * 100).toFixed(1);
                 const dtype      = dtypes[col] || 'unknown';
                 const dtypeLabel = dtype.includes('float') ? 'FLOAT' : dtype.includes('int') ? 'INT' : 'STR';
-                const dtypeColor = dtype.includes('float') ? 'bg-tertiary-container/20 text-tertiary' : dtype.includes('int') ? 'bg-secondary-container/20 text-secondary' : 'bg-primary-container/20 text-primary-container';
-                const nullColor  = nullCount === 0 ? 'text-tertiary' : nullCount < totalRows * 0.1 ? 'text-amber-400' : 'text-error';
+                const dtypeColor = dtype.includes('float') ? 'bg-emerald-50 text-emerald-600' : dtype.includes('int') ? 'bg-blue-50 text-blue-600' : 'bg-violet-50 text-violet-600';
+                const nullColor  = nullCount === 0 ? 'text-emerald-600' : nullCount < totalRows * 0.1 ? 'text-amber-500' : 'text-red-500';
                 colBody.innerHTML += `
-                    <tr class="hover:bg-primary-container/5 transition-colors">
-                        <td class="px-4 py-3 text-on-surface-variant">${String(i+1).padStart(2,'0')}</td>
-                        <td class="px-4 py-3 text-primary-container font-medium">${col}</td>
-                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] ${dtypeColor}">${dtypeLabel}</span></td>
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-4 py-3 text-slate-400">${String(i+1).padStart(2,'0')}</td>
+                        <td class="px-4 py-3 text-slate-800 font-medium">${col}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${dtypeColor}">${dtypeLabel}</span></td>
                         <td class="px-4 py-3 text-right ${nullColor}">${nullPctVal}%</td>
                     </tr>`;
             });
@@ -372,8 +480,8 @@
             document.getElementById('sampleHead').innerHTML =
                 '<tr>' + data.column_names.map(c => `<th class="px-6 py-4">${c}</th>`).join('') + '</tr>';
             document.getElementById('sampleBody').innerHTML = data.sample.map(row =>
-                '<tr class="hover:bg-white/5 transition-colors">' +
-                data.column_names.map(c => `<td class="px-6 py-4">${row[c] ?? '—'}</td>`).join('') + '</tr>'
+                '<tr class="hover:bg-slate-50 transition-colors">' +
+                data.column_names.map(c => `<td class="px-6 py-4 text-slate-600">${row[c] ?? '—'}</td>`).join('') + '</tr>'
             ).join('');
 
             overview.classList.remove('hidden');
@@ -406,8 +514,8 @@
             lines.push(`📊 Rows before: ${currentData.rows.toLocaleString()}`);
             if (dupes) lines.push(`📊 Rows after:  ~${(currentData.rows - currentData.duplicate_rows).toLocaleString()}`);
             document.getElementById('cleanPreview').innerHTML =
-                `<span class="material-symbols-outlined text-tertiary shrink-0">visibility</span>
-                 <p class="text-xs text-on-surface-variant leading-relaxed font-mono">${lines.join('<br>')}</p>`;
+                `<span class="material-symbols-outlined text-emerald-600 shrink-0">visibility</span>
+                 <p class="text-xs text-slate-600 leading-relaxed">${lines.join('<br>')}</p>`;
         }
 
         document.getElementById('removeDupes').addEventListener('change', updateCleanPreview);
@@ -442,8 +550,8 @@
                 renderColTable(currentData.column_names, currentData.dtypes, data.null_counts, data.final_rows);
 
                 document.getElementById('sampleBody').innerHTML = data.sample.map(row =>
-                    '<tr class="hover:bg-white/5 transition-colors">' +
-                    currentData.column_names.map(c => `<td class="px-6 py-4">${row[c] ?? '—'}</td>`).join('') + '</tr>'
+                    '<tr class="hover:bg-slate-50 transition-colors">' +
+                    currentData.column_names.map(c => `<td class="px-6 py-4 text-slate-600">${row[c] ?? '—'}</td>`).join('') + '</tr>'
                 ).join('');
 
                 currentData.null_counts    = data.null_counts;
@@ -458,7 +566,7 @@
             } catch (err) {
                 showToast('Cleaning failed.', true);
                 cleanBtn.disabled = false;
-                cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>';
+                cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>';
             }
         });
 
@@ -501,7 +609,7 @@
         function resetCleanBtn() {
             const cleanBtn = document.getElementById('cleanBtn');
             cleanBtn.disabled = false;
-            cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-tertiary/20 text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-full font-mono">Recommended</span>';
+            cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>';
             document.getElementById('removeDupes').checked = true;
             document.getElementById('handleNulls').checked = true;
             document.getElementById('nullStrategy').value  = 'drop';
@@ -527,9 +635,9 @@
             const title = document.getElementById('toastTitle');
             document.getElementById('toastMsg').textContent = msg;
             icon.textContent  = isError ? 'error' : 'check_circle';
-            wrap.className    = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-error-container/20 text-error' : 'bg-tertiary-container/20 text-tertiary'}`;
+            wrap.className    = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`;
             title.textContent = isError ? 'Error' : 'Success';
-            toast.className   = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${isError ? 'border-error' : 'border-tertiary'} p-4 rounded-xl shadow-2xl max-w-sm`;
+            toast.className   = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-white border-l-4 ${isError ? 'border-red-500' : 'border-emerald-500'} p-4 rounded-xl shadow-xl max-w-sm border border-slate-200`;
             toastTimer = setTimeout(hideToast, 3500);
         }
         function hideToast() {

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Web Scraper | DataPilot</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#e4e2e6",
+                        "on-secondary-fixed-variant": "#5b5b5f",
+                        "on-primary-fixed": "#003798",
+                        "on-primary-container": "#0048bf",
+                        "tertiary-dim": "#564f6b",
+                        "inverse-surface": "#0d0f0e",
+                        "primary-dim": "#0048c1",
+                        "surface-bright": "#f9f9f7",
+                        "outline": "#767c79",
+                        "secondary-fixed": "#e4e2e6",
+                        "on-secondary": "#faf8fc",
+                        "on-tertiary-fixed": "#3c3650",
+                        "on-surface": "#2d3432",
+                        "surface-container-lowest": "#ffffff",
+                        "error-dim": "#4e0309",
+                        "secondary-dim": "#535356",
+                        "on-tertiary": "#fdf7ff",
+                        "surface-container-low": "#f2f4f2",
+                        "on-surface-variant": "#5a605e",
+                        "surface-container": "#ecefec",
+                        "tertiary": "#625b77",
+                        "on-error": "#fff7f6",
+                        "inverse-on-surface": "#9c9d9b",
+                        "outline-variant": "#adb3b0",
+                        "primary-container": "#dbe1ff",
+                        "on-error-container": "#752121",
+                        "surface-dim": "#d4dcd8",
+                        "surface-container-high": "#e5e9e6",
+                        "on-tertiary-fixed-variant": "#59526e",
+                        "error-container": "#fe8983",
+                        "error": "#9f403d",
+                        "on-secondary-container": "#515155",
+                        "primary-fixed-dim": "#c7d3ff",
+                        "on-background": "#2d3432",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed-dim": "#d5d3d8",
+                        "on-primary-fixed-variant": "#0050d4",
+                        "on-tertiary-container": "#4f4964",
+                        "tertiary-fixed-dim": "#d0c7e8",
+                        "tertiary-container": "#dfd5f7",
+                        "surface-variant": "#dee4e0",
+                        "surface-container-highest": "#dee4e0",
+                        "inverse-primary": "#618bff",
+                        "primary": "#0053db",
+                        "on-secondary-fixed": "#3f3f43",
+                        "secondary": "#5f5f62",
+                        "on-primary": "#f8f7ff",
+                        "tertiary-fixed": "#dfd5f7",
+                        "surface": "#f9f9f7",
+                        "surface-tint": "#0053db",
+                        "background": "#f9f9f7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f7;
+        }
+
+        .font-manrope {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="text-on-surface">
+    <!-- TopNavBar -->
+    <nav
+        class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-zinc-900/80 backdrop-blur-md flex justify-between items-center px-8 py-4 max-w-full mx-auto">
+        <div class="flex items-center gap-8">
+            <span class="text-2xl font-bold tracking-tight text-on-surface font-manrope">DataPilot</span>
+            <div class="hidden md:flex gap-6">
+                <a class="text-blue-600 dark:text-blue-400 font-bold border-b-2 border-blue-600 font-inter" href="#">My
+                    Projects</a>
+                <a class="text-zinc-500 dark:text-zinc-400 font-medium hover:text-blue-500 transition-colors duration-200 font-inter"
+                    href="#">Templates</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button
+                class="px-4 py-2 rounded-lg border border-primary text-primary font-medium hover:bg-primary-container transition-all">Support</button>
+            <div class="flex gap-2 text-on-surface-variant">
+                <span
+                    class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+                <span
+                    class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">settings</span>
+            </div>
+            <img alt="User profile" class="w-8 h-8 rounded-full border border-surface-variant"
+                data-alt="Professional headshot of a woman with a friendly expression in a modern office environment with soft natural lighting"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEglFfWfzrwu-qxTM5v1c5u1Bn3Ot7jJYr_-_8iq6voqKE9QHZ74vB4veAajUJPw4R6mVAlufKT8S853Ds5I-bSeBmcPU6BolQWinChtc7qaAylV8xDYLZHWn8sU66PdRSA4BJugcDPi1S01Yn-ZzFPET9DiO1Y-k8FQud4gEGU-PCsrttM8bheSIxnaVQvwhNzIMJDShuhOt7pfdEUMoj1R-w4pbl3YHGxQD4waxgTPo7UBq-GxKbBdoFtP_PyktXSjQ3X5xhPCo" />
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="pt-28 pb-20 px-6 max-w-5xl mx-auto space-y-12">
+        <!-- Step 1: Input -->
+        <section class="space-y-6">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold font-headline">
+                    1</div>
+                <div>
+                    <h1 class="text-3xl font-extrabold font-headline tracking-tight">Enter a URL to scrape</h1>
+                    <p class="text-on-surface-variant font-body">DataPilot will extract structured data automatically
+                    </p>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/15">
+                <div class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex-grow space-y-2">
+                        <label class="text-sm font-semibold text-on-surface-variant ml-1">Website URL</label>
+                        <div class="relative flex items-center">
+                            <span class="material-symbols-outlined absolute left-4 text-outline">language</span>
+                            <input
+                                class="w-full pl-12 pr-4 py-3 bg-surface-container-low rounded-lg border-none focus:ring-2 focus:ring-primary/30 transition-all outline-none"
+                                placeholder="https://example.com/products" type="text" />
+                        </div>
+                    </div>
+                    <div class="w-full md:w-32 space-y-2">
+                        <label class="text-sm font-semibold text-on-surface-variant ml-1">Pages to scrape</label>
+                        <div class="flex items-center bg-surface-container-low rounded-lg p-1">
+                            <button
+                                class="w-8 h-10 flex items-center justify-center hover:bg-surface-variant rounded-md">-</button>
+                            <input class="w-full text-center bg-transparent border-none focus:ring-0 font-bold"
+                                type="number" value="5" />
+                            <button
+                                class="w-8 h-10 flex items-center justify-center hover:bg-surface-variant rounded-md">+</button>
+                        </div>
+                    </div>
+                    <button
+                        class="w-full md:w-auto px-8 py-3 bg-gradient-to-br from-primary to-primary-dim text-white font-bold rounded-lg hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                        Scrape <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Warning Banner -->
+            <div class="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+                <p class="text-sm font-medium">Only 3 pages found — showing results for available pages instead of
+                    requested 5</p>
+            </div>
+        </section>
+        <!-- Step 2: Results -->
+        <section class="space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold font-headline">
+                        2</div>
+                    <h2 class="text-3xl font-extrabold font-headline tracking-tight">Scraped Data</h2>
+                </div>
+                <div
+                    class="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
+                    <span class="material-symbols-outlined text-sm"
+                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    ✓ Data extracted
+                </div>
+            </div>
+            <div
+                class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/15 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-surface-container-low">
+                            <tr>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                                    Name</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                                    Price</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                                    Rating</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                                    URL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-container">
+                            <tr class="hover:bg-surface-container-low transition-colors">
+                                <td class="px-6 py-4 font-medium">Premium Wireless Headphones</td>
+                                <td class="px-6 py-4 text-primary font-bold">$129.99</td>
+                                <td class="px-6 py-4 flex items-center gap-1">4.8 <span
+                                        class="material-symbols-outlined text-amber-500 text-sm"
+                                        style="font-variation-settings: 'FILL' 1;">star</span></td>
+                                <td class="px-6 py-4 text-sm text-on-surface-variant truncate max-w-[200px]">
+                                    /products/h-100</td>
+                            </tr>
+                            <tr class="hover:bg-surface-container-low transition-colors">
+                                <td class="px-6 py-4 font-medium">Noise Cancelling Earbuds</td>
+                                <td class="px-6 py-4 text-primary font-bold">$89.00</td>
+                                <td class="px-6 py-4 flex items-center gap-1">4.5 <span
+                                        class="material-symbols-outlined text-amber-500 text-sm"
+                                        style="font-variation-settings: 'FILL' 1;">star</span></td>
+                                <td class="px-6 py-4 text-sm text-on-surface-variant truncate max-w-[200px]">
+                                    /products/ear-x</td>
+                            </tr>
+                            <tr class="hover:bg-surface-container-low transition-colors">
+                                <td class="px-6 py-4 font-medium">Smart Fitness Watch</td>
+                                <td class="px-6 py-4 text-primary font-bold">$199.99</td>
+                                <td class="px-6 py-4 flex items-center gap-1">4.2 <span
+                                        class="material-symbols-outlined text-amber-500 text-sm"
+                                        style="font-variation-settings: 'FILL' 1;">star</span></td>
+                                <td class="px-6 py-4 text-sm text-on-surface-variant truncate max-w-[200px]">
+                                    /products/fit-pro</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 bg-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4">
+                    <span
+                        class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-md text-xs font-bold">24
+                        rows extracted</span>
+                    <div class="flex gap-3">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-sm font-semibold hover:bg-white transition-all shadow-sm">
+                            <span class="material-symbols-outlined text-sm">content_copy</span> Copy
+                        </button>
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-all shadow-md">
+                            <span class="material-symbols-outlined text-sm">download</span> Download CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Step 3: Actions -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold font-headline">
+                    3</div>
+                <h2 class="text-3xl font-extrabold font-headline tracking-tight">What would you like to do next?</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Action Card 1 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-primary-container text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'wght' 600;">analytics</span>
+                    </div>
+                    <h3 class="text-xl font-bold font-headline mb-2">Analyze This Data</h3>
+                    <p class="text-on-surface-variant text-sm font-body">Run instant insights and charts on your
+                        extracted results.</p>
+                </div>
+                <!-- Action Card 2 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-surface-container-high text-on-surface rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'wght' 600;">refresh</span>
+                    </div>
+                    <h3 class="text-xl font-bold font-headline mb-2">Scrape Another URL</h3>
+                    <p class="text-on-surface-variant text-sm font-body">Clear results and start a new extraction
+                        process.</p>
+                </div>
+                <!-- Action Card 3 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-surface-container-high text-on-surface rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'wght' 600;">download</span>
+                    </div>
+                    <h3 class="text-xl font-bold font-headline mb-2">Export as Excel</h3>
+                    <p class="text-on-surface-variant text-sm font-body">Download the full dataset in .xlsx format for
+                        local analysis.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- SideNavBar (Hidden by default, represented by TopNavBar context per rules) -->
+    <div class="hidden">
+        <aside class="h-screen w-64 fixed left-0 top-0 bg-zinc-100 dark:bg-zinc-950 flex flex-col py-6 gap-2">
+            <div class="px-6 mb-8">
+                <span class="text-zinc-600 dark:text-zinc-400 font-manrope text-sm font-medium">Analysis Suite</span>
+            </div>
+            <nav class="flex-grow">
+                <div
+                    class="bg-white dark:bg-zinc-900 text-blue-600 rounded-lg mx-2 flex items-center gap-3 px-4 py-3 scale-98 cursor-pointer">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-manrope text-sm font-medium">Dashboard</span>
+                </div>
+                <div
+                    class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 mx-2 rounded-lg flex items-center gap-3 px-4 py-3 cursor-pointer">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span class="font-manrope text-sm font-medium">Analytics</span>
+                </div>
+                <div
+                    class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 mx-2 rounded-lg flex items-center gap-3 px-4 py-3 cursor-pointer">
+                    <span class="material-symbols-outlined">database</span>
+                    <span class="font-manrope text-sm font-medium">Data Sources</span>
+                </div>
+                <div
+                    class="text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 mx-2 rounded-lg flex items-center gap-3 px-4 py-3 cursor-pointer">
+                    <span class="material-symbols-outlined">description</span>
+                    <span class="font-manrope text-sm font-medium">Reports</span>
+                </div>
+            </nav>
+        </aside>
+    </div>
+</body>
+
+</html>

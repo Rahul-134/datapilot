@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Analyze | DataPilot</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-dim": "#4e0309",
+                        "outline": "#767c79",
+                        "on-tertiary": "#fdf7ff",
+                        "primary-container": "#dbe1ff",
+                        "primary-fixed-dim": "#c7d3ff",
+                        "on-primary": "#f8f7ff",
+                        "secondary": "#5f5f62",
+                        "surface-container": "#ecefec",
+                        "surface-container-highest": "#dee4e0",
+                        "secondary-fixed-dim": "#d5d3d8",
+                        "on-tertiary-container": "#4f4964",
+                        "on-tertiary-fixed-variant": "#59526e",
+                        "on-primary-fixed-variant": "#0050d4",
+                        "surface-container-high": "#e5e9e6",
+                        "surface-tint": "#0053db",
+                        "surface-bright": "#f9f9f7",
+                        "tertiary-dim": "#564f6b",
+                        "on-secondary": "#faf8fc",
+                        "primary": "#0053db",
+                        "on-error-container": "#752121",
+                        "secondary-fixed": "#e4e2e6",
+                        "on-surface": "#2d3432",
+                        "on-secondary-container": "#515155",
+                        "inverse-surface": "#0d0f0e",
+                        "tertiary-container": "#dfd5f7",
+                        "inverse-primary": "#618bff",
+                        "surface-variant": "#dee4e0",
+                        "on-tertiary-fixed": "#3c3650",
+                        "on-primary-container": "#0048bf",
+                        "on-surface-variant": "#5a605e",
+                        "inverse-on-surface": "#9c9d9b",
+                        "background": "#f9f9f7",
+                        "outline-variant": "#adb3b0",
+                        "surface-dim": "#d4dcd8",
+                        "error-container": "#fe8983",
+                        "error": "#9f403d",
+                        "secondary-dim": "#535356",
+                        "tertiary": "#625b77",
+                        "surface": "#f9f9f7",
+                        "tertiary-fixed": "#dfd5f7",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-fixed": "#3f3f43",
+                        "on-secondary-fixed-variant": "#5b5b5f",
+                        "surface-container-low": "#f2f4f2",
+                        "tertiary-fixed-dim": "#d0c7e8",
+                        "on-background": "#2d3432",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-dim": "#0048c1",
+                        "secondary-container": "#e4e2e6",
+                        "on-primary-fixed": "#003798",
+                        "on-error": "#fff7f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": [
+                            "Manrope"
+                        ],
+                        "body": [
+                            "Inter"
+                        ],
+                        "label": [
+                            "Inter"
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f7;
+        }
+
+        .editorial-shadow {
+            box-shadow: 0 32px 64px -12px rgba(45, 52, 50, 0.06);
+        }
+    </style>
+</head>
+
+<body class="text-on-surface">
+    <!-- TopNavBar (Shared Component) -->
+    <nav
+        class="bg-surface dark:bg-zinc-900 flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto fixed top-0 z-50">
+        <div class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-manrope">DataPilot</div>
+        <div class="hidden md:flex items-center gap-8">
+            <div class="flex gap-6 items-center">
+                <a class="text-on-surface-variant dark:text-zinc-400 text-sm font-medium font-inter hover:text-blue-500 dark:hover:text-blue-300 transition-colors"
+                    href="#">My Projects</a>
+                <a class="text-on-surface-variant dark:text-zinc-400 text-sm font-medium font-inter hover:text-blue-500 dark:hover:text-blue-300 transition-colors"
+                    href="#">Templates</a>
+            </div>
+            <button
+                class="text-on-surface-variant dark:text-zinc-400 text-sm font-medium font-inter hover:text-blue-500 dark:hover:text-blue-300 transition-colors">Support</button>
+        </div>
+    </nav>
+    <main class="pt-24 pb-20 px-6 max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-5xl font-extrabold font-headline tracking-tight text-on-surface mb-3">Ask anything about
+                your data...</h1>
+            <p class="text-on-surface-variant font-body text-lg">Your dataset: <span
+                    class="font-semibold text-on-surface">sales_data.csv</span> — 1,240 rows, 8 columns</p>
+        </header>
+        <!-- Query Input Section -->
+        <section class="mb-12">
+            <div class="bg-surface-container-lowest rounded-xl p-8 editorial-shadow">
+                <div class="relative flex items-center mb-6">
+                    <span class="material-symbols-outlined absolute left-4 text-on-surface-variant"
+                        data-icon="search">search</span>
+                    <input
+                        class="w-full pl-12 pr-4 py-5 bg-surface-container-low border-0 rounded-xl focus:ring-4 focus:ring-primary-fixed-dim/30 font-body text-lg text-on-surface placeholder:text-on-surface-variant/60"
+                        placeholder="e.g. &quot;What's the average revenue by region?&quot;" type="text" />
+                </div>
+                <div class="flex flex-wrap justify-between items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <button
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-on-surface font-semibold hover:bg-surface-container transition-all">
+                            <span class="material-symbols-outlined" data-icon="mic">mic</span>
+                            🎤 Voice
+                        </button>
+                        <button
+                            class="px-8 py-3 bg-gradient-to-br from-primary to-primary-dim text-on-primary rounded-lg font-bold flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            Analyze
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-on-surface-variant">Try these:</span>
+                        <button
+                            class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-semibold text-on-surface hover:bg-surface-container-highest transition-all">Top
+                            products</button>
+                        <button
+                            class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-semibold text-on-surface hover:bg-surface-container-highest transition-all">Quarterly
+                            growth</button>
+                        <button
+                            class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-semibold text-on-surface hover:bg-surface-container-highest transition-all">Region
+                            split</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Results Section -->
+        <section class="mb-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold font-headline text-on-surface">AI Analysis</h2>
+                <div
+                    class="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-sm font-medium">
+                    <span class="material-symbols-outlined text-sm" data-icon="check_circle"
+                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    ✓ Analysis complete
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <!-- AI Summary -->
+                <div class="md:col-span-5 bg-surface-container-lowest rounded-xl p-8 editorial-shadow">
+                    <p class="text-on-surface leading-relaxed text-lg mb-6">
+                        The data reveals a steady <span class="font-bold text-primary">12.4% increase</span> in revenue
+                        during Q3, primarily driven by the North American region. Electronic goods saw the highest
+                        margin growth, while logistics costs remained stabilized compared to the previous quarter.
+                    </p>
+                    <div class="flex gap-4">
+                        <button
+                            class="flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span>
+                            📋 Copy Result
+                        </button>
+                        <button
+                            class="flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+                            ⬇ Export
+                        </button>
+                    </div>
+                </div>
+                <!-- Visualization -->
+                <div
+                    class="md:col-span-7 bg-surface-container-lowest rounded-xl p-8 editorial-shadow min-h-[320px] flex flex-col justify-end">
+                    <div class="flex items-end justify-between h-48 gap-4 px-4">
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 40%"></div>
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 65%"></div>
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 90%"></div>
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 55%"></div>
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 75%"></div>
+                        <div class="w-full bg-surface-container-highest rounded-t-lg transition-all hover:bg-primary-container"
+                            style="height: 85%"></div>
+                    </div>
+                    <div class="flex justify-between mt-4 px-4 text-xs font-medium text-on-surface-variant">
+                        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Recent Queries -->
+        <section class="mb-16">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-6">Recent Queries</h3>
+            <div class="flex flex-wrap gap-4">
+                <button
+                    class="flex items-center gap-3 px-5 py-3 bg-surface-container-low rounded-xl text-on-surface font-medium hover:bg-surface-container transition-all">
+                    <span class="material-symbols-outlined text-lg text-on-surface-variant"
+                        data-icon="schedule">schedule</span>
+                    Monthly revenue trends by product
+                </button>
+                <button
+                    class="flex items-center gap-3 px-5 py-3 bg-surface-container-low rounded-xl text-on-surface font-medium hover:bg-surface-container transition-all">
+                    <span class="material-symbols-outlined text-lg text-on-surface-variant"
+                        data-icon="schedule">schedule</span>
+                    Correlate weather with ice cream sales
+                </button>
+                <button
+                    class="flex items-center gap-3 px-5 py-3 bg-surface-container-low rounded-xl text-on-surface font-medium hover:bg-surface-container transition-all">
+                    <span class="material-symbols-outlined text-lg text-on-surface-variant"
+                        data-icon="schedule">schedule</span>
+                    Top 5 customers by LTV
+                </button>
+            </div>
+        </section>
+        <!-- Bottom Action Strip -->
+        <section>
+            <h2 class="text-3xl font-extrabold font-headline text-on-surface mb-8">What would you like to do next?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Action Card 1 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl editorial-shadow hover:bg-primary cursor-pointer transition-all">
+                    <div
+                        class="w-12 h-12 bg-primary-container rounded-lg flex items-center justify-center mb-6 group-hover:bg-on-primary">
+                        <span class="material-symbols-outlined text-primary group-hover:text-primary"
+                            data-icon="add">add</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 group-hover:text-on-primary">New Query</h4>
+                    <p class="text-on-surface-variant text-sm group-hover:text-on-primary/80">Start a fresh analysis on
+                        this dataset.</p>
+                </div>
+                <!-- Action Card 2 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl editorial-shadow hover:bg-primary cursor-pointer transition-all">
+                    <div
+                        class="w-12 h-12 bg-primary-container rounded-lg flex items-center justify-center mb-6 group-hover:bg-on-primary">
+                        <span class="material-symbols-outlined text-primary group-hover:text-primary"
+                            data-icon="cleaning_services">cleaning_services</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 group-hover:text-on-primary">Clean My Data</h4>
+                    <p class="text-on-surface-variant text-sm group-hover:text-on-primary/80">Remove duplicates and fix
+                        formatting issues.</p>
+                </div>
+                <!-- Action Card 3 -->
+                <div
+                    class="group bg-surface-container-lowest p-8 rounded-xl editorial-shadow hover:bg-primary cursor-pointer transition-all">
+                    <div
+                        class="w-12 h-12 bg-primary-container rounded-lg flex items-center justify-center mb-6 group-hover:bg-on-primary">
+                        <span class="material-symbols-outlined text-primary group-hover:text-primary"
+                            data-icon="description">description</span>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 group-hover:text-on-primary">Export Report</h4>
+                    <p class="text-on-surface-variant text-sm group-hover:text-on-primary/80">Generate a comprehensive
+                        PDF or CSV report.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Simple Footer (SideNavBar would be in different context, using simple footer for Analyze focus) -->
+    <footer class="bg-surface-container-low py-12 mt-12">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-xl font-extrabold text-on-surface font-manrope opacity-50">DataPilot</div>
+            <div class="flex gap-8">
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-primary" href="#">Queries</a>
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-primary" href="#">Assets</a>
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-primary" href="#">Reports</a>
+            </div>
+            <div class="text-sm text-on-surface-variant">© 2024 DataPilot AI Analytics. All rights reserved.</div>
+        </div>
+    </footer>
+</body>
+
+</html>

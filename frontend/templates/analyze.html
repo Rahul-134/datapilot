@@ -1,243 +1,407 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="light" lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>DataPilot | Analyze Data</title>
+    <title>Analyze | DataPilot</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "on-secondary-fixed-variant": "#5a00c6", "on-primary": "#003642",
-                        "on-secondary-container": "#c9aeff", "primary-container": "#00d4ff",
-                        "tertiary-fixed": "#6ffbbe", "primary": "#a8e8ff", "background": "#0f131f",
-                        "surface-container-highest": "#313442", "tertiary-container": "#49da9f",
-                        "primary-fixed-dim": "#3cd7ff", "on-secondary": "#3f008e",
-                        "primary-fixed": "#b4ebff", "on-tertiary-container": "#005c3e",
-                        "surface-tint": "#3cd7ff", "error-container": "#93000a", "error": "#ffb4ab",
-                        "outline": "#859398", "secondary-fixed": "#eaddff", "tertiary": "#6af7ba",
-                        "secondary": "#d2bbff", "on-background": "#dfe2f3", "on-tertiary-fixed": "#002113",
-                        "secondary-fixed-dim": "#d2bbff", "inverse-primary": "#00677e",
-                        "inverse-surface": "#dfe2f3", "inverse-on-surface": "#2c303d",
-                        "outline-variant": "#3c494e", "surface-dim": "#0f131f", "surface": "#0f131f",
-                        "on-tertiary": "#003824", "tertiary-fixed-dim": "#4edea3",
-                        "surface-bright": "#353946", "surface-container-high": "#262a37",
-                        "surface-container-lowest": "#0a0e1a", "on-primary-fixed-variant": "#004e5f",
-                        "on-error": "#690005", "on-primary-fixed": "#001f27",
-                        "on-tertiary-fixed-variant": "#005236", "surface-container-low": "#171b28",
-                        "on-error-container": "#ffdad6", "surface-container": "#1b1f2c",
-                        "on-secondary-fixed": "#25005a", "surface-variant": "#313442",
-                        "on-surface-variant": "#bbc9cf", "secondary-container": "#6001d1",
-                        "on-surface": "#dfe2f3", "on-primary-container": "#00586b"
+                        "error-dim": "#4e0309",
+                        "outline": "#767c79",
+                        "on-tertiary": "#fdf7ff",
+                        "primary-container": "#dbe1ff",
+                        "primary-fixed-dim": "#c7d3ff",
+                        "on-primary": "#f8f7ff",
+                        "secondary": "#5f5f62",
+                        "surface-container": "#ecefec",
+                        "surface-container-highest": "#dee4e0",
+                        "secondary-fixed-dim": "#d5d3d8",
+                        "on-tertiary-container": "#4f4964",
+                        "on-tertiary-fixed-variant": "#59526e",
+                        "on-primary-fixed-variant": "#0050d4",
+                        "surface-container-high": "#e5e9e6",
+                        "surface-tint": "#0053db",
+                        "surface-bright": "#f9f9f7",
+                        "tertiary-dim": "#564f6b",
+                        "on-secondary": "#faf8fc",
+                        "primary": "#2563EB",
+                        "on-error-container": "#752121",
+                        "secondary-fixed": "#e4e2e6",
+                        "on-surface": "#2d3432",
+                        "on-secondary-container": "#515155",
+                        "inverse-surface": "#0d0f0e",
+                        "tertiary-container": "#dfd5f7",
+                        "inverse-primary": "#618bff",
+                        "surface-variant": "#dee4e0",
+                        "on-tertiary-fixed": "#3c3650",
+                        "on-primary-container": "#0048bf",
+                        "on-surface-variant": "#5a605e",
+                        "inverse-on-surface": "#9c9d9b",
+                        "background": "#F5F4EF",
+                        "outline-variant": "#adb3b0",
+                        "surface-dim": "#d4dcd8",
+                        "error-container": "#fe8983",
+                        "error": "#9f403d",
+                        "secondary-dim": "#535356",
+                        "tertiary": "#625b77",
+                        "surface": "#F5F4EF",
+                        "tertiary-fixed": "#dfd5f7",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-fixed": "#3f3f43",
+                        "on-secondary-fixed-variant": "#5b5b5f",
+                        "surface-container-low": "#f2f4f2",
+                        "tertiary-fixed-dim": "#d0c7e8",
+                        "on-background": "#2d3432",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-dim": "#1d4ed8",
+                        "secondary-container": "#e4e2e6",
+                        "on-primary-fixed": "#003798",
+                        "on-error": "#fff7f6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "12px",
+                        "full": "9999px"
                     },
                     fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body":     ["Space Grotesk"],
-                        "mono":     ["Space Mono"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
                 },
             },
         }
     </script>
     <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
         body {
-            background-color: #0a0e1a;
-            background-image: radial-gradient(circle at 2px 2px, rgba(0,212,255,0.03) 1px, transparent 0);
-            background-size: 24px 24px;
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F4EF;
         }
-        .glass-panel { backdrop-filter: blur(16px); border: 1px solid rgba(133,147,152,0.1); }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+        .editorial-shadow {
+            box-shadow: 0 32px 64px -12px rgba(45, 52, 50, 0.06);
+        }
+
+        .card-shadow {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
         @keyframes pulse-red {
-            0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-            70%  { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
-            100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
         }
-        .animate-pulse-red { animation: pulse-red 2s infinite; }
+
+        .animate-pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+
+        /* Smooth table rows */
+        #resultBody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        #resultBody tr:hover {
+            background-color: rgba(37, 99, 235, 0.04);
+        }
     </style>
 </head>
 
-<body class="text-on-background font-body min-h-screen">
+<body class="text-on-surface font-body">
 
     <!-- NAV -->
-    <nav class="bg-[#0a0e1a]/80 backdrop-blur-xl border-b border-cyan-500/10 shadow-[0_0_20px_rgba(0,212,255,0.15)] sticky top-0 z-50 w-full">
-        <div class="flex justify-between items-center px-8 py-4 max-w-full">
-            <div class="flex items-center gap-8">
-                <a href="index.html" class="text-2xl font-black text-white font-headline tracking-tight">
-                    Data<span class="text-[#00d4ff]">Pilot</span>
-                </a>
-                <div class="hidden md:flex gap-6 items-center">
-                    <a class="text-slate-400 hover:text-white transition-colors font-headline tracking-tight" href="index.html">Dashboard</a>
-                    <a class="text-[#00d4ff] border-b-2 border-[#00d4ff] pb-1 font-headline tracking-tight" href="#">Analytics</a>
-                    <a class="text-slate-400 hover:text-white transition-colors font-medium" href="scraper.html">Scraper</a>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="material-symbols-outlined text-[#a8e8ff] p-2 hover:bg-cyan-500/5 transition-all rounded-lg cursor-pointer">notifications</span>
-                <span class="material-symbols-outlined text-[#a8e8ff] p-2 hover:bg-cyan-500/5 transition-all rounded-lg cursor-pointer">settings</span>
+    <nav
+        class="bg-white/80 backdrop-blur-md flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto fixed top-0 z-50 border-b border-gray-200/60">
+        <a href="index.html" class="text-2xl font-extrabold text-[#2563EB] font-headline">DataPilot</a>
+        <div class="hidden md:flex items-center gap-8">
+            <div class="flex gap-6 items-center">
+                <a class="text-on-surface-variant text-sm font-medium hover:text-[#2563EB] transition-colors"
+                    href="index.html">Dashboard</a>
+                <a class="text-[#2563EB] text-sm font-semibold border-b-2 border-[#2563EB] pb-0.5" href="#">Analyze</a>
+                <a class="text-on-surface-variant text-sm font-medium hover:text-[#2563EB] transition-colors"
+                    href="scraper.html">Scraper</a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-8 py-10 space-y-10">
+    <main class="pt-24 pb-20 px-6 max-w-6xl mx-auto">
 
-        <!-- PAGE HEADER -->
-        <header class="flex items-center justify-between flex-wrap gap-4">
-            <div class="flex items-center gap-6">
-                <a href="index.html" class="flex items-center gap-2 text-primary hover:text-primary-fixed transition-colors group">
-                    <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                    <span class="font-headline font-semibold">Back to Overview</span>
-                </a>
-                <h1 class="text-4xl font-extrabold font-headline tracking-tight text-white">Analyze Data</h1>
-            </div>
-            <div class="bg-surface-container-high px-4 py-2 rounded-xl flex items-center gap-3 border border-outline-variant/20 shadow-lg">
-                <span class="material-symbols-outlined text-tertiary">description</span>
-                <span id="filenameDisplay" class="font-mono text-sm text-on-surface-variant uppercase tracking-widest">no file loaded</span>
-            </div>
+        <!-- HEADER -->
+        <header class="mb-12">
+            <h1 class="text-5xl font-extrabold font-headline tracking-tight text-on-surface mb-3">Ask anything about
+                your data...</h1>
+            <p class="text-on-surface-variant font-body text-lg">Your dataset: <span id="filenameDisplay"
+                    class="font-semibold text-on-surface">no file loaded</span> — <span id="datasetMeta"
+                    class="text-on-surface-variant"></span></p>
         </header>
 
         <!-- QUERY INPUT SECTION -->
-        <section class="space-y-6">
-            <div class="flex flex-col gap-2">
-                <label class="text-secondary font-headline font-bold text-lg tracking-wide">Ask Your Data</label>
-                <!-- Suggested prompts -->
-                <div id="suggestedPrompts" class="flex flex-wrap gap-2">
-                    <span onclick="usePrompt(this)" class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Show top 10 rows by selling price</span>
-                    <span onclick="usePrompt(this)" class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Count unique values in each column</span>
-                    <span onclick="usePrompt(this)" class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Average value grouped by category</span>
-                    <span onclick="usePrompt(this)" class="px-3 py-1.5 bg-secondary-container/20 text-secondary border border-secondary/20 rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-container/40 transition-all">Show rows with highest null count</span>
-                </div>
-            </div>
-
-            <!-- Input box -->
-            <div class="relative group">
-                <div class="absolute inset-0 bg-primary/5 rounded-2xl blur-xl group-focus-within:bg-primary/10 transition-all"></div>
-                <div class="relative bg-surface-container-lowest glass-panel rounded-2xl p-2 flex items-center gap-4 focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl p-8 editorial-shadow">
+                <!-- Search input -->
+                <div class="relative flex items-center mb-6">
+                    <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">search</span>
                     <input id="queryInput"
-                        class="bg-transparent border-none focus:ring-0 flex-grow px-4 py-4 font-mono text-on-surface placeholder:text-outline/50 text-lg"
-                        placeholder="e.g. Show me the top 10 rows by selling price..."
-                        type="text" />
-                    <button id="micBtn" class="p-3 rounded-full text-outline hover:bg-error-container/20 transition-all" title="Toggle microphone">
-                        <span id="micIcon" class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;">mic</span>
-                    </button>
-                    <button id="askBtn" class="bg-gradient-to-r from-secondary to-secondary-container text-white px-8 py-4 rounded-xl font-headline font-bold flex items-center gap-2 shadow-[0_0_20px_rgba(96,1,209,0.3)] hover:shadow-[0_0_30px_rgba(96,1,209,0.5)] transition-all active:scale-95">
-                        <span>Ask</span>
-                        <span class="material-symbols-outlined">auto_awesome</span>
-                    </button>
+                        class="w-full pl-12 pr-4 py-5 bg-[#F5F4EF] border-0 rounded-xl focus:ring-4 focus:ring-[#2563EB]/20 font-body text-lg text-on-surface placeholder:text-on-surface-variant/60"
+                        placeholder='e.g. "Show me the top 10 rows by selling price..."' type="text" />
                 </div>
-            </div>
 
-            <!-- Mic status -->
-            <p id="micStatus" class="text-xs font-mono text-outline min-h-[16px]"></p>
+                <div class="flex flex-wrap justify-between items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <!-- Voice button -->
+                        <button id="micBtn"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-on-surface font-semibold hover:bg-[#F5F4EF] transition-all"
+                            title="Toggle microphone">
+                            <span id="micIcon" class="material-symbols-outlined"
+                                style="font-variation-settings:'FILL' 0;">mic</span>
+                            Voice
+                        </button>
+                        <!-- Analyze button -->
+                        <button id="askBtn"
+                            class="px-8 py-3 bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white rounded-lg font-bold flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            <span>Analyze</span>
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
 
-            <!-- Speech not supported warning -->
-            <p id="speechNotSupported" class="hidden text-xs font-mono text-error">⚠ Speech recognition not supported. Use Chrome or Edge.</p>
+                    <!-- Suggested prompts -->
+                    <div id="suggestedPrompts" class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm font-medium text-on-surface-variant">Try these:</span>
+                        <span onclick="usePrompt(this)"
+                            class="px-3 py-1 bg-[#e5e9e6] rounded-full text-xs font-semibold text-on-surface hover:bg-[#dee4e0] transition-all cursor-pointer">Show
+                            top 10 rows by selling price</span>
+                        <span onclick="usePrompt(this)"
+                            class="px-3 py-1 bg-[#e5e9e6] rounded-full text-xs font-semibold text-on-surface hover:bg-[#dee4e0] transition-all cursor-pointer">Count
+                            unique values in each column</span>
+                        <span onclick="usePrompt(this)"
+                            class="px-3 py-1 bg-[#e5e9e6] rounded-full text-xs font-semibold text-on-surface hover:bg-[#dee4e0] transition-all cursor-pointer">Average
+                            value grouped by category</span>
+                        <span onclick="usePrompt(this)"
+                            class="px-3 py-1 bg-[#e5e9e6] rounded-full text-xs font-semibold text-on-surface hover:bg-[#dee4e0] transition-all cursor-pointer">Show
+                            rows with highest null count</span>
+                    </div>
+                </div>
 
-            <!-- Recent queries -->
-            <div id="historyWrap" class="hidden flex-col gap-3">
-                <label class="text-outline text-xs font-mono uppercase tracking-widest">Recent Queries</label>
-                <div id="queryHistoryList" class="flex gap-3 overflow-x-auto pb-2"></div>
+                <!-- Mic status -->
+                <p id="micStatus" class="text-xs font-body text-on-surface-variant mt-3 min-h-[16px]"></p>
+                <!-- Speech not supported warning -->
+                <p id="speechNotSupported" class="hidden text-xs font-body text-[#9f403d] mt-2">⚠ Speech recognition not
+                    supported. Use Chrome or Edge.</p>
             </div>
         </section>
 
         <!-- LOADING STATE -->
-        <div id="queryLoading" class="hidden flex-col items-center justify-center py-12 space-y-4">
-            <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p class="font-headline font-medium text-primary animate-pulse">Analyzing your query...</p>
+        <div id="queryLoading" class="hidden flex-col items-center justify-center py-16 space-y-4">
+            <div class="w-12 h-12 border-4 border-[#2563EB]/20 border-t-[#2563EB] rounded-full animate-spin"></div>
+            <p class="font-headline font-bold text-[#2563EB] animate-pulse">Analyzing your query...</p>
         </div>
 
         <!-- ERROR BOX -->
-        <div id="queryError" class="hidden p-4 rounded-xl bg-error-container/10 border border-error/20 text-error font-mono text-sm"></div>
+        <div id="queryError"
+            class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-[#9f403d] font-body text-sm mb-8"></div>
 
-        <!-- RESULT SECTION -->
-        <section id="resultSection" class="hidden space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="h-2 w-2 rounded-full bg-tertiary animate-pulse"></div>
-                    <span class="font-mono text-sm text-on-surface-variant">
-                        Showing <span id="resultCount">—</span> rows ·
-                        <span id="resultCols">—</span> columns ·
-                        Total <span id="resultTotal">—</span> rows
-                    </span>
+        <!-- RESULT SECTION (AI Analysis) -->
+        <section id="resultSection" class="hidden mb-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold font-headline text-on-surface">AI Analysis</h2>
+                <div id="resultBadge"
+                    class="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-sm font-medium">
+                    <span class="material-symbols-outlined text-sm"
+                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    ✓ Analysis complete
                 </div>
-                <div class="flex items-center gap-3">
-                    <button id="codeToggle" onclick="toggleCode()" class="flex items-center gap-2 px-4 py-2 bg-surface-container-high rounded-lg text-sm font-headline font-medium hover:bg-surface-container-highest transition-colors">
-                        <span class="material-symbols-outlined text-sm">code</span>
-                        <span>View Generated Code</span>
-                    </button>
-                    <button onclick="downloadQueryResult('csv')" class="flex items-center gap-2 px-4 py-2 border border-outline-variant/20 rounded-lg text-sm font-headline font-medium hover:bg-outline-variant/10 transition-colors">
-                        <span class="material-symbols-outlined text-sm">download</span>
-                        <span>CSV</span>
-                    </button>
-                    <button onclick="downloadQueryResult('xlsx')" class="flex items-center gap-2 px-4 py-2 border border-outline-variant/20 rounded-lg text-sm font-headline font-medium hover:bg-outline-variant/10 transition-colors">
-                        <span class="material-symbols-outlined text-sm">download</span>
-                        <span>Excel</span>
-                    </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
+                <!-- Result stats + actions -->
+                <div class="md:col-span-5 bg-white rounded-2xl p-8 editorial-shadow">
+                    <div class="mb-6">
+                        <p class="text-on-surface leading-relaxed text-lg">
+                            Showing <span id="resultCount" class="font-bold text-[#2563EB]">—</span> rows ·
+                            <span id="resultCols" class="font-bold text-[#2563EB]">—</span> columns ·
+                            Total <span id="resultTotal" class="font-bold text-[#2563EB]">—</span> rows
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button id="codeToggle" onclick="toggleCode()"
+                            class="flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors">
+                            <span class="material-symbols-outlined text-lg">code</span>
+                            View Code
+                        </button>
+                        <button onclick="downloadQueryResult('csv')"
+                            class="flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors">
+                            <span class="material-symbols-outlined text-lg">download</span>
+                            CSV
+                        </button>
+                        <button onclick="downloadQueryResult('xlsx')"
+                            class="flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors">
+                            <span class="material-symbols-outlined text-lg">download</span>
+                            Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result table -->
+                <div class="md:col-span-7 bg-white rounded-2xl overflow-hidden editorial-shadow">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead id="resultHead"></thead>
+                            <tbody id="resultBody" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- Code block -->
-            <div id="codeBlock" class="hidden bg-[#0d1117] rounded-2xl p-6 font-mono text-sm border border-outline-variant/10 shadow-inner overflow-x-auto">
-                <div class="flex justify-between mb-4 border-b border-white/5 pb-2">
-                    <span class="text-outline/60 tracking-widest text-[10px] uppercase">Python (Pandas)</span>
-                    <span onclick="copyCode()" class="material-symbols-outlined text-outline/40 text-sm cursor-pointer hover:text-white transition-colors">content_copy</span>
+            <div id="codeBlock"
+                class="hidden bg-[#1e293b] rounded-2xl p-6 font-mono text-sm border border-gray-200 overflow-x-auto mb-8">
+                <div class="flex justify-between mb-4 border-b border-white/10 pb-2">
+                    <span class="text-gray-400 tracking-widest text-[10px] uppercase">Python (Pandas)</span>
+                    <span onclick="copyCode()"
+                        class="material-symbols-outlined text-gray-400 text-sm cursor-pointer hover:text-white transition-colors">content_copy</span>
                 </div>
-                <pre id="codeContent" class="text-[#4edea3] leading-relaxed whitespace-pre-wrap"></pre>
-            </div>
-
-            <!-- Result table -->
-            <div class="bg-surface-container rounded-2xl overflow-hidden border border-outline-variant/10 shadow-2xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead id="resultHead"></thead>
-                        <tbody id="resultBody" class="divide-y divide-outline-variant/5"></tbody>
-                    </table>
-                </div>
+                <pre id="codeContent" class="text-emerald-400 leading-relaxed whitespace-pre-wrap"></pre>
             </div>
         </section>
 
+        <!-- RECENT QUERIES -->
+        <section id="historyWrap" class="hidden mb-16 flex-col">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-6">Recent Queries</h3>
+            <div id="queryHistoryList" class="flex flex-wrap gap-4"></div>
+        </section>
+
+        <!-- BOTTOM ACTION STRIP -->
+        <section>
+            <h2 class="text-3xl font-extrabold font-headline text-on-surface mb-8">What would you like to do next?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Action Card 1: New Query -->
+                <div onclick="document.getElementById('queryInput').focus()"
+                    class="group bg-white p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-primary-container text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-[#2563EB] group-hover:text-white">add</span>
+                    </div>
+                    <h4 class="text-xl font-bold font-manrope mb-2">New Query</h4>
+                    <p class="text-on-surface-variant text-sm">Start a fresh analysis on this
+                        dataset.</p>
+                </div>
+                <!-- Action Card 2: Clean Data -->
+                <a href="index.html"
+                    class="group bg-white p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-primary-container text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span
+                            class="material-symbols-outlined text-[#2563EB] group-hover:text-white">cleaning_services</span>
+                    </div>
+                    <h4 class="text-xl font-bold font-manrope mb-2">Clean My Data</h4>
+                    <p class="text-on-surface-variant text-sm">Remove duplicates and fix
+                        formatting issues.</p>
+                </a>
+                <!-- Action Card 3: Export Report -->
+                <div onclick="downloadQueryResult('csv')"
+                    class="group bg-white p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
+                    <div
+                        class="w-16 h-16 bg-primary-container text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-[#2563EB] group-hover:text-white">description</span>
+                    </div>
+                    <h4 class="text-xl font-bold font-manrope mb-2">Export Report</h4>
+                    <p class="text-on-surface-variant text-sm">Generate a comprehensive CSV or
+                        Excel report.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- FOOTER -->
+    <footer class="bg-[#ecefec] py-12 mt-12">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-xl font-extrabold text-on-surface font-headline opacity-50">DataPilot</div>
+            <div class="flex gap-8">
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
+                    href="index.html">Dashboard</a>
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
+                    href="#">Queries</a>
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
+                    href="scraper.html">Scraper</a>
+            </div>
+            <div class="text-sm text-on-surface-variant">© 2024 DataPilot AI Analytics. All rights reserved.</div>
+        </div>
+    </footer>
+
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-surface-container-highest border-l-4 border-tertiary p-4 rounded-xl shadow-2xl max-w-sm">
-        <div id="toastIconWrap" class="h-10 w-10 bg-tertiary-container/20 rounded-full flex items-center justify-center text-tertiary shrink-0">
+    <div id="toast"
+        class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-white border-l-4 border-emerald-500 p-4 rounded-2xl shadow-xl max-w-sm">
+        <div id="toastIconWrap"
+            class="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
             <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
         </div>
         <div>
             <p id="toastTitle" class="font-headline font-bold text-on-surface text-sm">Success</p>
-            <p id="toastMsg" class="text-xs text-on-surface-variant font-mono"></p>
+            <p id="toastMsg" class="text-xs text-on-surface-variant font-body"></p>
         </div>
-        <button onclick="hideToast()" class="text-outline hover:text-white transition-colors ml-auto">
+        <button onclick="hideToast()" class="text-on-surface-variant hover:text-on-surface transition-colors ml-auto">
             <span class="material-symbols-outlined text-sm">close</span>
         </button>
     </div>
 
-    <!-- AI Active Indicator (shown only when listening/querying) -->
-    <div id="aiIndicator" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-surface-container-highest/80 backdrop-blur-md px-6 py-3 rounded-full border border-outline-variant/20 items-center gap-4 shadow-2xl">
+    <!-- AI Active Indicator -->
+    <div id="aiIndicator"
+        class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full border border-gray-200 items-center gap-4 shadow-xl">
         <div class="relative">
-            <span class="material-symbols-outlined text-secondary animate-pulse">psychology</span>
-            <div class="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full blur-[2px]"></div>
+            <span class="material-symbols-outlined text-[#2563EB] animate-pulse">psychology</span>
+            <div class="absolute -top-1 -right-1 h-2 w-2 bg-[#2563EB] rounded-full blur-[2px]"></div>
         </div>
-        <span id="aiIndicatorText" class="text-xs font-headline font-medium tracking-wide text-on-surface-variant">AI is processing your query...</span>
+        <span id="aiIndicatorText" class="text-xs font-headline font-medium tracking-wide text-on-surface-variant">AI is
+            processing your query...</span>
     </div>
 
     <script>
-        // ── FILENAME from sessionStorage ──
+        // ── FILENAME & DATASET META from sessionStorage ──
         const filename = sessionStorage.getItem('dp_filename') || 'no file loaded';
-        document.getElementById('filenameDisplay').textContent = filename.toUpperCase();
+        document.getElementById('filenameDisplay').textContent = filename;
+
+        // Pull row/column count if available
+        const rowCount = sessionStorage.getItem('dp_rows');
+        const colCount = sessionStorage.getItem('dp_cols');
+        const metaEl = document.getElementById('datasetMeta');
+        if (rowCount && colCount) {
+            metaEl.textContent = `${Number(rowCount).toLocaleString()} rows, ${colCount} columns`;
+        } else {
+            metaEl.textContent = '';
+        }
 
         let queryHistory = [];
 
-        const queryInput  = document.getElementById('queryInput');
-        const askBtn      = document.getElementById('askBtn');
-        const queryError  = document.getElementById('queryError');
-        const resultSec   = document.getElementById('resultSection');
+        const queryInput = document.getElementById('queryInput');
+        const askBtn = document.getElementById('askBtn');
+        const queryError = document.getElementById('queryError');
+        const resultSec = document.getElementById('resultSection');
         const queryLoading = document.getElementById('queryLoading');
 
         // ── ASK BUTTON + ENTER KEY ──
@@ -252,7 +416,7 @@
             if (!prompt) return;
 
             askBtn.disabled = true;
-            askBtn.innerHTML = '<span class="font-headline font-bold">Thinking...</span>';
+            askBtn.innerHTML = '<span class="font-bold">Thinking...</span>';
             queryError.classList.add('hidden');
             resultSec.classList.add('hidden');
             queryLoading.classList.remove('hidden');
@@ -260,15 +424,15 @@
             showAIIndicator('AI is processing your query...');
 
             try {
-                const res  = await fetch('http://localhost:8000/api/query/', {
-                    method:  'POST',
+                const res = await fetch('http://localhost:8000/api/query/', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt })
                 });
                 const data = await res.json();
 
                 if (data.error) {
-                    queryError.textContent = '❌ ' + data.error;
+                    queryError.textContent = '❌ ' + 'API key is exhausted. Please try later';
                     queryError.classList.remove('hidden');
                     return;
                 }
@@ -284,7 +448,7 @@
                 queryError.classList.remove('hidden');
             } finally {
                 askBtn.disabled = false;
-                askBtn.innerHTML = '<span>Ask</span><span class="material-symbols-outlined">auto_awesome</span>';
+                askBtn.innerHTML = '<span>Analyze</span><span class="material-symbols-outlined">arrow_forward</span>';
                 queryLoading.classList.add('hidden');
                 queryLoading.classList.remove('flex');
                 hideAIIndicator();
@@ -293,20 +457,20 @@
 
         function renderQueryResult(data) {
             document.getElementById('resultCount').textContent = data.rows.length;
-            document.getElementById('resultCols').textContent  = data.columns.length;
+            document.getElementById('resultCols').textContent = data.columns.length;
             document.getElementById('resultTotal').textContent = data.total_rows.toLocaleString();
             document.getElementById('codeContent').textContent = data.generated_code;
 
             // Table head
             document.getElementById('resultHead').innerHTML =
-                '<tr class="bg-surface-container-high/50 border-b border-outline-variant/10">' +
-                data.columns.map(c => `<th class="px-6 py-4 font-mono text-xs uppercase tracking-widest text-outline">${c}</th>`).join('') +
+                '<tr class="bg-[#F5F4EF] border-b border-gray-200">' +
+                data.columns.map(c => `<th class="px-6 py-4 font-body text-xs uppercase tracking-widest text-on-surface-variant font-semibold">${c}</th>`).join('') +
                 '</tr>';
 
             // Table body
             document.getElementById('resultBody').innerHTML = data.rows.map(row =>
-                '<tr class="hover:bg-primary/5 transition-colors cursor-default">' +
-                data.columns.map(c => `<td class="px-6 py-4 font-mono text-sm">${row[c] ?? '—'}</td>`).join('') +
+                '<tr class="border-b border-gray-50">' +
+                data.columns.map(c => `<td class="px-6 py-4 font-body text-sm text-on-surface">${row[c] ?? '—'}</td>`).join('') +
                 '</tr>'
             ).join('');
 
@@ -314,12 +478,12 @@
         }
 
         function toggleCode() {
-            const block  = document.getElementById('codeBlock');
+            const block = document.getElementById('codeBlock');
             const toggle = document.getElementById('codeToggle');
             const isOpen = block.classList.toggle('hidden');
             toggle.innerHTML = isOpen
-                ? '<span class="material-symbols-outlined text-sm">code</span><span>View Generated Code</span>'
-                : '<span class="material-symbols-outlined text-sm">code_off</span><span>Hide Code</span>';
+                ? '<span class="material-symbols-outlined text-lg">code</span> View Code'
+                : '<span class="material-symbols-outlined text-lg">code_off</span> Hide Code';
         }
 
         function copyCode() {
@@ -339,9 +503,9 @@
             const list = document.getElementById('queryHistoryList');
             const wrap = document.getElementById('historyWrap');
             list.innerHTML = queryHistory.map(q =>
-                `<button onclick="usePrompt(this)" class="whitespace-nowrap px-4 py-2 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/30 transition-all flex items-center gap-2 group">
-                    <span class="material-symbols-outlined text-xs text-outline group-hover:text-primary">history</span>
-                    <span class="text-sm text-on-surface-variant font-mono">${q}</span>
+                `<button onclick="usePrompt(this)" class="flex items-center gap-3 px-5 py-3 bg-[#f2f4f2] rounded-xl text-on-surface font-medium hover:bg-[#ecefec] transition-all">
+                    <span class="material-symbols-outlined text-lg text-on-surface-variant">schedule</span>
+                    <span class="text-sm">${q}</span>
                 </button>`
             ).join('');
             wrap.classList.remove('hidden');
@@ -367,13 +531,13 @@
         }
 
         // ── SPEECH TO TEXT ──
-        let recognition  = null;
-        let isListening  = false;
+        let recognition = null;
+        let isListening = false;
         let silenceTimer = null;
         const SILENCE_DELAY = 2000;
-        const micBtn    = document.getElementById('micBtn');
+        const micBtn = document.getElementById('micBtn');
         const micStatus = document.getElementById('micStatus');
-        const micIcon   = document.getElementById('micIcon');
+        const micIcon = document.getElementById('micIcon');
 
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             micBtn.style.display = 'none';
@@ -385,9 +549,9 @@
         function setupSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            recognition.continuous     = true;
+            recognition.continuous = true;
             recognition.interimResults = true;
-            recognition.lang           = 'en-US';
+            recognition.lang = 'en-US';
 
             recognition.onresult = (event) => {
                 let interim = '', final = '';
@@ -411,8 +575,8 @@
 
             recognition.onstart = () => {
                 isListening = true;
-                micBtn.classList.add('animate-pulse-red', 'text-error');
-                micBtn.classList.remove('text-outline');
+                micBtn.classList.add('animate-pulse-red');
+                micBtn.style.color = '#9f403d';
                 micIcon.style.fontVariationSettings = "'FILL' 1";
                 micStatus.textContent = '🔴 Listening... speak your query';
                 showAIIndicator('🎤 Listening for your query...');
@@ -420,8 +584,8 @@
 
             recognition.onend = () => {
                 if (isListening) { recognition.start(); return; }
-                micBtn.classList.remove('animate-pulse-red', 'text-error');
-                micBtn.classList.add('text-outline');
+                micBtn.classList.remove('animate-pulse-red');
+                micBtn.style.color = '';
                 micIcon.style.fontVariationSettings = "'FILL' 0";
                 micStatus.textContent = '';
                 hideAIIndicator();
@@ -430,8 +594,8 @@
             recognition.onerror = (event) => {
                 if (event.error === 'no-speech') return;
                 isListening = false;
-                micBtn.classList.remove('animate-pulse-red', 'text-error');
-                micBtn.classList.add('text-outline');
+                micBtn.classList.remove('animate-pulse-red');
+                micBtn.style.color = '';
                 micStatus.textContent = `⚠ Mic error: ${event.error}`;
                 hideAIIndicator();
             };
@@ -460,14 +624,14 @@
         function showToast(msg, isError = false) {
             clearTimeout(toastTimer);
             const toast = document.getElementById('toast');
-            const icon  = document.getElementById('toastIcon');
-            const wrap  = document.getElementById('toastIconWrap');
+            const icon = document.getElementById('toastIcon');
+            const wrap = document.getElementById('toastIconWrap');
             const title = document.getElementById('toastTitle');
             document.getElementById('toastMsg').textContent = msg;
-            icon.textContent  = isError ? 'error' : 'check_circle';
-            wrap.className    = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-error-container/20 text-error' : 'bg-tertiary-container/20 text-tertiary'}`;
+            icon.textContent = isError ? 'error' : 'check_circle';
+            wrap.className = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-red-50 text-[#9f403d]' : 'bg-emerald-50 text-emerald-600'}`;
             title.textContent = isError ? 'Error' : 'Success';
-            toast.className   = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-surface-container-highest border-l-4 ${isError ? 'border-error' : 'border-tertiary'} p-4 rounded-xl shadow-2xl max-w-sm`;
+            toast.className = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-white border-l-4 ${isError ? 'border-[#9f403d]' : 'border-emerald-500'} p-4 rounded-2xl shadow-xl max-w-sm`;
             toastTimer = setTimeout(hideToast, 3500);
         }
         function hideToast() {
@@ -477,4 +641,5 @@
         }
     </script>
 </body>
+
 </html>
