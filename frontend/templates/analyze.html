@@ -136,16 +136,23 @@
 <body class="text-on-surface font-body">
 
     <!-- NAV -->
-    <nav
-        class="bg-white/80 backdrop-blur-md flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto fixed top-0 z-50 border-b border-gray-200/60">
-        <a href="index.html" class="text-2xl font-extrabold text-[#2563EB] font-headline">DataPilot</a>
-        <div class="hidden md:flex items-center gap-8">
-            <div class="flex gap-6 items-center">
-                <a class="text-on-surface-variant text-sm font-medium hover:text-[#2563EB] transition-colors"
+    <nav class="fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight text-slate-900">
+                    Data<span class="text-blue-600">Pilot</span>
+                </span>
+            </a>
+            <div class="hidden md:flex items-center gap-6">
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
                     href="index.html">Dashboard</a>
-                <a class="text-[#2563EB] text-sm font-semibold border-b-2 border-[#2563EB] pb-0.5" href="#">Analyze</a>
-                <a class="text-on-surface-variant text-sm font-medium hover:text-[#2563EB] transition-colors"
-                    href="scraper.html">Scraper</a>
+                <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
+                    href="analyze.html">Analytics</a>
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+                    href="scraper.html">Scraper <span class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
             </div>
         </div>
     </nav>
@@ -161,8 +168,17 @@
                     class="text-on-surface-variant"></span></p>
         </header>
 
+        <!-- NO FILE BANNER -->
+        <div id="noFileBanner" class="hidden mb-8 p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4">
+            <span class="material-symbols-outlined text-amber-500 text-2xl">warning</span>
+            <div>
+                <p class="font-bold text-slate-900 text-sm">No dataset loaded</p>
+                <p class="text-slate-500 text-sm">Upload a file on the <a href="index.html" class="text-blue-600 font-semibold hover:underline">Dashboard</a> first, then come back to analyze it.</p>
+            </div>
+        </div>
+
         <!-- QUERY INPUT SECTION -->
-        <section class="mb-12">
+        <section id="querySection" class="mb-12">
             <div class="bg-white rounded-2xl p-8 editorial-shadow">
                 <!-- Search input -->
                 <div class="relative flex items-center mb-6">
@@ -341,16 +357,15 @@
     <!-- FOOTER -->
     <footer class="bg-[#ecefec] py-12 mt-12">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-            <div class="text-xl font-extrabold text-on-surface font-headline opacity-50">DataPilot</div>
+            <div class="text-xl font-extrabold text-slate-900 opacity-50">DataPilot</div>
             <div class="flex gap-8">
-                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
                     href="index.html">Dashboard</a>
-                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
-                    href="#">Queries</a>
-                <a class="text-sm font-semibold text-on-surface-variant hover:text-[#2563EB] transition-colors"
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="analyze.html">Analytics</a>
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
                     href="scraper.html">Scraper</a>
             </div>
-            <div class="text-sm text-on-surface-variant">© 2024 DataPilot AI Analytics. All rights reserved.</div>
         </div>
     </footer>
 
@@ -383,8 +398,9 @@
 
     <script>
         // ── FILENAME & DATASET META from sessionStorage ──
-        const filename = sessionStorage.getItem('dp_filename') || 'no file loaded';
-        document.getElementById('filenameDisplay').textContent = filename;
+        const filename = sessionStorage.getItem('dp_filename') || '';
+        const hasFile = !!filename;
+        document.getElementById('filenameDisplay').textContent = filename || 'no file loaded';
 
         // Pull row/column count if available
         const rowCount = sessionStorage.getItem('dp_rows');
@@ -394,6 +410,15 @@
             metaEl.textContent = `${Number(rowCount).toLocaleString()} rows, ${colCount} columns`;
         } else {
             metaEl.textContent = '';
+        }
+
+        // ── GATE: disable query UI if no file is loaded ──
+        if (!hasFile) {
+            document.getElementById('noFileBanner').classList.remove('hidden');
+            document.getElementById('noFileBanner').classList.add('flex');
+            const qs = document.getElementById('querySection');
+            qs.style.opacity = '0.45';
+            qs.style.pointerEvents = 'none';
         }
 
         let queryHistory = [];

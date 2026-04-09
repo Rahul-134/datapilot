@@ -9,8 +9,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <style>
         :root {
@@ -109,8 +108,15 @@
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .animate-fadeUp {
@@ -118,8 +124,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
         }
 
         .animate-float {
@@ -147,30 +160,28 @@
 <body class="min-h-screen selection:bg-blue-100">
 
     <!-- NAV -->
-    <nav class="sticky top-0 z-50 w-full glass-nav border-b border-slate-100 px-6 py-4 shadow-sm">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                    <span class="material-symbols-outlined text-white" data-icon="auto_awesome">auto_awesome</span>
+    <nav class="fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
                 </div>
-                <h1 class="text-xl font-extrabold tracking-tight text-slate-900">
+                <span class="text-xl font-extrabold tracking-tight text-slate-900">
                     Data<span class="text-blue-600">Pilot</span>
-                </h1>
-            </div>
+                </span>
+            </a>
             <div class="hidden md:flex items-center gap-6">
-                <a class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1" href="#">Dashboard</a>
-                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors" href="analyze.html">Analytics</a>
-                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors" href="scraper.html">Scraper</a>
-                <div class="h-8 w-[1px] bg-slate-200"></div>
-                <div class="flex items-center px-3 py-1 rounded-full bg-slate-100 border border-slate-200">
-                    <span class="text-[10px] font-mono uppercase tracking-widest text-blue-600 mr-2">v1.0</span>
-                    <span class="text-xs font-medium text-slate-500">AI Data Analyst</span>
-                </div>
+                <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
+                    href="index.html">Dashboard</a>
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+                    href="analyze.html">Analytics</a>
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+                    href="scraper.html">Scraper <span class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-6 py-12 lg:py-16 space-y-16">
+    <main class="max-w-4xl mx-auto px-6 pt-24 pb-12 lg:pt-28 lg:pb-16 space-y-16">
 
         <!-- HERO / UPLOAD -->
         <section id="uploadSection" class="text-center space-y-8 max-w-3xl mx-auto">
@@ -216,24 +227,22 @@
                         <span class="step-number">2</span>
                         <h3 class="text-2xl font-bold text-slate-900">Dataset Overview</h3>
                     </div>
-                    <p class="text-slate-400 text-sm ml-9">active: <span id="badgeFilename" class="font-medium text-slate-600">—</span></p>
+                    <p class="text-slate-400 text-sm ml-9">active: <span id="badgeFilename"
+                            class="font-medium text-slate-600">—</span></p>
                 </div>
                 <div class="flex gap-3 flex-wrap">
-                    <button id="resetFileBtn"
-                        class="humanistic-btn btn-secondary">
+                    <button id="resetFileBtn" class="humanistic-btn btn-secondary">
                         🔄 Reset File
                     </button>
-                    <button id="cleanBtn"
-                        class="humanistic-btn btn-warning">
+                    <button id="cleanBtn" class="humanistic-btn btn-warning">
                         🧹 Clean Data
-                        <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>
+                        <span
+                            class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>
                     </button>
-                    <button id="downloadBtn"
-                        class="hidden humanistic-btn btn-primary items-center gap-2">
+                    <button id="downloadBtn" class="hidden humanistic-btn btn-primary items-center gap-2">
                         <span class="material-symbols-outlined text-lg">download</span> Download Cleaned
                     </button>
-                    <button id="resetBtn"
-                        class="humanistic-btn btn-secondary">
+                    <button id="resetBtn" class="humanistic-btn btn-secondary">
                         ↩ New File
                     </button>
                 </div>
@@ -245,31 +254,36 @@
                     <div class="absolute top-0 left-0 w-full h-1 bg-blue-600 rounded-t-xl"></div>
                     <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Total Rows</p>
                     <p id="statRows" class="text-2xl font-bold text-slate-900">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-blue-600">database</span>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-blue-600">database</span>
                 </div>
                 <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
                     <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 rounded-t-xl"></div>
                     <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Columns</p>
                     <p id="statCols" class="text-2xl font-bold text-slate-900">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-emerald-500">view_column</span>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-emerald-500">view_column</span>
                 </div>
                 <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
                     <div class="absolute top-0 left-0 w-full h-1 bg-red-500 rounded-t-xl"></div>
                     <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Duplicates</p>
                     <p id="statDupes" class="text-2xl font-bold text-red-500">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-red-500">content_copy</span>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-red-500">content_copy</span>
                 </div>
                 <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
                     <div class="absolute top-0 left-0 w-full h-1 bg-amber-500 rounded-t-xl"></div>
                     <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">Null Values</p>
                     <p id="statNulls" class="text-2xl font-bold text-amber-500">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-amber-500">scan_delete</span>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-amber-500">scan_delete</span>
                 </div>
                 <div class="insight-card relative overflow-hidden hover:-translate-y-0.5 transition-transform">
                     <div class="absolute top-0 left-0 w-full h-1 bg-violet-500 rounded-t-xl"></div>
                     <p class="text-slate-400 text-xs uppercase tracking-widest mb-3 font-semibold">File Size</p>
                     <p id="statSize" class="text-2xl font-bold text-slate-900">—</p>
-                    <span class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-violet-500">data_usage</span>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-2 -right-2 text-5xl opacity-5 text-violet-500">data_usage</span>
                 </div>
             </div>
 
@@ -295,8 +309,14 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
-                                <tr><th class="px-4 py-3">#</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">Type</th><th class="px-4 py-3 text-right">Null %</th></tr>
+                            <thead
+                                class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
+                                <tr>
+                                    <th class="px-4 py-3">#</th>
+                                    <th class="px-4 py-3">Name</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3 text-right">Null %</th>
+                                </tr>
                             </thead>
                             <tbody id="colTableBody" class="divide-y divide-slate-50"></tbody>
                         </table>
@@ -308,7 +328,8 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead id="sampleHead" class="bg-blue-50 text-blue-600 text-[10px] uppercase font-semibold"></thead>
+                            <thead id="sampleHead" class="bg-blue-50 text-blue-600 text-[10px] uppercase font-semibold">
+                            </thead>
                             <tbody id="sampleBody" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
@@ -330,7 +351,8 @@
     </main>
 
     <!-- CLEAN MODAL -->
-    <div id="cleanModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-black/30 backdrop-blur-sm">
+    <div id="cleanModal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-black/30 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 border border-slate-200">
             <div class="flex items-center gap-4">
                 <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
@@ -342,7 +364,8 @@
                 </div>
             </div>
             <div class="space-y-4">
-                <label class="flex items-center gap-4 cursor-pointer bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-200 transition-all">
+                <label
+                    class="flex items-center gap-4 cursor-pointer bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-blue-200 transition-all">
                     <input type="checkbox" id="removeDupes" checked class="w-4 h-4 accent-blue-600 rounded" />
                     <div>
                         <p class="text-slate-800 font-bold text-sm">Remove duplicate rows</p>
@@ -371,14 +394,17 @@
                 <button id="cancelClean"
                     class="flex-1 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
                 <button id="confirmClean"
-                    class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Apply & Clean</button>
+                    class="flex-1 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Apply
+                    & Clean</button>
             </div>
         </div>
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-white border-l-4 border-emerald-500 p-4 rounded-xl shadow-xl max-w-sm border border-slate-200">
-        <div id="toastIconWrap" class="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
+    <div id="toast"
+        class="fixed bottom-8 right-8 z-[200] hidden items-center gap-4 bg-white border-l-4 border-emerald-500 p-4 rounded-xl shadow-xl max-w-sm border border-slate-200">
+        <div id="toastIconWrap"
+            class="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 shrink-0">
             <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
         </div>
         <div>
@@ -391,8 +417,18 @@
     </div>
 
     <!-- Footer -->
-    <footer class="max-w-6xl mx-auto px-6 py-12 text-center text-slate-400 text-sm">
-        <p>© 2024 DataPilot AI. Making data analysis approachable for everyone.</p>
+    <footer class="bg-[#ecefec] py-12 mt-12">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-xl font-extrabold text-slate-900 opacity-50">DataPilot</div>
+            <div class="flex gap-8">
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="index.html">Dashboard</a>
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="analyze.html">Analytics</a>
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="scraper.html">Scraper</a>
+            </div>
+        </div>
     </footer>
 
     <script>
@@ -400,9 +436,9 @@
         let fileSize = 0;
 
         const fileInput = document.getElementById('fileInput');
-        const dropZone  = document.getElementById('dropZone');
-        const loading   = document.getElementById('loading');
-        const overview  = document.getElementById('overview');
+        const dropZone = document.getElementById('dropZone');
+        const loading = document.getElementById('loading');
+        const overview = document.getElementById('overview');
         const uploadSec = document.getElementById('uploadSection');
 
         // Drag & drop
@@ -446,15 +482,15 @@
             const colBody = document.getElementById('colTableBody');
             colBody.innerHTML = '';
             colNames.forEach((col, i) => {
-                const nullCount  = nullCounts[col] || 0;
+                const nullCount = nullCounts[col] || 0;
                 const nullPctVal = ((nullCount / totalRows) * 100).toFixed(1);
-                const dtype      = dtypes[col] || 'unknown';
+                const dtype = dtypes[col] || 'unknown';
                 const dtypeLabel = dtype.includes('float') ? 'FLOAT' : dtype.includes('int') ? 'INT' : 'STR';
                 const dtypeColor = dtype.includes('float') ? 'bg-emerald-50 text-emerald-600' : dtype.includes('int') ? 'bg-blue-50 text-blue-600' : 'bg-violet-50 text-violet-600';
-                const nullColor  = nullCount === 0 ? 'text-emerald-600' : nullCount < totalRows * 0.1 ? 'text-amber-500' : 'text-red-500';
+                const nullColor = nullCount === 0 ? 'text-emerald-600' : nullCount < totalRows * 0.1 ? 'text-amber-500' : 'text-red-500';
                 colBody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-4 py-3 text-slate-400">${String(i+1).padStart(2,'0')}</td>
+                        <td class="px-4 py-3 text-slate-400">${String(i + 1).padStart(2, '0')}</td>
                         <td class="px-4 py-3 text-slate-800 font-medium">${col}</td>
                         <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${dtypeColor}">${dtypeLabel}</span></td>
                         <td class="px-4 py-3 text-right ${nullColor}">${nullPctVal}%</td>
@@ -464,11 +500,11 @@
 
         function renderOverview(data) {
             document.getElementById('badgeFilename').textContent = data.filename;
-            document.getElementById('statRows').textContent  = data.rows.toLocaleString();
-            document.getElementById('statCols').textContent  = data.columns;
+            document.getElementById('statRows').textContent = data.rows.toLocaleString();
+            document.getElementById('statCols').textContent = data.columns;
             document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
-            document.getElementById('statSize').textContent  = formatSize(fileSize);
-            const totalNulls = Object.values(data.null_counts).reduce((a,b) => a+b, 0);
+            document.getElementById('statSize').textContent = formatSize(fileSize);
+            const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
             document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
 
             const health = calcHealth(totalNulls, data.rows, data.columns, data.duplicate_rows);
@@ -501,10 +537,10 @@
         });
 
         function updateCleanPreview() {
-            const dupes    = document.getElementById('removeDupes').checked;
-            const nulls    = document.getElementById('handleNulls').checked;
+            const dupes = document.getElementById('removeDupes').checked;
+            const nulls = document.getElementById('handleNulls').checked;
             const strategy = document.getElementById('nullStrategy').value;
-            const totalNulls = Object.values(currentData.null_counts).reduce((a,b) => a+b, 0);
+            const totalNulls = Object.values(currentData.null_counts).reduce((a, b) => a + b, 0);
             let lines = [];
             if (dupes && currentData.duplicate_rows > 0)
                 lines.push(`🗑 ${currentData.duplicate_rows.toLocaleString()} duplicate rows will be removed`);
@@ -531,21 +567,21 @@
             cleanBtn.textContent = '⏳ Cleaning...';
             const payload = {
                 remove_duplicates: document.getElementById('removeDupes').checked,
-                handle_nulls:      document.getElementById('handleNulls').checked,
-                null_strategy:     document.getElementById('nullStrategy').value
+                handle_nulls: document.getElementById('handleNulls').checked,
+                null_strategy: document.getElementById('nullStrategy').value
             };
             try {
-                const res  = await fetch('http://localhost:8000/api/clean/', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                const res = await fetch('http://localhost:8000/api/clean/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if (data.error) { showToast(data.error, true); return; }
 
-                document.getElementById('statRows').textContent  = data.final_rows.toLocaleString();
+                document.getElementById('statRows').textContent = data.final_rows.toLocaleString();
                 document.getElementById('statDupes').textContent = data.duplicate_rows.toLocaleString();
-                const totalNulls = Object.values(data.null_counts).reduce((a,b) => a+b, 0);
+                const totalNulls = Object.values(data.null_counts).reduce((a, b) => a + b, 0);
                 document.getElementById('statNulls').textContent = totalNulls.toLocaleString();
                 const health = calcHealth(totalNulls, data.final_rows, currentData.columns, data.duplicate_rows);
                 document.getElementById('healthScore').textContent = health + '%';
-                document.getElementById('healthFill').style.width  = health + '%';
+                document.getElementById('healthFill').style.width = health + '%';
 
                 renderColTable(currentData.column_names, currentData.dtypes, data.null_counts, data.final_rows);
 
@@ -554,8 +590,8 @@
                     currentData.column_names.map(c => `<td class="px-6 py-4 text-slate-600">${row[c] ?? '—'}</td>`).join('') + '</tr>'
                 ).join('');
 
-                currentData.null_counts    = data.null_counts;
-                currentData.rows           = data.final_rows;
+                currentData.null_counts = data.null_counts;
+                currentData.rows = data.final_rows;
                 currentData.duplicate_rows = data.duplicate_rows;
 
                 const dlBtn = document.getElementById('downloadBtn');
@@ -581,7 +617,7 @@
                 if (!file) { showToast('No file to reset.', true); return; }
                 const formData = new FormData();
                 formData.append('file', file);
-                const res  = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
+                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
                 const data = await res.json();
                 currentData = data;
                 renderOverview(data);
@@ -612,7 +648,7 @@
             cleanBtn.innerHTML = '🧹 Clean Data <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 border border-amber-300 px-2 py-0.5 rounded-full font-medium">Recommended</span>';
             document.getElementById('removeDupes').checked = true;
             document.getElementById('handleNulls').checked = true;
-            document.getElementById('nullStrategy').value  = 'drop';
+            document.getElementById('nullStrategy').value = 'drop';
         }
 
         document.getElementById('startAnalysisBtn').addEventListener('click', () => {
@@ -630,14 +666,14 @@
         function showToast(msg, isError = false) {
             clearTimeout(toastTimer);
             const toast = document.getElementById('toast');
-            const icon  = document.getElementById('toastIcon');
-            const wrap  = document.getElementById('toastIconWrap');
+            const icon = document.getElementById('toastIcon');
+            const wrap = document.getElementById('toastIconWrap');
             const title = document.getElementById('toastTitle');
             document.getElementById('toastMsg').textContent = msg;
-            icon.textContent  = isError ? 'error' : 'check_circle';
-            wrap.className    = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`;
+            icon.textContent = isError ? 'error' : 'check_circle';
+            wrap.className = `h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isError ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'}`;
             title.textContent = isError ? 'Error' : 'Success';
-            toast.className   = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-white border-l-4 ${isError ? 'border-red-500' : 'border-emerald-500'} p-4 rounded-xl shadow-xl max-w-sm border border-slate-200`;
+            toast.className = `fixed bottom-8 right-8 z-[200] flex items-center gap-4 bg-white border-l-4 ${isError ? 'border-red-500' : 'border-emerald-500'} p-4 rounded-xl shadow-xl max-w-sm border border-slate-200`;
             toastTimer = setTimeout(hideToast, 3500);
         }
         function hideToast() {
@@ -647,4 +683,5 @@
         }
     </script>
 </body>
+
 </html>

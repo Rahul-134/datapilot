@@ -151,16 +151,23 @@
 <body class="text-on-surface font-body min-h-screen">
 
     <!-- NAV -->
-    <nav
-        class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md flex justify-between items-center px-8 py-4 max-w-full mx-auto border-b border-outline-variant/15">
-        <div class="flex items-center gap-8">
-            <a href="index.html" class="text-2xl font-bold tracking-tight text-on-surface font-manrope">DataPilot</a>
-            <div class="hidden md:flex gap-6">
-                <a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200"
+    <nav class="fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight text-slate-900">
+                    Data<span class="text-blue-600">Pilot</span>
+                </span>
+            </a>
+            <div class="hidden md:flex items-center gap-6">
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
                     href="index.html">Dashboard</a>
-                <a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200"
+                <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
                     href="analyze.html">Analytics</a>
-                <a class="text-primary font-bold border-b-2 border-primary" href="#">Scraper</a>
+                <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
+                    href="scraper.html">Scraper <span class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-500 border border-blue-200">BETA</span></a>
             </div>
         </div>
     </nav>
@@ -174,8 +181,11 @@
                     class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold font-manrope">
                     1</div>
                 <div>
-                    <h1 class="text-3xl font-extrabold font-manrope tracking-tight">Enter a URL to scrape</h1>
+                    <h1 class="text-3xl font-extrabold font-manrope tracking-tight">Enter a URL to scrape
+                        <span class="ml-1.5 align-middle inline-flex items-center justify-center px-3 py-0.5 mt-[-4px] text-[10px] font-bold uppercase tracking-widest rounded-full bg-slate-50 text-slate-500 border border-slate-200 shadow-sm leading-none h-6">BETA</span>
+                    </h1>
                     <p class="text-on-surface-variant">DataPilot will extract structured data automatically</p>
+                    <p class="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">info</span> This feature is still under development; so use it just for reference.</p>
                 </div>
             </div>
 
@@ -449,6 +459,21 @@
         </section>
 
     </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#ecefec] py-12 mt-12">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-xl font-extrabold text-slate-900 opacity-50">DataPilot</div>
+            <div class="flex gap-8">
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="index.html">Dashboard</a>
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="analyze.html">Analytics</a>
+                <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
+                    href="scraper.html">Scraper</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- TOAST -->
     <div id="toast"
