@@ -1,6 +1,6 @@
 # DataPilot
 
-DataPilot is an AI-powered data analysis and web scraping platform built with FastAPI. It provides an end-to-end workflow for uploading datasets, cleaning data, running natural language queries against your data, and extracting structured information from any website -- all through a modern browser-based interface.
+DataPilot is an AI-powered data analysis and web scraping platform built with FastAPI. It provides an end-to-end workflow for uploading datasets, cleaning data, running natural language queries against your data, and extracting structured information from any website — all through a modern, light-themed browser interface with a clean editorial design.
 
 ---
 
@@ -95,6 +95,24 @@ Browser (HTML/JS)
 
 The frontend is server-rendered using Jinja2 templates and communicates with the backend through JSON API endpoints. Static assets (CSS, JavaScript) are served by FastAPI's static file handler.
 
+### Design System
+
+The UI follows a warm, editorial design language:
+
+| Token             | Value                                      |
+|-------------------|--------------------------------------------|
+| Page Background   | `#F5F4EF` (warm off-white)                 |
+| Card Background   | `#FFFFFF` with subtle shadow               |
+| Primary Accent    | `#2563EB` (blue-600)                       |
+| Secondary Accent  | `#059669` (emerald-600)                    |
+| Text – Main       | `#111827` / `#2D3432`                      |
+| Text – Muted      | `#6B7280` / `#5A605E`                      |
+| Border            | `#E5E7EB`                                  |
+| Navigation        | Fixed top glassmorphism (white/85 + backdrop blur) |
+| Footer            | Unified light theme (`#ecefec`) with consistent branding |
+| Cards             | Rounded corners (12-16 px), light borders  |
+| Animations        | Fade-up on load, hover lift, float         |
+
 ---
 
 ## Tech Stack
@@ -104,8 +122,8 @@ The frontend is server-rendered using Jinja2 templates and communicates with the
 | Backend   | Python 3, FastAPI, Uvicorn                               |
 | AI/LLM    | Google Gemini API (gemini-2.5-flash, gemini-3.1-flash-lite, gemini-3-flash, gemini-2.5-flash-lite — auto-cascade) |
 | Data      | pandas, openpyxl, BeautifulSoup, lxml                     |
-| Frontend  | HTML, JavaScript, Tailwind CSS (CDN)                      |
-| Fonts     | Space Grotesk, Space Mono, Syne (Google Fonts)            |
+| Frontend  | HTML, JavaScript, Tailwind CSS (CDN), Material Symbols    |
+| Fonts     | Plus Jakarta Sans, Inter, Manrope (Google Fonts)          |
 | HTTP      | requests (scraping), httpx (Gemini SDK)                   |
 | Templating| Jinja2                                                    |
 
@@ -198,9 +216,9 @@ Examples of supported queries:
 - "Average value grouped by category"
 - "Filter rows where price is greater than 500"
 
-### Web Scraper
+### Web Scraper (BETA)
 
-Navigate to the Scraper page from the navigation bar.
+Navigate to the Scraper page from the navigation bar. Note: This feature is currently under active development.
 
 **URL Mode**: Enter a target URL and describe what data to extract. Set the number of pages to scrape (1-20). Click **Scrape & Extract Data**.
 
