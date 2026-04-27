@@ -1,12 +1,13 @@
 # DataPilot
 
-DataPilot is an AI-powered data analysis and web scraping platform built with FastAPI. It provides an end-to-end workflow for uploading datasets, cleaning data, running natural language queries against your data, and extracting structured information from any website — all through a modern, light-themed browser interface with a clean editorial design.
+DataPilot is an AI-powered data analysis, web scraping, and machine learning platform built with FastAPI and Streamlit. It provides an end-to-end workflow for uploading datasets, cleaning data, running natural language queries against your data, extracting structured information from any website, and training ML models — all through a modern, light-themed browser interface with a clean editorial design.
 
 ---
 
 ## Table of Contents
 
 - [Features](#features)
+- [ML Model Trainer](#ml-model-trainer)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -19,6 +20,7 @@ DataPilot is an AI-powered data analysis and web scraping platform built with Fa
   - [Data Cleaning](#data-cleaning)
   - [Analytics -- Natural Language Queries](#analytics----natural-language-queries)
   - [Web Scraper](#web-scraper)
+  - [ML Model Trainer Usage](#ml-model-trainer-usage)
 - [API Reference](#api-reference)
 - [Project Structure](#project-structure)
 - [License](#license)
@@ -75,32 +77,114 @@ DataPilot is an AI-powered data analysis and web scraping platform built with Fa
 
 ---
 
+## ML Model Trainer
+
+The **ML Model Trainer** is a standalone Streamlit application (`ml_trainer/app.py`) accessible directly from the DataPilot navigation bar. It provides a complete, no-code machine learning workflow — from data upload to trained model predictions — without leaving the browser.
+
+### File Upload & Preview
+- Upload CSV or Excel files (.csv, .xlsx) via drag-and-drop.
+- Instant dataframe preview of the uploaded dataset.
+- Session-aware file tracking with confirmation dialog on file removal to prevent accidental data loss.
+
+### Data Cleaning
+- **Null value handling** — four strategies: drop rows, fill with mean, fill with median, or fill with a custom value.
+- **Duplicate row removal** — detect and remove duplicates with one click.
+- **Outlier removal (IQR method)** — select numeric columns, view outlier counts per column, and remove outliers using the interquartile range (Q1 − 1.5·IQR, Q3 + 1.5·IQR).
+- Cleaned data preview with live row × column shape indicator.
+
+### Model Training
+Supports both **Regression** and **Classification** tasks with the following algorithms:
+
+| Task            | Available Models                                              |
+|-----------------|---------------------------------------------------------------|
+| Regression      | Linear Regression, Multiple Linear Regression, Polynomial Regression |
+| Classification  | Decision Tree, K-Nearest Neighbors (KNN), Support Vector Machine (SVM), Random Forest |
+
+**Workflow:**
+1. Select task type (Regression or Classification).
+2. Choose a model algorithm.
+3. Pick independent (X) and dependent (Y/target) columns — supports both numeric and categorical features via automatic one-hot encoding (`pd.get_dummies`).
+4. Configure train-test split (10%–40%, default 20%, `random_state=42`).
+5. Click **Train Model** — the app automatically searches for optimal hyperparameters.
+
+### Auto Hyperparameter Tuning
+Each model performs an automated parameter search to find the best configuration:
+
+| Model               | Parameter Searched       | Range            |
+|----------------------|--------------------------|------------------|
+| Polynomial Regression| Degree                   | 1–5              |
+| Decision Tree        | `max_depth`              | 1–20             |
+| KNN                  | `n_neighbors`            | 1–20             |
+| SVM                  | `C` (regularization)     | 0.01, 0.1, 1, 10, 100 |
+| Random Forest        | `n_estimators`           | 10, 50, 100, 150, 200, 300 |
+
+The best parameter is selected by highest R² (regression) or highest accuracy (classification). Search results are displayed in a table for full transparency.
+
+### Evaluation & Reports
+- **Regression metrics**: R² Score, Mean Squared Error (MSE), equation display for simple linear models.
+- **Classification metrics**: Accuracy, F1 Score (weighted), full Classification Report (precision, recall, F1 per class), and interactive Confusion Matrix heatmap.
+- **Per-model reports**: Click "Get Report" on any trained model to view its full evaluation.
+
+### Prediction
+- Select any previously trained model from a dropdown.
+- Input feature values via auto-generated form fields (number inputs with min/max/mean for numeric columns, dropdowns for categorical columns).
+- Handles preprocessing automatically: one-hot encoding alignment, polynomial feature transformation, SVM scaling (`StandardScaler`).
+- Instant prediction result display.
+
+### Code Export
+- Generate ready-to-run Python code that reproduces the entire training session for any trained model.
+- Includes all imports, data loading, preprocessing, model initialization with best hyperparameters, training, and evaluation.
+- View the code inline or download as a `.py` file.
+
+### Visualizations
+Seven interactive chart types powered by Plotly:
+
+| Chart Type    | Configurable Options                            |
+|---------------|--------------------------------------------------|
+| Scatter Plot  | X axis, Y axis, optional color grouping          |
+| Histogram     | Column selection, bin count (5–100)              |
+| Pie Chart     | Category column, value column                    |
+| Bar Chart     | X/Y axes with aggregation (sum, mean, count)    |
+| Line Chart    | X/Y axes, optional color grouping               |
+| Heatmap       | Multi-column correlation matrix                  |
+| Box Plot      | Value column, optional group-by                  |
+
+- 10 color palettes available (Default Blue, Viridis, Plasma, Sunset, Teal, Red-Orange, Green, Rainbow, Pastel, Bold).
+- All plotted graphs are stored in the session and displayed in an expandable gallery.
+- Graphs can be cleared in bulk.
+
+### Model Comparison
+- When two or more models are trained, a comparison table is automatically generated showing all models side-by-side with their metrics.
+- Interactive grouped bar charts compare classifier accuracy/F1 or regressor R²/MSE.
+
+---
+
 ## Architecture
 
 ```
-Browser (HTML/JS)
-      |
-      | HTTP (REST API)
-      |
-  FastAPI Server
-      |
-      +-- Routes (upload, clean, query, scraper)
-      |       |
-      +-- Services
-              |-- file_parser.py     File upload and parsing (CSV/Excel)
-              |-- data_cleaner.py    Duplicate removal, null handling
-              |-- llm_service.py     NL-to-pandas code generation via Gemini
-              |-- scraper_service.py Web scraping, pagination, search mode
+Browser (HTML/JS)                          Streamlit (ML Trainer)
+       |                                          |
+       | HTTP (REST API)                          | localhost:8501
+       |                                          |
+   FastAPI Server                          ml_trainer/app.py
+       |                                    (standalone app)
+       +-- Routes (upload, clean, query, scraper)
+       |       |
+       +-- Services
+               |-- file_parser.py     File upload and parsing (CSV/Excel)
+               |-- data_cleaner.py    Duplicate removal, null handling
+               |-- llm_service.py     NL-to-pandas code generation via Gemini
+               |-- scraper_service.py Web scraping, pagination, search mode
 ```
 
-The frontend is server-rendered using Jinja2 templates and communicates with the backend through JSON API endpoints. Static assets (CSS, JavaScript) are served by FastAPI's static file handler.
+The main frontend is server-rendered using Jinja2 templates and communicates with the backend through JSON API endpoints. Static assets (CSS, JavaScript) are served by FastAPI's static file handler. The ML Model Trainer runs as a separate Streamlit application on port 8501, linked from the main navigation bar via a "Train a Model" button.
 
 ### Design System
 
 The UI follows a warm, editorial design language:
 
 | Token             | Value                                      |
-|-------------------|--------------------------------------------|
+|-------------------|---------------------------------------------|
 | Page Background   | `#F5F4EF` (warm off-white)                 |
 | Card Background   | `#FFFFFF` with subtle shadow               |
 | Primary Accent    | `#2563EB` (blue-600)                       |
@@ -113,19 +197,24 @@ The UI follows a warm, editorial design language:
 | Cards             | Rounded corners (12-16 px), light borders  |
 | Animations        | Fade-up on load, hover lift, float         |
 
+The ML Trainer uses the same design tokens via custom Streamlit CSS, ensuring visual consistency across both services.
+
 ---
 
 ## Tech Stack
 
-| Layer     | Technology                                               |
-|-----------|----------------------------------------------------------|
-| Backend   | Python 3, FastAPI, Uvicorn                               |
-| AI/LLM    | Google Gemini API (gemini-2.5-flash, gemini-3.1-flash-lite, gemini-3-flash, gemini-2.5-flash-lite — auto-cascade) |
-| Data      | pandas, openpyxl, BeautifulSoup, lxml                     |
-| Frontend  | HTML, JavaScript, Tailwind CSS (CDN), Material Symbols    |
-| Fonts     | Plus Jakarta Sans, Inter, Manrope (Google Fonts)          |
-| HTTP      | requests (scraping), httpx (Gemini SDK)                   |
-| Templating| Jinja2                                                    |
+| Layer      | Technology                                               |
+|------------|----------------------------------------------------------|
+| Backend    | Python 3, FastAPI, Uvicorn                               |
+| AI/LLM     | Google Gemini API (gemini-2.5-flash, gemini-3.1-flash-lite, gemini-3-flash, gemini-2.5-flash-lite — auto-cascade) |
+| ML         | scikit-learn (LinearRegression, DecisionTree, KNN, SVM, RandomForest, PolynomialFeatures) |
+| Data       | pandas, openpyxl, BeautifulSoup, lxml                    |
+| Viz        | Plotly, Matplotlib, Seaborn                              |
+| Frontend   | HTML, JavaScript, Tailwind CSS (CDN), Material Symbols   |
+| ML UI      | Streamlit                                                |
+| Fonts      | Plus Jakarta Sans, Inter, Manrope (Google Fonts)         |
+| HTTP       | requests (scraping), httpx (Gemini SDK)                  |
+| Templating | Jinja2                                                   |
 
 ---
 
@@ -173,13 +262,25 @@ GEMINI_API_KEY=your_api_key_here
 
 ### Running the Application
 
-Start the development server:
+DataPilot consists of two services that run simultaneously:
+
+**1. Start the FastAPI server** (main app — Dashboard, Analytics, Scraper):
 
 ```bash
 uvicorn backend.main:app --reload
 ```
 
-The application will be available at [http://localhost:8000](http://localhost:8000).
+This serves the main application at [http://localhost:8000](http://localhost:8000).
+
+**2. Start the Streamlit ML Trainer** (in a separate terminal):
+
+```bash
+streamlit run ml_trainer/app.py
+```
+
+This launches the ML Model Trainer at [http://localhost:8501](http://localhost:8501).
+
+> **Tip:** The "Train a Model" button in the main DataPilot navbar links directly to the Streamlit app. Both services must be running for the full experience.
 
 ---
 
@@ -224,6 +325,19 @@ Navigate to the Scraper page from the navigation bar. Note: This feature is curr
 
 **Search Mode**: Toggle to Search Mode. Describe the data you need in natural language. Configure the number of websites to discover (1-10) and pages per site (1-10). Click **Search & Extract Data**. The system finds relevant websites via search engines, scrapes them with a unified schema, filters out irrelevant rows, and merges the results. If any Gemini model is rate-limited, the system automatically switches to another available model.
 
+### ML Model Trainer Usage
+
+Click the **Train a Model** button in the navigation bar (available on all pages) to open the ML Trainer in a new tab. The workflow is:
+
+1. **Upload** a CSV or Excel file.
+2. **Clean** the data — handle nulls, remove duplicates, remove outliers using the IQR method.
+3. **Configure** the model — select task type, algorithm, feature/target columns, and train-test split.
+4. **Train** — the app auto-tunes hyperparameters and displays results with metrics.
+5. **Predict** — input new values and get instant predictions from any trained model.
+6. **Visualize** — create up to 7 chart types with customizable palettes.
+7. **Compare** — view a side-by-side comparison table and charts when multiple models are trained.
+8. **Export** — generate and download reproducible Python training code.
+
 ---
 
 ## API Reference
@@ -239,6 +353,8 @@ Navigate to the Scraper page from the navigation bar. Note: This feature is curr
 | POST   | `/api/scrape/`        | Scrape a specific URL                    |
 | POST   | `/api/scrape/search`  | Search mode -- discover and scrape URLs  |
 | GET    | `/api/scrape/download`| Download scraped data (CSV or Excel)     |
+
+> **Note:** The ML Model Trainer does not expose REST endpoints — it is a standalone Streamlit app with its own UI at `localhost:8501`.
 
 ---
 
@@ -270,6 +386,9 @@ DataPilot/
 |           |-- app.js             Application JavaScript
 |           |-- dataTable.js       Data table rendering
 |           |-- speech.js          Speech recognition integration
+|-- ml_trainer/
+|   |-- app.py                     Streamlit ML training app (data cleaning, model
+|                                  training, prediction, visualization, code export)
 |-- .env                           Environment variables (not committed)
 |-- .gitignore                     Git ignore rules
 |-- requirements.txt               Python dependencies

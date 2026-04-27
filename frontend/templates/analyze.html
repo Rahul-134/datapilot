@@ -130,6 +130,70 @@
         #resultBody tr:hover {
             background-color: rgba(37, 99, 235, 0.04);
         }
+
+        /* Train a Model tooltip */
+        .train-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .train-tooltip {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 272px;
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        /* Arrow pointing up */
+        .train-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 18px;
+            width: 11px;
+            height: 11px;
+            background: #FFFFFF;
+            border-left: 1px solid #E5E7EB;
+            border-top: 1px solid #E5E7EB;
+            transform: rotate(45deg);
+        }
+
+        .train-btn-wrapper:hover .train-tooltip {
+            display: block;
+        }
+
+        .train-tooltip-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.01em;
+        }
+
+        .train-tooltip-body {
+            font-size: 0.78rem;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 0.65rem;
+        }
+
+        .train-tooltip-hint {
+            font-size: 0.75rem;
+            color: #92400E;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 7px;
+            padding: 0.45rem 0.6rem;
+            line-height: 1.45;
+        }
     </style>
 </head>
 
@@ -152,7 +216,25 @@
                 <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
                     href="analyze.html">Analytics</a>
                 <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                    href="scraper.html">Scraper <span class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
+                    href="scraper.html">Scraper <span
+                        class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
+                <div class="train-btn-wrapper">
+                    <a class="flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors px-3.5 py-1.5 rounded-lg shadow-sm"
+                        href="http://localhost:8501" target="_blank">
+                        <span class="material-symbols-outlined text-white" style="font-size:16px;">model_training</span>
+                        Train a Model
+                    </a>
+                    <div class="train-tooltip">
+                        <div class="train-tooltip-title">🤖 ML Model Trainer</div>
+                        <div class="train-tooltip-body">
+                            Train regression &amp; classification models, visualize results, compare accuracy, and
+                            export training code — no setup needed.
+                        </div>
+                        <div class="train-tooltip-hint">
+                            💡 Want to use your current file? Download it first, then re-upload it on the trainer page.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -169,11 +251,14 @@
         </header>
 
         <!-- NO FILE BANNER -->
-        <div id="noFileBanner" class="hidden mb-8 p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4">
+        <div id="noFileBanner"
+            class="hidden mb-8 p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4">
             <span class="material-symbols-outlined text-amber-500 text-2xl">warning</span>
             <div>
                 <p class="font-bold text-slate-900 text-sm">No dataset loaded</p>
-                <p class="text-slate-500 text-sm">Upload a file on the <a href="index.html" class="text-blue-600 font-semibold hover:underline">Dashboard</a> first, then come back to analyze it.</p>
+                <p class="text-slate-500 text-sm">Upload a file on the <a href="index.html"
+                        class="text-blue-600 font-semibold hover:underline">Dashboard</a> first, then come back to
+                    analyze it.</p>
             </div>
         </div>
 
