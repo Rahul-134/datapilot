@@ -226,7 +226,7 @@
     <!-- NAV -->
     <nav class="fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2.5">
+            <a href="/" class="flex items-center gap-2.5">
                 <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
                     <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
                 </div>
@@ -236,15 +236,15 @@
             </a>
             <div class="hidden md:flex items-center gap-6">
                 <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
-                    href="index.html">Dashboard</a>
+                    href="/">Dashboard</a>
                 <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                    href="analyze.html">Analytics</a>
+                    href="/analyze">Analytics</a>
                 <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                    href="scraper.html">Scraper <span
+                    href="/scraper">Scraper <span
                         class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
                 <div class="train-btn-wrapper">
                     <a class="flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors px-3.5 py-1.5 rounded-lg shadow-sm"
-                        href="http://localhost:8501" target="_blank">
+                        href="{{ ml_trainer_url }}" target="_blank">
                         <span class="material-symbols-outlined text-white" style="font-size:16px;">model_training</span>
                         Train a Model
                     </a>
@@ -504,16 +504,26 @@
             <div class="text-xl font-extrabold text-slate-900 opacity-50">DataPilot</div>
             <div class="flex gap-8">
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="index.html">Dashboard</a>
+                    href="/">Dashboard</a>
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="analyze.html">Analytics</a>
+                    href="/analyze">Analytics</a>
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="scraper.html">Scraper</a>
+                    href="/scraper">Scraper</a>
             </div>
         </div>
     </footer>
 
     <script>
+        function getSessionId() {
+            let id = localStorage.getItem('dp_session_id');
+            if (!id) {
+                id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                localStorage.setItem('dp_session_id', id);
+            }
+            return id;
+        }
+        const SESSION_ID = getSessionId();
+
         let currentData = null;
         let fileSize = 0;
 
@@ -541,7 +551,7 @@
             const formData = new FormData();
             formData.append('file', file);
             try {
-                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
+                const res = await fetch(`/api/upload/?session_id=${SESSION_ID}`, { method: 'POST', body: formData });
                 const data = await res.json();
                 currentData = data;
                 renderOverview(data);
@@ -653,7 +663,7 @@
                 null_strategy: document.getElementById('nullStrategy').value
             };
             try {
-                const res = await fetch('http://localhost:8000/api/clean/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const res = await fetch(`/api/clean/?session_id=${SESSION_ID}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
                 if (data.error) { showToast(data.error, true); return; }
 
@@ -689,17 +699,17 @@
         });
 
         document.getElementById('downloadBtn').addEventListener('click', () => {
-            window.location.href = 'http://localhost:8000/api/clean/download';
+            window.location.href = `/api/clean/download?session_id=${SESSION_ID}`;
         });
 
         document.getElementById('resetFileBtn').addEventListener('click', async () => {
             try {
-                await fetch('http://localhost:8000/api/clean/reset', { method: 'POST' });
+                await fetch(`/api/clean/reset?session_id=${SESSION_ID}`, { method: 'POST' });
                 const file = fileInput.files[0];
                 if (!file) { showToast('No file to reset.', true); return; }
                 const formData = new FormData();
                 formData.append('file', file);
-                const res = await fetch('http://localhost:8000/api/upload/', { method: 'POST', body: formData });
+                const res = await fetch(`/api/upload/?session_id=${SESSION_ID}`, { method: 'POST', body: formData });
                 const data = await res.json();
                 currentData = data;
                 renderOverview(data);

@@ -202,7 +202,7 @@
     <!-- NAV -->
     <nav class="fixed top-0 z-50 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2.5">
+            <a href="/" class="flex items-center gap-2.5">
                 <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
                     <span class="material-symbols-outlined text-white text-lg">auto_awesome</span>
                 </div>
@@ -212,15 +212,15 @@
             </a>
             <div class="hidden md:flex items-center gap-6">
                 <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                    href="index.html">Dashboard</a>
+                    href="/">Dashboard</a>
                 <a class="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5"
-                    href="analyze.html">Analytics</a>
+                    href="/analyze">Analytics</a>
                 <a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                    href="scraper.html">Scraper <span
+                    href="/scraper">Scraper <span
                         class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-slate-50 text-slate-400 border border-slate-200">BETA</span></a>
                 <div class="train-btn-wrapper">
                     <a class="flex items-center gap-1.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors px-3.5 py-1.5 rounded-lg shadow-sm"
-                        href="http://localhost:8501" target="_blank">
+                        href="{{ ml_trainer_url }}" target="_blank">
                         <span class="material-symbols-outlined text-white" style="font-size:16px;">model_training</span>
                         Train a Model
                     </a>
@@ -256,7 +256,7 @@
             <span class="material-symbols-outlined text-amber-500 text-2xl">warning</span>
             <div>
                 <p class="font-bold text-slate-900 text-sm">No dataset loaded</p>
-                <p class="text-slate-500 text-sm">Upload a file on the <a href="index.html"
+                <p class="text-slate-500 text-sm">Upload a file on the <a href="/"
                         class="text-blue-600 font-semibold hover:underline">Dashboard</a> first, then come back to
                     analyze it.</p>
             </div>
@@ -413,7 +413,7 @@
                         dataset.</p>
                 </div>
                 <!-- Action Card 2: Clean Data -->
-                <a href="index.html"
+                <a href="/"
                     class="group bg-white p-8 rounded-xl border border-outline-variant/15 hover:border-primary hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer text-center">
                     <div
                         class="w-16 h-16 bg-primary-container text-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
@@ -445,11 +445,11 @@
             <div class="text-xl font-extrabold text-slate-900 opacity-50">DataPilot</div>
             <div class="flex gap-8">
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="index.html">Dashboard</a>
+                    href="/">Dashboard</a>
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="analyze.html">Analytics</a>
+                    href="/analyze">Analytics</a>
                 <a class="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors"
-                    href="scraper.html">Scraper</a>
+                    href="/scraper">Scraper</a>
             </div>
         </div>
     </footer>
@@ -482,6 +482,16 @@
     </div>
 
     <script>
+        function getSessionId() {
+            let id = localStorage.getItem('dp_session_id');
+            if (!id) {
+                id = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                localStorage.setItem('dp_session_id', id);
+            }
+            return id;
+        }
+        const SESSION_ID = getSessionId();
+
         // ── FILENAME & DATASET META from sessionStorage ──
         const filename = sessionStorage.getItem('dp_filename') || '';
         const hasFile = !!filename;
@@ -534,7 +544,7 @@
             showAIIndicator('AI is processing your query...');
 
             try {
-                const res = await fetch('http://localhost:8000/api/query/', {
+                const res = await fetch(`/api/query/?session_id=${SESSION_ID}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt })
@@ -602,7 +612,7 @@
         }
 
         function downloadQueryResult(format) {
-            window.location.href = `http://localhost:8000/api/query/download?format=${format}`;
+            window.location.href = `/api/query/download?format=${format}&session_id=${SESSION_ID}`;
         }
 
         function addToHistory(prompt) {

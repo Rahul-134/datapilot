@@ -3,6 +3,8 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from backend.services.file_parser import get_stored_df, get_stored_filename, set_stored_df
 from backend.services.data_cleaner import clean_dataframe
+from backend.services.session_store import get_value, set_value, clear_session
+import pandas as pd
 import io
 
 router = APIRouter()
@@ -12,12 +14,10 @@ class CleanRequest(BaseModel):
     handle_nulls: bool = True
     null_strategy: str = "drop"
 
-_cleaned_store: dict = {"df": None, "filename": None}
-
 @router.post("/")
-def clean_data(req: CleanRequest):
-    df       = get_stored_df()
-    filename = get_stored_filename()
+def clean_data(session_id: str, req: CleanRequest):
+    df       = get_stored_df(session_id)
+    filename = get_stored_filename(session_id)
 
     if df is None:
         return {"error": "No file uploaded yet. Please upload a file first."}
@@ -30,11 +30,11 @@ def clean_data(req: CleanRequest):
     )
 
     # ✅ Update active df so queries now run on cleaned data
-    set_stored_df(result["_df"])
+    set_stored_df(session_id, result["_df"])
 
     # Store for download
-    _cleaned_store["df"]       = result["_df"]
-    _cleaned_store["filename"] = filename
+    set_value(session_id, "cleaned_df", result["_df"].to_csv(index=False))
+    set_value(session_id, "cleaned_filename", filename or "")
 
     # Strip internal keys before returning
     result.pop("_df")
@@ -43,12 +43,14 @@ def clean_data(req: CleanRequest):
     return result
 
 @router.get("/download")
-def download_clean():
-    df       = _cleaned_store["df"]
-    filename = _cleaned_store["filename"]
+def download_clean(session_id: str):
+    csv_text = get_value(session_id, "cleaned_df")
+    filename = get_value(session_id, "cleaned_filename")
 
-    if df is None:
+    if csv_text is None:
         return {"error": "No cleaned data available. Please clean a file first."}
+
+    df = pd.read_csv(io.StringIO(csv_text))
 
     base     = filename.rsplit(".", 1)[0] if filename else "data"
     ext      = filename.rsplit(".", 1)[-1] if filename else "csv"
@@ -70,10 +72,6 @@ def download_clean():
     )
 
 @router.post("/reset")
-def reset_data():
-    from backend.services.file_parser import _store
-    _store["df"]               = None
-    _store["filename"]         = None
-    _cleaned_store["df"]       = None
-    _cleaned_store["filename"] = None
+def reset_data(session_id: str):
+    clear_session(session_id)
     return {"success": True, "message": "Session reset."}

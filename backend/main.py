@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -5,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
+
+ML_TRAINER_URL = os.getenv("ML_TRAINER_URL", "http://localhost:8501")
 
 app = FastAPI(title="DataPilot", version="1.0.0")
 
@@ -27,12 +30,12 @@ app.include_router(scraper.router, prefix="/api/scrape")
 
 @app.get("/")
 def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})
 
 @app.get("/scraper")
 def scraper_page(request: Request):
-    return templates.TemplateResponse("scraper.html", {"request": request})
+    return templates.TemplateResponse("scraper.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})
 
 @app.get("/analyze")
 def analyze_page(request: Request):
-    return templates.TemplateResponse("analyze.html", {"request": request})
+    return templates.TemplateResponse("analyze.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})

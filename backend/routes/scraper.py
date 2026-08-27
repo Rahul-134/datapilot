@@ -2,13 +2,11 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from backend.services.scraper_service import scrape_url, search_and_scrape
+from backend.services.session_store import get_value, set_value
 import pandas as pd
 import io
 
 router = APIRouter()
-
-# Store last scrape result for download
-_scrape_store: dict = {"df": None}
 
 class ScrapeRequest(BaseModel):
     url:         str
@@ -21,7 +19,7 @@ class SearchScrapeRequest(BaseModel):
     max_pages_per_site: int = Field(default=3, ge=1, le=10)
 
 @router.post("/")
-def run_scrape(req: ScrapeRequest):
+def run_scrape(session_id: str, req: ScrapeRequest):
     if not req.url.strip():
         return {"error": "URL cannot be empty."}
     if not req.instruction.strip():
@@ -34,27 +32,31 @@ def run_scrape(req: ScrapeRequest):
     result = scrape_url(req.url.strip(), req.instruction.strip(), req.max_pages)
 
     if result.get("success"):
-        _scrape_store["df"] = pd.DataFrame(result["rows"], columns=result["columns"])
+        result_df = pd.DataFrame(result["rows"], columns=result["columns"])
+        set_value(session_id, "scrape_df", result_df.to_csv(index=False))
 
     return result
 
 @router.post("/search")
-def run_search_scrape(req: SearchScrapeRequest):
+def run_search_scrape(session_id: str, req: SearchScrapeRequest):
     if not req.query.strip():
         return {"error": "Search query cannot be empty."}
 
     result = search_and_scrape(req.query.strip(), req.max_results, req.max_pages_per_site)
 
     if result.get("success"):
-        _scrape_store["df"] = pd.DataFrame(result["rows"], columns=result["columns"])
+        result_df = pd.DataFrame(result["rows"], columns=result["columns"])
+        set_value(session_id, "scrape_df", result_df.to_csv(index=False))
 
     return result
 
 @router.get("/download")
-def download_scrape(format: str = "csv"):
-    df = _scrape_store["df"]
-    if df is None:
+def download_scrape(session_id: str, format: str = "csv"):
+    csv_text = get_value(session_id, "scrape_df")
+    if csv_text is None:
         return {"error": "No scrape result available. Run a scrape first."}
+
+    df = pd.read_csv(io.StringIO(csv_text))
 
     buf      = io.BytesIO()
     out_name = "scraped_data"

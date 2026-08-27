@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from backend.services.file_parser import get_stored_df
 from backend.services.llm_service import query_dataframe, build_prompt, execute_code
+from backend.services.session_store import get_value, set_value
 import pandas as pd
 import io
 
@@ -11,12 +12,9 @@ router = APIRouter()
 class QueryRequest(BaseModel):
     prompt: str
 
-# Store last query result for download
-_query_store: dict = {"df": None, "prompt": None}
-
 @router.post("/")
-def run_query(req: QueryRequest):
-    df = get_stored_df()
+def run_query(session_id: str, req: QueryRequest):
+    df = get_stored_df(session_id)
 
     if df is None:
         return {"error": "No file uploaded yet. Please upload a file first."}
@@ -28,17 +26,20 @@ def run_query(req: QueryRequest):
 
     if result.get("success"):
         # Store result df for download
-        _query_store["df"]     = pd.DataFrame(result["rows"], columns=result["columns"])
-        _query_store["prompt"] = req.prompt.strip()
+        result_df = pd.DataFrame(result["rows"], columns=result["columns"])
+        set_value(session_id, "query_df", result_df.to_csv(index=False))
+        set_value(session_id, "query_prompt", req.prompt.strip())
 
     return result
 
 @router.get("/download")
-def download_query_result(format: str = "csv"):
-    df = _query_store["df"]
+def download_query_result(session_id: str, format: str = "csv"):
+    csv_text = get_value(session_id, "query_df")
 
-    if df is None:
+    if csv_text is None:
         return {"error": "No query result available. Run a query first."}
+
+    df = pd.read_csv(io.StringIO(csv_text))
 
     buf      = io.BytesIO()
     out_name = "query_result"
