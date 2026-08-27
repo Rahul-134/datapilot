@@ -822,7 +822,9 @@
                 '</tr>';
 
             // Column-aware cell styler — inline styles are reliable in dynamic innerHTML
-            const TD_BASE = 'padding:14px 24px;font-size:13.5px;';
+            const TD_BASE = 'padding:14px 24px;font-size:13.5px;vertical-align:top;';
+            // Clamp long free-text cells (e.g. descriptions) so one wordy column can't blow up the whole row's height
+            const CLAMP = 'max-width:320px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;';
             function styleCell(colName, val, isFirst) {
                 const col = colName.toLowerCase();
                 const strVal = (val !== null && val !== undefined) ? String(val) : '—';
@@ -857,11 +859,11 @@
 
                 // First column → medium-weight dark name (like scraper_new.html font-medium)
                 if (isFirst) {
-                    return `<td style="${TD_BASE}font-weight:500;color:#1c1c1c;">${strVal}</td>`;
+                    return `<td style="${TD_BASE}${CLAMP}font-weight:500;color:#1c1c1c;">${strVal}</td>`;
                 }
 
                 // Default
-                return `<td style="${TD_BASE}color:#2d3432;">${strVal}</td>`;
+                return `<td style="${TD_BASE}${CLAMP}color:#2d3432;">${strVal}</td>`;
             }
 
             // Table body rows with hairline dividers
