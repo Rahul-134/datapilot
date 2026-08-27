@@ -9,6 +9,12 @@ load_dotenv()
 
 ML_TRAINER_URL = os.getenv("ML_TRAINER_URL", "http://localhost:8501")
 
+# Resolve relative to this file, not the process's working directory — Vercel's
+# Python runtime does not guarantee cwd is the project root at request time.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_DIR = os.path.join(BASE_DIR, "frontend", "static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "frontend", "templates")
+
 app = FastAPI(title="DataPilot", version="1.0.0")
 
 app.add_middleware(
@@ -19,8 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-templates = Jinja2Templates(directory="frontend/templates")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 from backend.routes import upload, clean, query, scraper
 app.include_router(upload.router,  prefix="/api/upload")
