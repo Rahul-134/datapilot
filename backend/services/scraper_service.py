@@ -13,7 +13,14 @@ import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    return _client
 
 # Optional Google Custom Search credentials (free 100 queries/day)
 GOOGLE_SEARCH_API_KEY = os.getenv("GOOGLE_SEARCH_API_KEY", "").strip()
@@ -46,7 +53,7 @@ def gemini_generate(prompt: str) -> str | None:
     for model_idx, model_name in enumerate(GEMINI_MODELS):
         try:
             log.debug(f"  Trying model: {model_name}")
-            response = client.models.generate_content(
+            response = _get_client().models.generate_content(
                 model=model_name,
                 contents=prompt
             )

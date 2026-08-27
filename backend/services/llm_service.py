@@ -7,7 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        _client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    return _client
 
 def sanitize(value):
     if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
@@ -88,7 +94,7 @@ def query_dataframe(user_query: str, df: pd.DataFrame) -> dict:
     prompt = build_prompt(user_query, df)
 
     try:
-        response = client.models.generate_content(
+        response = _get_client().models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
         )
