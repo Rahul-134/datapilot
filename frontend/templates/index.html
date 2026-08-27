@@ -746,7 +746,7 @@
         document.getElementById('startAnalysisBtn').addEventListener('click', () => {
             if (!currentData) { showToast('Please upload a file first.', true); return; }
             sessionStorage.setItem('dp_filename', currentData.filename);
-            window.location.href = 'analyze.html';
+            window.location.href = '/analyze';
         });
 
         // Modal helpers
