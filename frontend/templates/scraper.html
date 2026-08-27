@@ -251,8 +251,31 @@
                     </div>
                 </div>
             </div>
+            <button onclick="toggleMobileNav()"
+                class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-slate-100 transition-colors">
+                <span id="navMenuIcon" class="material-symbols-outlined text-slate-700">menu</span>
+            </button>
+        </div>
+        <div id="mobileNavMenu" class="hidden md:hidden px-6 pb-4 bg-white border-t border-slate-200/60">
+            <a class="block py-2.5 text-sm font-medium text-slate-600" href="/">Dashboard</a>
+            <a class="block py-2.5 text-sm font-medium text-slate-600" href="/analyze">Analytics</a>
+            <a class="block py-2.5 text-sm font-semibold text-blue-600" href="/scraper">Scraper <span
+                    class="ml-1 inline-block px-1.5 py-[1px] text-[8px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-500 border border-blue-200">BETA</span></a>
+            <a class="flex items-center justify-center gap-1.5 mt-2 text-sm font-semibold text-white bg-blue-600 px-3.5 py-2.5 rounded-lg"
+                href="{{ ml_trainer_url }}" target="_blank">
+                <span class="material-symbols-outlined text-white" style="font-size:16px;">model_training</span>
+                Train a Model
+            </a>
         </div>
     </nav>
+    <script>
+        function toggleMobileNav() {
+            const menu = document.getElementById('mobileNavMenu');
+            const icon = document.getElementById('navMenuIcon');
+            menu.classList.toggle('hidden');
+            icon.textContent = menu.classList.contains('hidden') ? 'menu' : 'close';
+        }
+    </script>
 
     <main class="pt-28 pb-20 px-6 max-w-5xl mx-auto space-y-12">
 
