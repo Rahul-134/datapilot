@@ -36,12 +36,12 @@ app.include_router(scraper.router, prefix="/api/scrape")
 
 @app.get("/")
 def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})
+    return templates.TemplateResponse(request, "index.html", {"ml_trainer_url": ML_TRAINER_URL})
 
 @app.get("/scraper")
 def scraper_page(request: Request):
-    return templates.TemplateResponse("scraper.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})
+    return templates.TemplateResponse(request, "scraper.html", {"ml_trainer_url": ML_TRAINER_URL})
 
 @app.get("/analyze")
 def analyze_page(request: Request):
-    return templates.TemplateResponse("analyze.html", {"request": request, "ml_trainer_url": ML_TRAINER_URL})
+    return templates.TemplateResponse(request, "analyze.html", {"ml_trainer_url": ML_TRAINER_URL})
