@@ -51,8 +51,8 @@ st.markdown("""
     max-width: 1100px !important;
 }
 
-/* ── HEADINGS ───────────────────────────────────── */
-h1, h2, h3 {
+/* ── HEADINGS & BODY TEXT ───────────────────────── */
+h1, h2, h3, h4, h5, h6 {
     color: #111827 !important;
     letter-spacing: -0.02em;
 }
@@ -63,6 +63,9 @@ h1, h2, h3 {
     padding-bottom: 0.35rem;
     border-bottom: 2px solid #E5E7EB;
     margin-bottom: 0.75rem;
+}
+[data-testid="stWidgetLabel"] p {
+    color: #111827 !important;
 }
 
 /* ── CARDS — wrap sections ──────────────────────── */
