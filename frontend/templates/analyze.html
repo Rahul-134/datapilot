@@ -633,7 +633,7 @@
         }
 
         function usePrompt(el) {
-            queryInput.value = el.textContent.trim();
+            queryInput.value = el.textContent.replace(/\s+/g, ' ').trim();
             queryInput.focus();
         }
 
